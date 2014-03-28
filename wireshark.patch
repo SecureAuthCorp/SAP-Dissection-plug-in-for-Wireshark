@@ -1,0 +1,121 @@
+From 9265c779fbb44419f1c2781ebb6de0640472a8de Mon Sep 17 00:00:00 2001
+From: Martin Gallo <mgallo@coresecurity.com>
+Date: Mon, 10 Mar 2014 10:54:56 -0300
+Subject: [PATCH] Configured sap plugin.
+
+---
+ CMakeLists.txt                |    1 +
+ Makefile.am                   |    1 +
+ configure.ac                  |    1 +
+ epan/Makefile.am              |    7 +++++++
+ packaging/nsis/Makefile.nmake |    1 +
+ packaging/nsis/wireshark.nsi  |    1 +
+ plugins/Makefile.am           |    1 +
+ plugins/Makefile.nmake        |    1 +
+ 8 files changed, 14 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9e818df..a785121 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -463,6 +463,7 @@ if(ENABLE_PLUGINS)
+ 		plugins/mate
+ 		plugins/opcua
+ 		plugins/profinet
++		plugins/sap
+ 		plugins/stats_tree
+ 		plugins/unistim
+ 		plugins/wimax
+diff --git a/Makefile.am b/Makefile.am
+index f3e313c..2269594 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -299,6 +299,7 @@ plugin_ldadd = $(_CUSTOM_plugin_ldadd_) \
+ 	-dlopen plugins/mate/mate.la \
+ 	-dlopen plugins/opcua/opcua.la \
+ 	-dlopen plugins/profinet/profinet.la \
++	-dlopen plugins/sap/sap.la \
+ 	-dlopen plugins/stats_tree/stats_tree.la \
+ 	-dlopen plugins/unistim/unistim.la \
+ 	-dlopen plugins/wimax/wimax.la \
+diff --git a/configure.ac b/configure.ac
+index 59b68e5..076cac0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2694,6 +2694,7 @@ AC_OUTPUT(
+   plugins/mate/Makefile
+   plugins/opcua/Makefile
+   plugins/profinet/Makefile
++  plugins/sap/Makefile
+   plugins/stats_tree/Makefile
+   plugins/unistim/Makefile
+   plugins/wimax/Makefile
+diff --git a/epan/Makefile.am b/epan/Makefile.am
+index 9eebe99..10f7bdb 100644
+--- a/epan/Makefile.am
++++ b/epan/Makefile.am
+@@ -232,6 +232,13 @@ plugin_src = \
+ 	../plugins/m2m/wimax_tlv.c \
+ 	../plugins/mgcp/packet-mgcp.c \
+ 	../plugins/rdm/packet-rdm.c \
++	../plugins/sap/packet-sapdiag.c \
++		../plugins/sap/packet-sapenqueue.c \
++        ../plugins/sap/packet-saprouter.c \
++        ../plugins/sap/packet-sapprotocol.c \
++        ../plugins/sap/packet-saprfc.c \
++        ../plugins/sap/packet-sapms.c \
++        ../plugins/sap/packet-sapsnc.c \
+ 	../plugins/sercosiii/packet-sercosiii.c \
+         ../plugins/wimax/crc.c \
+         ../plugins/wimax/crc_data.c \
+diff --git a/packaging/nsis/Makefile.nmake b/packaging/nsis/Makefile.nmake
+index 2a301e6..3e3c9b3 100644
+--- a/packaging/nsis/Makefile.nmake
++++ b/packaging/nsis/Makefile.nmake
+@@ -54,6 +54,7 @@ PLUGINS= \
+ 	../../plugins/mate/mate.dll \
+ 	../../plugins/opcua/opcua.dll \
+ 	../../plugins/profinet/profinet.dll \
++	../../plugins/sap/sap.dll \
+ 	../../plugins/stats_tree/stats_tree.dll \
+ 	../../plugins/unistim/unistim.dll \
+ 	../../plugins/wimax/wimax.dll \
+diff --git a/packaging/nsis/wireshark.nsi b/packaging/nsis/wireshark.nsi
+index cc917b5..0e3d736 100644
+--- a/packaging/nsis/wireshark.nsi
++++ b/packaging/nsis/wireshark.nsi
+@@ -850,6 +850,7 @@ File "${STAGING_DIR}\plugins\${VERSION}\irda.dll"
+ File "${STAGING_DIR}\plugins\${VERSION}\m2m.dll"
+ File "${STAGING_DIR}\plugins\${VERSION}\opcua.dll"
+ File "${STAGING_DIR}\plugins\${VERSION}\profinet.dll"
++File "${STAGING_DIR}\plugins\${VERSION}\sap.dll"
+ File "${STAGING_DIR}\plugins\${VERSION}\unistim.dll"
+ File "${STAGING_DIR}\plugins\${VERSION}\wimax.dll"
+ File "${STAGING_DIR}\plugins\${VERSION}\wimaxasncp.dll"
+diff --git a/plugins/Makefile.am b/plugins/Makefile.am
+index 9058bac..13d8c34 100644
+--- a/plugins/Makefile.am
++++ b/plugins/Makefile.am
+@@ -33,6 +33,7 @@ SUBDIRS = $(_CUSTOM_SUBDIRS_) \
+ 	mate \
+ 	opcua \
+ 	profinet \
++	sap \
+ 	stats_tree \
+ 	unistim \
+ 	wimax \
+diff --git a/plugins/Makefile.nmake b/plugins/Makefile.nmake
+index 2415d92..e42a5a0 100644
+--- a/plugins/Makefile.nmake
++++ b/plugins/Makefile.nmake
+@@ -16,6 +16,7 @@ PLUGIN_LIST = \
+ 	mate        \
+ 	opcua       \
+ 	profinet    \
++	sap         \
+ 	stats_tree  \
+ 	unistim     \
+ 	wimax       \
+-- 
+1.7.9.5
+
