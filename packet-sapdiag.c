@@ -1656,9 +1656,10 @@ dissect_sapdiag_dyntatom(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
             } case 121:  /* DIAG_DGOTYP_EFIELD_1 */
               case 122:  /* DIAG_DGOTYP_OFIELD_1 */
               case 123:{ /* DIAG_DGOTYP_KEYWORD_1_1 */
-                /* Found in NW 7.01 versions */
-                add_item_value_uint8(tvb, atom_item, atom_item_tree, offset, 1, "MLen"); offset+=1; atom_item_length-=1;
+                /* Found in NW 7.00 and 7.01 versions */
+                add_item_value_uint8(tvb, atom_item, atom_item_tree, offset, 1, "Flag1"); offset+=1; atom_item_length-=1;
                 add_item_value_uint8(tvb, atom_item, atom_item_tree, offset, 1, "DLen"); offset+=1; atom_item_length-=1;
+                add_item_value_uint8(tvb, atom_item, atom_item_tree, offset, 1, "MLen"); offset+=1; atom_item_length-=1;
                 add_item_value_uint16(tvb, atom_item, atom_item_tree, offset, 2, "MaxNrChars"); offset+=2; atom_item_length-=2;
 		        add_item_value_string(tvb, atom_item, atom_item_tree, offset, atom_item_length, "Text", 0); offset+=atom_item_length;
                 break;
