@@ -136,6 +136,7 @@ static int hf_sapenqueue_server_admin_trace_limit = -1;
 static int hf_sapenqueue_server_admin_trace_thread = -1;
 static int hf_sapenqueue_server_admin_trace_level = -1;
 static int hf_sapenqueue_server_admin_trace_logging = -1;
+static int hf_sapenqueue_server_admin_trace_max_file_size = -1;
 static int hf_sapenqueue_server_admin_trace_nopatterns = -1;
 static int hf_sapenqueue_server_admin_trace_eyecatcher = -1;
 static int hf_sapenqueue_server_admin_trace_patterns = -1;
@@ -205,7 +206,8 @@ dissect_sapenqueue_server_admin(tvbuff_t *tvb, packet_info *pinfo, proto_tree *t
     		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_level, tvb, offset, 4, FALSE); offset += 4;
     		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_level, tvb, offset, 4, FALSE); offset += 4;
     		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_logging, tvb, offset, 1, FALSE); offset += 1;
-    		    offset += 4;  /* Unknown field here */
+    		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_max_file_size, tvb, offset, 4, FALSE); offset += 4;
+
     		    nopatterns = tvb_get_ntohl(tvb, offset);
     		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_nopatterns, tvb, offset, 4, FALSE); offset += 4;
     		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_nopatterns, tvb, offset, 4, FALSE); offset += 4;
@@ -455,11 +457,13 @@ proto_register_sapenqueue(void)
 		{ &hf_sapenqueue_server_admin_trace_thread,
 			{ "Trace Thread", "sapenque.server_admin.trace.thread", FT_UINT8, BASE_DEC, hf_sapenqueue_server_admin_trace_thread_vals, 0x0, "SAP Enqueue Server Admin Trace Request Thread", HFILL }},
 		{ &hf_sapenqueue_server_admin_trace_level,
-			{ "Trace Level", "sapenque.server_admin.trace.level", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP Enqueue Server Admin Trace Request Protocol Level", HFILL }},
+			{ "Trace Level", "sapenque.server_admin.trace.level", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP Enqueue Server Admin Trace Request Level", HFILL }},
 		{ &hf_sapenqueue_server_admin_trace_logging,
-			{ "Trace Logging", "sapenque.server_admin.trace.logging", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP Enqueue Server Admin Trace Request Protocol Logging", HFILL }},
+			{ "Trace Logging", "sapenque.server_admin.trace.logging", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP Enqueue Server Admin Trace Request Logging", HFILL }},
+		{ &hf_sapenqueue_server_admin_trace_max_file_size,
+			{ "Trace Max File Size", "sapenque.server_admin.trace.max_file_size", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP Enqueue Server Admin Trace Request Max File Size", HFILL }},
 		{ &hf_sapenqueue_server_admin_trace_nopatterns,
-			{ "Trace No Patterns", "sapenque.server_admin.trace.nopatterns", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP Enqueue Server Admin Trace Request Protocol No Patterns", HFILL }},
+			{ "Trace No Patterns", "sapenque.server_admin.trace.nopatterns", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP Enqueue Server Admin Trace Request No Patterns", HFILL }},
 		{ &hf_sapenqueue_server_admin_trace_eyecatcher,
 			{ "Trace Eye Catcher", "sapenque.server_admin.trace.eyecatcher", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Enqueue Server Admin Trace Request Eye Catcher", HFILL }},
 		{ &hf_sapenqueue_server_admin_trace_patterns,
