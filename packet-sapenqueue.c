@@ -202,7 +202,7 @@ dissect_sapenqueue_server_admin(tvbuff_t *tvb, packet_info *pinfo, proto_tree *t
     		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_action, tvb, offset, 1, FALSE); offset += 1;
     		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_limit, tvb, offset, 1, FALSE); offset += 1;
     		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_thread, tvb, offset, 1, FALSE); offset += 1;
-    		    offset += 4;  /* Unknown field here */
+    		    offset += 4;  /* TODO: Unknown field here */
     		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_level, tvb, offset, 4, FALSE); offset += 4;
     		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_level, tvb, offset, 4, FALSE); offset += 4;
     		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_logging, tvb, offset, 1, FALSE); offset += 1;
@@ -211,7 +211,7 @@ dissect_sapenqueue_server_admin(tvbuff_t *tvb, packet_info *pinfo, proto_tree *t
     		    nopatterns = tvb_get_ntohl(tvb, offset);
     		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_nopatterns, tvb, offset, 4, FALSE); offset += 4;
     		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_nopatterns, tvb, offset, 4, FALSE); offset += 4;
-    		    offset += 4;  /* Unknown field here */
+    		    offset += 4;  /* TODO: Unknown field here */
     		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_eyecatcher, tvb, offset, 4, FALSE); offset += 4;
 
 	        	/* As we don't have the right size yet, start with 1 byte */
@@ -229,6 +229,7 @@ dissect_sapenqueue_server_admin(tvbuff_t *tvb, packet_info *pinfo, proto_tree *t
         		    /* Set the max length to the remaining of the packet, just in case a malformed packet arrives */
         		    if (!tvb_offset_exists(tvb, offset + pattern_length)) {
         		    	pattern_length = tvb_length_remaining(tvb, offset);
+        				expert_add_info_format(pinfo, trace_request_pattern, PI_MALFORMED, PI_WARN, "The reported length is incorrect");
         		    }
         		    proto_tree_add_item(trace_request_pattern_tree, hf_sapenqueue_server_admin_trace_pattern_value, tvb, offset, pattern_length, FALSE); offset += pattern_length;
 
@@ -288,14 +289,32 @@ dissect_sapenqueue_conn_admin(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tre
 
 	        	if (id == 0x03){	/* Set Name parameter */
 	        		name_length = tvb_strsize(tvb, offset);
-					proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_name, tvb, offset, name_length, FALSE); offset += name_length;
-					length += name_length;
+	        		if (name_length > 0) {
+	        			proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_name, tvb, offset, name_length, FALSE); offset += name_length;
+	        			length += name_length;
+	        		}
 
-				} else {
-					if (id == 0x06){  /* Set Unicode Support Parameter */
-						proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_len, tvb, offset, 4, FALSE); offset += 4;
+				} else if (id == 0x04) {  /* No support parameter */
+					/* This parameter appears to have more fields only for responses */
+					if (opcode == 0x02) {
+						proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_value, tvb, offset, 4, FALSE); offset += 4;
 						length += 4;
 					}
+
+	        	} else if (id == 0x06){  /* Set Unicode Support Parameter */
+	        		name_length = tvb_get_ntohl(tvb, offset);
+	        		proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_len, tvb, offset, 4, FALSE); offset += 4;
+
+	        		/* If the reported length is not correct, use the remaining of the packet as length */
+	        		if (tvb_length_remaining(tvb, offset) < name_length) {
+	        			name_length = tvb_length_remaining(tvb, offset);
+        				expert_add_info_format(pinfo, param, PI_MALFORMED, PI_WARN, "The reported length is incorrect");
+	        		}
+
+	        		proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_value, tvb, offset, name_length, FALSE); offset += name_length;
+					length += 4 + name_length;
+				} else {
+					/* The rest of the parameters have an integer value field */
 					proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_value, tvb, offset, 4, FALSE); offset += 4;
 					length += 4;
 	        	}
