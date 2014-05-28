@@ -1948,13 +1948,13 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
 
 	} else if (item_type==0x10 && item_id==0x06 && item_sid==0x23){		/* Codepage Diag GUI */
 		add_item_value_uint32(tvb, item, item_value_tree, offset, 4, "Codepage number (numeric representation)"); offset+=4;
-		add_item_value_uint8(tvb, item, item_value_tree, offset, 1, "Minimum number of bytes per charcter"); offset+=1;
+		add_item_value_uint8(tvb, item, item_value_tree, offset, 1, "Minimum number of bytes per character"); offset+=1;
 		offset+=add_item_value_stringz(tvb, item, item_value_tree, offset, "Codepage number (string representation)", 1);
 		offset+=add_item_value_stringz(tvb, item, item_value_tree, offset, "Codepage description", 1);
 
 	} else if (item_type==0x10 && item_id==0x06 && item_sid==0x27){		/* Codepage App Server */
 		add_item_value_uint32(tvb, item, item_value_tree, offset, 4, "Codepage number (numeric representation)"); offset+=4;
-		add_item_value_uint8(tvb, item, item_value_tree, offset, 1, "Minimum number of bytes per charcter"); offset+=1;
+		add_item_value_uint8(tvb, item, item_value_tree, offset, 1, "Minimum number of bytes per character"); offset+=1;
 		offset+=add_item_value_stringz(tvb, item, item_value_tree, offset, "Codepage number (string representation)", 1);
 		offset+=add_item_value_stringz(tvb, item, item_value_tree, offset, "Codepage description", 1);
 
