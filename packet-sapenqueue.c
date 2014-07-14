@@ -57,6 +57,34 @@ static const value_string hf_sapenqueue_server_admin_opcode_vals[] = {
 	{  0, NULL },
 };
 
+/* Enqueue Server Connection Admin Trace Action values */
+static const value_string hf_sapenqueue_server_admin_trace_action_vals[] = {
+	{  1, "Raise level" },
+	{  2, "Lower level" },
+	{  3, "Get trace state" },
+	{  4, "Set trace status" },
+	{  5, "Reset trace files" },
+};
+
+/* Enqueue Server Connection Admin Trace Limit values */
+static const value_string hf_sapenqueue_server_admin_trace_limit_vals[] = {
+	{  0, "Globally" },
+    {  1, "Only in enserver" },
+    {  2, "Only in repserver" },
+    {  3, "Only in threads of type" },
+    {  4, "Only in one thread of type" },
+};
+
+/* Enqueue Server Connection Admin Trace Thread values */
+static const value_string hf_sapenqueue_server_admin_trace_thread_vals[] = {
+    {  0, "All threads" },
+    {  1, "All I/O threads" },
+    {  2, "Enqueue Worker thread" },
+    {  3, "Replication thread" },
+    {  4, "ADM thread" },
+    {  5, "Signal thread" },
+    {  6, "Listener thread" },
+};
 
 /* Enqueue Server Connection Admin Opcode values */
 static const value_string hf_sapenqueue_conn_admin_opcode_vals[] = {
@@ -68,7 +96,6 @@ static const value_string hf_sapenqueue_conn_admin_opcode_vals[] = {
 	{  5, "Shutdown Both" },
 	{  6, "Keepalive" },
 };
-
 
 /* Enqueue Server Connection Admin Parameter values */
 static const value_string hf_sapenqueue_conn_admin_param_vals[] = {
@@ -103,6 +130,20 @@ static int hf_sapenqueue_server_admin_rc = -1;
 static int hf_sapenqueue_server_admin_value = -1;
 
 static int hf_sapenqueue_server_admin_trace_request = -1;
+static int hf_sapenqueue_server_admin_trace_protocol_version = -1;
+static int hf_sapenqueue_server_admin_trace_action = -1;
+static int hf_sapenqueue_server_admin_trace_limit = -1;
+static int hf_sapenqueue_server_admin_trace_thread = -1;
+static int hf_sapenqueue_server_admin_trace_level = -1;
+static int hf_sapenqueue_server_admin_trace_logging = -1;
+static int hf_sapenqueue_server_admin_trace_max_file_size = -1;
+static int hf_sapenqueue_server_admin_trace_nopatterns = -1;
+static int hf_sapenqueue_server_admin_trace_eyecatcher = -1;
+static int hf_sapenqueue_server_admin_trace_patterns = -1;
+
+static int hf_sapenqueue_server_admin_trace_pattern = -1;
+static int hf_sapenqueue_server_admin_trace_pattern_len = -1;
+static int hf_sapenqueue_server_admin_trace_pattern_value = -1;
 
 static int hf_sapenqueue_conn_admin = -1;
 static int hf_sapenqueue_conn_admin_params_count = -1;
@@ -147,17 +188,66 @@ dissect_sapenqueue_server_admin(tvbuff_t *tvb, packet_info *pinfo, proto_tree *t
     proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_eyecatcher, tvb, offset, 4, FALSE); offset += 4;
 
     if (tvb_length_remaining(tvb, offset) > 0){
-    	proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_value, tvb, offset, -1, FALSE);
-
     	switch(opcode){
     		case 0x06:{		/* EnAdmTraceRequest */
-    			proto_item *trace_request = NULL;
-    			proto_tree *trace_request_tree = NULL;
+    			guint8 pattern_length = 0;
+    			guint32 nopatterns = 0, total_length = 0;
+    			proto_item *trace_request = NULL, *trace_request_patterns = NULL, *trace_request_pattern = NULL;
+    			proto_tree *trace_request_tree = NULL, *trace_request_patterns_tree = NULL, *trace_request_pattern_tree = NULL;
 
     			trace_request = proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_trace_request, tvb, offset, -1, FALSE);
     			trace_request_tree = proto_item_add_subtree(trace_request, ett_sapenqueue);
 
-    			/* TODO: Dissect the trace request fields */
+    		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_protocol_version, tvb, offset, 1, FALSE); offset += 1;
+    		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_action, tvb, offset, 1, FALSE); offset += 1;
+    		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_limit, tvb, offset, 1, FALSE); offset += 1;
+    		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_thread, tvb, offset, 1, FALSE); offset += 1;
+    		    offset += 4;  /* TODO: Unknown field here */
+    		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_level, tvb, offset, 4, FALSE); offset += 4;
+    		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_level, tvb, offset, 4, FALSE); offset += 4;
+    		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_logging, tvb, offset, 1, FALSE); offset += 1;
+    		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_max_file_size, tvb, offset, 4, FALSE); offset += 4;
+
+    		    nopatterns = tvb_get_ntohl(tvb, offset);
+    		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_nopatterns, tvb, offset, 4, FALSE); offset += 4;
+    		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_nopatterns, tvb, offset, 4, FALSE); offset += 4;
+    		    offset += 4;  /* TODO: Unknown field here */
+    		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_eyecatcher, tvb, offset, 4, FALSE); offset += 4;
+
+	        	/* As we don't have the right size yet, start with 1 byte */
+    			trace_request_patterns = proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_patterns, tvb, offset, 1, FALSE);
+    			trace_request_patterns_tree = proto_item_add_subtree(trace_request_patterns, ett_sapenqueue);
+
+    	        while (nopatterns > 0 && tvb_offset_exists(tvb, offset)){
+    	        	/* As we don't have the right size yet, start with 1 byte */
+        			trace_request_pattern = proto_tree_add_item(trace_request_patterns_tree, hf_sapenqueue_server_admin_trace_pattern, tvb, offset, 1, FALSE);
+        			trace_request_pattern_tree = proto_item_add_subtree(trace_request_pattern, ett_sapenqueue);
+
+        			pattern_length = tvb_get_guint8(tvb, offset) + 1; /* Pattern string is null terminated */
+        		    proto_tree_add_item(trace_request_pattern_tree, hf_sapenqueue_server_admin_trace_pattern_len, tvb, offset, 1, FALSE); offset += 1;
+
+        		    /* Set the max length to the remaining of the packet, just in case a malformed packet arrives */
+        		    if (!tvb_offset_exists(tvb, offset + pattern_length)) {
+        		    	pattern_length = tvb_length_remaining(tvb, offset);
+        				expert_add_info_format(pinfo, trace_request_pattern, PI_MALFORMED, PI_WARN, "The reported length is incorrect");
+        		    }
+        		    proto_tree_add_item(trace_request_pattern_tree, hf_sapenqueue_server_admin_trace_pattern_value, tvb, offset, pattern_length, FALSE); offset += pattern_length;
+
+        			/* Set the right size for the pattern tree */
+        		    pattern_length += 1; /* Add also the length field */
+					proto_item_set_len(trace_request_pattern, pattern_length);
+
+					nopatterns -= 1;
+					total_length += pattern_length;
+				}
+				proto_item_set_len(trace_request_patterns, total_length);
+
+    		    proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_eyecatcher, tvb, offset, 4, FALSE); offset += 4;
+
+    			break;
+    		}
+    		default:{
+    	    	proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_value, tvb, offset, -1, FALSE);
     			break;
     		}
     	}
@@ -199,14 +289,32 @@ dissect_sapenqueue_conn_admin(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tre
 
 	        	if (id == 0x03){	/* Set Name parameter */
 	        		name_length = tvb_strsize(tvb, offset);
-					proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_name, tvb, offset, name_length, FALSE); offset += name_length;
-					length += name_length;
+	        		if (name_length > 0) {
+	        			proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_name, tvb, offset, name_length, FALSE); offset += name_length;
+	        			length += name_length;
+	        		}
 
-				} else {
-					if (id == 0x06){  /* Set Unicode Support Parameter */
-						proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_len, tvb, offset, 4, FALSE); offset += 4;
+				} else if (id == 0x04) {  /* No support parameter */
+					/* This parameter appears to have more fields only for responses */
+					if (opcode == 0x02) {
+						proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_value, tvb, offset, 4, FALSE); offset += 4;
 						length += 4;
 					}
+
+	        	} else if (id == 0x06){  /* Set Unicode Support Parameter */
+	        		name_length = tvb_get_ntohl(tvb, offset);
+	        		proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_len, tvb, offset, 4, FALSE); offset += 4;
+
+	        		/* If the reported length is not correct, use the remaining of the packet as length */
+	        		if (tvb_length_remaining(tvb, offset) < name_length) {
+	        			name_length = tvb_length_remaining(tvb, offset);
+        				expert_add_info_format(pinfo, param, PI_MALFORMED, PI_WARN, "The reported length is incorrect");
+	        		}
+
+	        		proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_value, tvb, offset, name_length, FALSE); offset += name_length;
+					length += 4 + name_length;
+				} else {
+					/* The rest of the parameters have an integer value field */
 					proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_value, tvb, offset, 4, FALSE); offset += 4;
 					length += 4;
 	        	}
@@ -359,6 +467,34 @@ proto_register_sapenqueue(void)
 		/* Trace Request fields */
 		{ &hf_sapenqueue_server_admin_trace_request,
 			{ "Trace Request", "sapenque.server_admin.trace", FT_NONE, BASE_NONE, NULL, 0x0, "SAP Enqueue Server Admin Trace Request", HFILL }},
+		{ &hf_sapenqueue_server_admin_trace_protocol_version,
+			{ "Trace Protocol Version", "sapenque.server_admin.trace.protocol", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP Enqueue Server Admin Trace Request Protocol Version", HFILL }},
+		{ &hf_sapenqueue_server_admin_trace_action,
+			{ "Trace Action", "sapenque.server_admin.trace.action", FT_UINT8, BASE_DEC, hf_sapenqueue_server_admin_trace_action_vals, 0x0, "SAP Enqueue Server Admin Trace Request Action", HFILL }},
+		{ &hf_sapenqueue_server_admin_trace_limit,
+			{ "Trace Limit", "sapenque.server_admin.trace.limit", FT_UINT8, BASE_DEC, hf_sapenqueue_server_admin_trace_limit_vals, 0x0, "SAP Enqueue Server Admin Trace Request Limit", HFILL }},
+		{ &hf_sapenqueue_server_admin_trace_thread,
+			{ "Trace Thread", "sapenque.server_admin.trace.thread", FT_UINT8, BASE_DEC, hf_sapenqueue_server_admin_trace_thread_vals, 0x0, "SAP Enqueue Server Admin Trace Request Thread", HFILL }},
+		{ &hf_sapenqueue_server_admin_trace_level,
+			{ "Trace Level", "sapenque.server_admin.trace.level", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP Enqueue Server Admin Trace Request Level", HFILL }},
+		{ &hf_sapenqueue_server_admin_trace_logging,
+			{ "Trace Logging", "sapenque.server_admin.trace.logging", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP Enqueue Server Admin Trace Request Logging", HFILL }},
+		{ &hf_sapenqueue_server_admin_trace_max_file_size,
+			{ "Trace Max File Size", "sapenque.server_admin.trace.max_file_size", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP Enqueue Server Admin Trace Request Max File Size", HFILL }},
+		{ &hf_sapenqueue_server_admin_trace_nopatterns,
+			{ "Trace No Patterns", "sapenque.server_admin.trace.nopatterns", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP Enqueue Server Admin Trace Request No Patterns", HFILL }},
+		{ &hf_sapenqueue_server_admin_trace_eyecatcher,
+			{ "Trace Eye Catcher", "sapenque.server_admin.trace.eyecatcher", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Enqueue Server Admin Trace Request Eye Catcher", HFILL }},
+		{ &hf_sapenqueue_server_admin_trace_patterns,
+			{ "Trace Patterns", "sapenque.server_admin.trace.patterns", FT_NONE, BASE_NONE, NULL, 0x0, "SAP Enqueue Server Admin Trace Request Patterns", HFILL }},
+
+		/* Trace Request Pattern fields */
+		{ &hf_sapenqueue_server_admin_trace_pattern,
+			{ "Trace Pattern", "sapenque.server_admin.trace.pattern", FT_NONE, BASE_NONE, NULL, 0x0, "SAP Enqueue Server Admin Trace Request Pattern", HFILL }},
+		{ &hf_sapenqueue_server_admin_trace_pattern_len,
+			{ "Trace Pattern Length", "sapenque.server_admin.trace.pattern.length", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP Enqueue Server Admin Trace Request Pattern Length", HFILL }},
+		{ &hf_sapenqueue_server_admin_trace_pattern_value,
+			{ "Trace Pattern Value", "sapenque.server_admin.trace.pattern.value", FT_STRINGZ, BASE_NONE, NULL, 0x0, "SAP Enqueue Server Admin Trace Request Pattern Value", HFILL }},
 
 		/* Connection Admin fields */
 		{ &hf_sapenqueue_conn_admin,
