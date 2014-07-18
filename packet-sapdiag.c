@@ -1810,22 +1810,11 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
 
 		eventarray = tvb_get_guint8(tvb, offset);
 		add_item_value_uint8(tvb, item, item_value_tree, offset, 1, "Event Array");offset+=1;
-
-		if (eventarray == 0){
-			add_item_value_uint8(tvb, item, item_value_tree, offset, 1, "Event ID 1"); offset+=1;
-			add_item_value_uint8(tvb, item, item_value_tree, offset, 1, "Event ID 2"); offset+=1;
-			add_item_value_uint8(tvb, item, item_value_tree, offset, 1, "Event ID 3"); offset+=1;
-			add_item_value_uint8(tvb, item, item_value_tree, offset, 1, "Event ID 4"); offset+=1;
-			add_item_value_uint8(tvb, item, item_value_tree, offset, 1, "Event ID 5"); offset+=1;
-		} else {
-
-	        /* If the preference is set, report the item as partially dissected in the expert info */
-	        if (global_sapdiag_highlight_items){
-	            expert_add_info_format(pinfo, item, PI_UNDECODED, PI_WARN, "The Diag Item is dissected partially (0x%.2x, 0x%.2x, 0x%.2x)", item_type, item_id, item_sid);
-	        }
-	        offset+=5;
-		}
-
+		add_item_value_uint8(tvb, item, item_value_tree, offset, 1, "Event ID 1"); offset+=1;
+		add_item_value_uint8(tvb, item, item_value_tree, offset, 1, "Event ID 2"); offset+=1;
+		add_item_value_uint8(tvb, item, item_value_tree, offset, 1, "Event ID 3"); offset+=1;
+		add_item_value_uint8(tvb, item, item_value_tree, offset, 1, "Event ID 4"); offset+=1;
+		add_item_value_uint8(tvb, item, item_value_tree, offset, 1, "Event ID 5"); offset+=1;
 		add_item_value_uint8(tvb, item, item_value_tree, offset, 1, "Screen Flag"); offset+=1; /* XXX: Add flag values */
 		add_item_value_uint8(tvb, item, item_value_tree, offset, 1, "Modal No"); offset+=1;
 		add_item_value_uint8(tvb, item, item_value_tree, offset, 1, "X Pos"); offset+=1;
