@@ -2332,12 +2332,10 @@ dissect_sapdiag_payload(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, pro
 
 static int
 check_sapdiag_dp(tvbuff_t *tvb, guint32 offset){
-	guint8 dp = 0;
 
 	/* Since there's no SAP Diag mode 0xff, if the first byte is a 0xFF the
 	 * packet probably holds an initialization DP Header */
-	dp = tvb_get_guint8(tvb, offset);
-	if (dp == 0xFF){
+	if ((tvb_length_remaining(tvb, offset) > 200 + 8) && tvb_get_guint8(tvb, offset) == 0xFF){
 		return (TRUE);
 	}
     return (FALSE);
@@ -2370,7 +2368,10 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 		}
 
 		/* Check for fixed error messages */
-		if (tvb_strneql(tvb, 0, "**DPTMMSG**\x00\x00\xf8", 14) == 0){
+		if (tvb_strneql(tvb, 0, "**DPTMMSG**\x00", 12) == 0){
+			proto_tree_add_item(sapdiag_tree, hf_sapdiag_payload, tvb, offset, -1, FALSE);
+			return;
+		} else if (tvb_strneql(tvb, 0, "**DPTMOPC**\x00", 12) == 0){
 			proto_tree_add_item(sapdiag_tree, hf_sapdiag_payload, tvb, offset, -1, FALSE);
 			return;
 		}
