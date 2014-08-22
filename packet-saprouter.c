@@ -142,6 +142,12 @@ static int hf_saprouter_route_offset = -1;
 static int hf_saprouter_route = -1;
 static int hf_saprouter_route_string = -1;
 
+/* Route strings */
+static int hf_saprouter_route_string_hostname = -1;
+static int hf_saprouter_route_string_service = -1;
+static int hf_saprouter_route_string_password = -1;
+
+
 /* Error Information/Control Messages */
 static int hf_saprouter_opcode = -1;
 static int hf_saprouter_return_code = -1;
@@ -149,6 +155,19 @@ static int hf_saprouter_return_code = -1;
 /* Error Information Messages */
 static int hf_saprouter_error_length = -1;
 static int hf_saprouter_error_string = -1;
+static int hf_saprouter_error_eyecatcher = -1;
+static int hf_saprouter_error_counter = -1;
+static int hf_saprouter_error_error = -1;
+static int hf_saprouter_error_return_code= -1;
+static int hf_saprouter_error_component = -1;
+static int hf_saprouter_error_release = -1;
+static int hf_saprouter_error_version = -1;
+static int hf_saprouter_error_module = -1;
+static int hf_saprouter_error_line = -1;
+static int hf_saprouter_error_detail= -1;
+static int hf_saprouter_error_time = -1;
+static int hf_saprouter_error_location= -1;
+static int hf_saprouter_error_unknown= -1;  // TODO: Unknown fields
 
 /* Control Messages */
 static int hf_saprouter_control_length = -1;
@@ -213,32 +232,55 @@ dissect_routestring(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32
     int hop = 1;
     guint32 len, route_offset, int_port = 0;
     guchar *hostname = NULL, *port = NULL, *password = NULL;
-    proto_item *route_item = NULL;
+    proto_item *route_hop = NULL, *route_password = NULL;
+    proto_tree *route_hop_tree = NULL;
 
     while (tvb_offset_exists(tvb, offset)){
         route_offset = offset; hostname = port = password = NULL;
+
+        /* Create the subtree for this route hop */
+    	if (tree){
+    		route_hop = proto_tree_add_item(tree, hf_saprouter_route_string, tvb, offset, 0, FALSE);
+    		route_hop_tree = proto_item_add_subtree(route_hop, ett_saprouter);
+            proto_item_append_text(route_hop, ", nro %d", hop);
+    	}
+
         /* Dissect the hostname string */
         len = tvb_strsize(tvb, offset);
-        hostname = tvb_get_string(tvb, offset, len - 1); offset+=len;
+        hostname = tvb_get_string(tvb, offset, len - 1);
+        if (tree){
+        	proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_hostname, tvb, offset, len, FALSE);
+        }
+        offset += len;
+
         /* Dissect the port string */
         len = tvb_strsize(tvb, offset);
-        port = tvb_get_string(tvb, offset, len - 1); offset+=len;
+        port = tvb_get_string(tvb, offset, len - 1);
+        if (tree){
+        	proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_service, tvb, offset, len, FALSE);
+        }
+        offset += len;
+
         /* Dissect the password string */
         len = tvb_strsize(tvb, offset);
-        password = tvb_get_string(tvb, offset, len - 1); offset+=len;
-
-        /* Get the service port in numeric format */
-        int_port = dissect_serviceport(port); 
-
-        /* Add the route string to the tree */
+        password = tvb_get_string(tvb, offset, len - 1);
         if (tree){
-            route_item = proto_tree_add_text(tree, tvb, route_offset, offset - route_offset, "Route Hop %d: Hostname=%s Service=%s Port=%d", hop, hostname, port, int_port);
+        	route_password = proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_password, tvb, offset, len, FALSE);
+
             /* If a password was found, add a expert warning in the security category */
-            if (strlen(password)>0){
-                proto_item_append_text(route_item, " Password=%s", password);
-                expert_add_info_format(pinfo, route_item, PI_SECURITY, PI_WARN, "Route password");
+            if (len > 1){
+                expert_add_info_format(pinfo, route_password, PI_SECURITY, PI_WARN, "Route password found");
             }
         }
+        offset += len;
+
+        /* Adjust the size of the route hop item now that we know the size */
+        if (tree){
+        	proto_item_set_len(route_hop, offset - route_offset);
+        }
+
+        /* Get the service port in numeric format */
+        int_port = dissect_serviceport(port);
 
         /* Add the first hostname/port as source in the conversation state*/
         if ((hop==1) && session_state){
@@ -266,13 +308,53 @@ static void
 dissect_errorstring(tvbuff_t *tvb, proto_tree *tree, guint32 offset)
 {
     guint32 len;
-    while (tvb_offset_exists(tvb, offset)){
-        len = tvb_strsize(tvb, offset);
-        if (len>1){
-        	proto_tree_add_text(tree, tvb, offset, len, "%s", tvb_get_string(tvb, offset, len - 1));
-        }
-        offset += len;
-    }
+
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_eyecatcher, tvb, offset, len, FALSE); offset += len;
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_counter, tvb, offset, len, FALSE); offset += len;
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_error, tvb, offset, len, FALSE); offset += len;
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_return_code, tvb, offset, len, FALSE); offset += len;
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_component, tvb, offset, len, FALSE); offset += len;
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_release, tvb, offset, len, FALSE); offset += len;
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_version, tvb, offset, len, FALSE); offset += len;
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_module, tvb, offset, len, FALSE); offset += len;
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_line, tvb, offset, len, FALSE); offset += len;
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_detail, tvb, offset, len, FALSE); offset += len;
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_time, tvb, offset, len, FALSE); offset += len;
+
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_unknown, tvb, offset, len, FALSE); offset += len;
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_unknown, tvb, offset, len, FALSE); offset += len;
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_unknown, tvb, offset, len, FALSE); offset += len;
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_unknown, tvb, offset, len, FALSE); offset += len;
+
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_location, tvb, offset, len, FALSE); offset += len;
+
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_unknown, tvb, offset, len, FALSE); offset += len;
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_unknown, tvb, offset, len, FALSE); offset += len;
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_unknown, tvb, offset, len, FALSE); offset += len;
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_unknown, tvb, offset, len, FALSE); offset += len;
+
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_eyecatcher, tvb, offset, len, FALSE); offset += len;
 }
 
 
@@ -542,23 +624,59 @@ proto_register_saprouter(void)
         { &hf_saprouter_route,
             { "Route String", "saprouter.routestring", FT_NONE, BASE_NONE, NULL, 0x0, "SAP Router Route", HFILL }},
         { &hf_saprouter_route_string,
-            { "Route String", "saprouter.routestring", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Route String", HFILL }},
+            { "Route Hop", "saprouter.routestring", FT_NONE, BASE_NONE, NULL, 0x0, "SAP Router Route Hop", HFILL }},
+		{ &hf_saprouter_route_string_hostname,
+			{ "Hostname", "saprouter.routestring.hostname", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Route Hop Hostname", HFILL }},
+		{ &hf_saprouter_route_string_service,
+			{ "Service", "saprouter.routestring.service", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Route Hop Service ", HFILL }},
+		{ &hf_saprouter_route_string_password,
+			{ "Password", "saprouter.routestring.password", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Route Hop Password", HFILL }},
+
 		/* NI error information / Control messages */
         { &hf_saprouter_opcode,
             { "Operation Code", "saprouter.opcode", FT_UINT8, BASE_DEC, hf_saprouter_opcode_vals, 0x0, "SAP Router Operation Code", HFILL }},
         { &hf_saprouter_return_code,
             { "Return Code", "saprouter.returncode", FT_INT32, BASE_DEC, hf_saprouter_return_code_vals, 0x0, "SAP Router Return Code", HFILL }},
+
         /* NI Error Information messages */
         { &hf_saprouter_error_length,
             { "Error Information Text Length", "saprouter.errorlength", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP Router Error Information Text length", HFILL }},
         { &hf_saprouter_error_string,
-            { "Error Information Text", "saprouter.errortext", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Text", HFILL }},
+            { "Error Information Text", "saprouter.errortext", FT_NONE, BASE_NONE, NULL, 0x0, "SAP Router Error Information Text", HFILL }},
+		{ &hf_saprouter_error_eyecatcher,
+			{ "Eyecatcher", "saprouter.errortext.eyecatcher", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Eyecatcher", HFILL }},
+		{ &hf_saprouter_error_counter,
+			{ "Counter", "saprouter.errortext.counter", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Counter", HFILL }},
+		{ &hf_saprouter_error_error,
+			{ "Error", "saprouter.errortext.error", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Error", HFILL }},
+		{ &hf_saprouter_error_return_code,
+			{ "Return code", "saprouter.errortext.returncode", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Return Code", HFILL }},
+		{ &hf_saprouter_error_component,
+			{ "Component", "saprouter.errortext.component", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Component", HFILL }},
+		{ &hf_saprouter_error_release,
+			{ "Release", "saprouter.errortext.release", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Release", HFILL }},
+		{ &hf_saprouter_error_version,
+			{ "Version", "saprouter.errortext.version", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Version", HFILL }},
+		{ &hf_saprouter_error_module,
+			{ "Module", "saprouter.errortext.module", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Module", HFILL }},
+		{ &hf_saprouter_error_line,
+			{ "Line", "saprouter.errortext.line", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Line", HFILL }},
+		{ &hf_saprouter_error_detail,
+			{ "Detail", "saprouter.errortext.detail", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Detail", HFILL }},
+		{ &hf_saprouter_error_time,
+			{ "Time", "saprouter.errortext.time", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Time", HFILL }},
+		{ &hf_saprouter_error_location,
+			{ "Location", "saprouter.errortext.location", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Location", HFILL }},
+		{ &hf_saprouter_error_unknown,
+			{ "Unknown field", "saprouter.errortext.unknown", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Unknown field", HFILL }},
+
         /* Control messages */
 		{ &hf_saprouter_control_length,
 			{ "Control Text Length", "saprouter.controllength", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP Router Control Text length", HFILL }},
 		{ &hf_saprouter_control_string,
 			{ "Control Text", "saprouter.controltext", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Control Text", HFILL }},
-        /* Router Admin messages */
+
+		/* Router Admin messages */
         { &hf_saprouter_admin_command,
             { "Admin Command", "saprouter.command", FT_UINT8, BASE_DEC, hf_saprouter_admin_command_vals, 0x0, "SAP Router Admin Command", HFILL }},
         { &hf_saprouter_admin_password,
