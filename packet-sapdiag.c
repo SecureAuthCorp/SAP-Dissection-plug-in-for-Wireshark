@@ -2335,7 +2335,7 @@ check_sapdiag_dp(tvbuff_t *tvb, guint32 offset){
 
 	/* Since there's no SAP Diag mode 0xff, if the first byte is a 0xFF the
 	 * packet probably holds an initialization DP Header */
-	if ((tvb_length_remaining(tvb, offset) > 200 + 8) && tvb_get_guint8(tvb, offset) == 0xFF){
+	if ((tvb_length_remaining(tvb, offset) >= 200 + 8) && tvb_get_guint8(tvb, offset) == 0xFF){
 		return (TRUE);
 	}
     return (FALSE);
