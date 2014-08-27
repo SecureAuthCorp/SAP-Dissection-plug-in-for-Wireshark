@@ -830,6 +830,9 @@ static int hf_sapdiag_msg_info = -1;
 static int hf_sapdiag_msg_rc = -1;
 static int hf_sapdiag_compress = -1;
 
+/* Error messages */
+static int hf_sapdiag_error_message = -1;
+
 /* Compression header */
 static int hf_sapdiag_compress_header = -1;
 static int hf_sapdiag_uncomplength = -1;
@@ -2353,7 +2356,7 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 
 	if (tree) { /* we are being asked for details */
 
-		guint8 compress;
+		guint8 compress = 0, error_flag = 0;
 		proto_item *sapdiag = NULL, *header = NULL, *com_flag = NULL, *compression_header = NULL, *payload = NULL, *rl = NULL;
 		proto_tree *sapdiag_tree = NULL, *header_tree = NULL, *com_flag_tree = NULL, *compression_header_tree = NULL, *payload_tree = NULL;
 		tvbuff_t *next_tvb;
@@ -2395,6 +2398,8 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 	    proto_tree_add_item(com_flag_tree, hf_sapdiag_com_flag_TERM_GRA, tvb, offset, 1, FALSE);offset++;
 
 		proto_tree_add_item(header_tree, hf_sapdiag_mode_stat, tvb, offset, 1, FALSE); offset++;
+
+		error_flag = tvb_get_guint8(tvb, offset);
 		proto_tree_add_item(header_tree, hf_sapdiag_err_flag, tvb, offset, 1, FALSE); offset++;
 		proto_tree_add_item(header_tree, hf_sapdiag_msg_type, tvb, offset, 1, FALSE); offset++;
 		proto_tree_add_item(header_tree, hf_sapdiag_msg_info, tvb, offset, 1, FALSE); offset++;
@@ -2403,8 +2408,18 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 		compress = tvb_get_guint8(tvb, offset);
 		proto_tree_add_item(header_tree, hf_sapdiag_compress, tvb, offset, 1, FALSE); offset++;
 
+		/* Check for error messages */
+		if ((error_flag != 0x00) && (tvb_length_remaining(tvb, offset) > 0)){
+			gchar  *error_message = NULL;
+			guint32 error_message_length = 0;
+
+			error_message_length = tvb_length_remaining(tvb, offset) - 1;
+			error_message = tvb_get_unicode_string(tvb, offset, error_message_length, ENC_LITTLE_ENDIAN);
+			proto_tree_add_string(sapdiag_tree, hf_sapdiag_error_message, tvb, offset, error_message_length, error_message);
+			g_free(error_message);
+
 		/* If the message is compressed */
-		if ((compress == 0x01)&&(tvb_length_remaining(tvb, offset) > 0)){
+		} else if ((compress == 0x01) && (tvb_length_remaining(tvb, offset) > 0)){
 			int rt = 0;
 			guint8 *decompressed_buffer;
 			guint32 reported_length = 0, uncompress_length = 0;
@@ -2545,6 +2560,11 @@ proto_register_sapdiag(void)
 			{ "Message Rc", "sapdiag.header.msgrc", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP Diag Message RC", HFILL }},
 		{ &hf_sapdiag_compress,
 			{ "Compress", "sapdiag.header.compress", FT_UINT8, BASE_HEX, hf_sapdiag_compress_vals, 0x0, "SAP Diag Compress", HFILL }},
+
+		/* Error Messages */
+		{ &hf_sapdiag_error_message,
+			{ "Error Message", "sapdiag.error_message", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Diag Error Message", HFILL }},
+
 		/* Compression header */
 		{ &hf_sapdiag_compress_header,
 			{ "Compression Header", "sapdiag.header.compression", FT_NONE, BASE_NONE, NULL, 0x0, "SAP Diag Compression Header", HFILL }},
