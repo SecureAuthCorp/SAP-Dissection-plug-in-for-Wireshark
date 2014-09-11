@@ -12,15 +12,15 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install libglib2.0-dev libpcap-dev flex bison make -qq
   - sudo apt-get build-dep wireshark -qq
-  - mkdir wireshark-$WIRESHARK_BRANCH
-  - cd wireshark-$WIRESHARK_BRANCH
+  - mkdir ${HOME}/wireshark-$WIRESHARK_BRANCH
+  - cd ${HOME}/wireshark-$WIRESHARK_BRANCH
   - git init
   - git remote add -t $WIRESHARK_BRANCH -f origin https://github.com/wireshark/wireshark
   - git checkout $WIRESHARK_BRANCH
   - mkdir plugins/sap
-  - cp $TRAVIS_BUILD_DIR/* plugins/sap
+  - cp $TRAVIS_BUILD_DIR/* plugins/sap/
   - git apply $TRAVIS_BUILD_DIR/wireshark.patch
 install:
   - if [ ${BUILD_CMAKE} == "yes" ]; then mkdir build && cd build && cmake ..; else ./autogen.sh && ./configure --with-gtk2; fi
 script: 
-  - make 
+  - make
