@@ -15,7 +15,7 @@ before_install:
   - mkdir wireshark-$WIRESHARK_BRANCH
   - cd wireshark-$WIRESHARK_BRANCH
   - git init
-  - git remote add -t $WIRESHARK_BRANCH -f origin https://code.wireshark.org/review/wireshark
+  - git remote add -t $WIRESHARK_BRANCH -f origin https://github.com/wireshark/wireshark
   - git checkout $WIRESHARK_BRANCH
 install:
   - cd wireshark-$WIRESHARK_BRANCH
