@@ -18,7 +18,6 @@ before_install:
   - git remote add -t $WIRESHARK_BRANCH -f origin https://github.com/wireshark/wireshark
   - git checkout $WIRESHARK_BRANCH
 install:
-  - cd wireshark-$WIRESHARK_BRANCH
   - mkdir plugins/sap
   - cp $TRAVIS_BUILD_DIR/* plugins/sap
   - git apply $TRAVIS_BUILD_DIR/wireshark.patch
