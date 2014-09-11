@@ -17,10 +17,10 @@ before_install:
   - git init
   - git remote add -t $WIRESHARK_BRANCH -f origin https://github.com/wireshark/wireshark
   - git checkout $WIRESHARK_BRANCH
-install:
   - mkdir plugins/sap
   - cp $TRAVIS_BUILD_DIR/* plugins/sap
   - git apply $TRAVIS_BUILD_DIR/wireshark.patch
+install:
   - if [ ${BUILD_CMAKE} == "yes" ]; then mkdir build && cd build && cmake ..; else ./autogen.sh && ./configure --with-gtk2; fi
 script: 
   - make 
