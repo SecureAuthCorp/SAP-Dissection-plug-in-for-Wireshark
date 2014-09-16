@@ -166,6 +166,9 @@ static int hf_saprouter_error_module = -1;
 static int hf_saprouter_error_line = -1;
 static int hf_saprouter_error_detail= -1;
 static int hf_saprouter_error_time = -1;
+static int hf_saprouter_error_system_call = -1;
+static int hf_saprouter_error_errorno = -1;
+static int hf_saprouter_error_errorno_text = -1;
 static int hf_saprouter_error_location= -1;
 static int hf_saprouter_error_unknown= -1;  // TODO: Unknown fields
 
@@ -331,13 +334,13 @@ dissect_errorstring(tvbuff_t *tvb, proto_tree *tree, guint32 offset)
     proto_tree_add_item(tree, hf_saprouter_error_detail, tvb, offset, len, FALSE); offset += len;
     len = tvb_strsize(tvb, offset);
     proto_tree_add_item(tree, hf_saprouter_error_time, tvb, offset, len, FALSE); offset += len;
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_system_call, tvb, offset, len, FALSE); offset += len;
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_errorno, tvb, offset, len, FALSE); offset += len;
+    len = tvb_strsize(tvb, offset);
+    proto_tree_add_item(tree, hf_saprouter_error_errorno_text, tvb, offset, len, FALSE); offset += len;
 
-    len = tvb_strsize(tvb, offset);
-    proto_tree_add_item(tree, hf_saprouter_error_unknown, tvb, offset, len, FALSE); offset += len;
-    len = tvb_strsize(tvb, offset);
-    proto_tree_add_item(tree, hf_saprouter_error_unknown, tvb, offset, len, FALSE); offset += len;
-    len = tvb_strsize(tvb, offset);
-    proto_tree_add_item(tree, hf_saprouter_error_unknown, tvb, offset, len, FALSE); offset += len;
     len = tvb_strsize(tvb, offset);
     proto_tree_add_item(tree, hf_saprouter_error_unknown, tvb, offset, len, FALSE); offset += len;
 
@@ -665,6 +668,12 @@ proto_register_saprouter(void)
 			{ "Detail", "saprouter.errortext.detail", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Detail", HFILL }},
 		{ &hf_saprouter_error_time,
 			{ "Time", "saprouter.errortext.time", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Time", HFILL }},
+		{ &hf_saprouter_error_system_call,
+			{ "System Call", "saprouter.errortext.system_call", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information System Call", HFILL }},
+		{ &hf_saprouter_error_errorno,
+			{ "Error Number", "saprouter.errortext.errorno", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Error Number", HFILL }},
+		{ &hf_saprouter_error_errorno_text,
+			{ "Error Number Text", "saprouter.errortext.errorno_text", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Error Number Text", HFILL }},
 		{ &hf_saprouter_error_location,
 			{ "Location", "saprouter.errortext.location", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Location", HFILL }},
 		{ &hf_saprouter_error_unknown,
