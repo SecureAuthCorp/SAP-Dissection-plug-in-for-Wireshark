@@ -169,6 +169,7 @@ static int hf_saprouter_error_time = -1;
 static int hf_saprouter_error_system_call = -1;
 static int hf_saprouter_error_errorno = -1;
 static int hf_saprouter_error_errorno_text = -1;
+static int hf_saprouter_error_error_count = -1;
 static int hf_saprouter_error_location= -1;
 static int hf_saprouter_error_unknown= -1;  // TODO: Unknown fields
 
@@ -340,10 +341,8 @@ dissect_errorstring(tvbuff_t *tvb, proto_tree *tree, guint32 offset)
     proto_tree_add_item(tree, hf_saprouter_error_errorno, tvb, offset, len, FALSE); offset += len;
     len = tvb_strsize(tvb, offset);
     proto_tree_add_item(tree, hf_saprouter_error_errorno_text, tvb, offset, len, FALSE); offset += len;
-
     len = tvb_strsize(tvb, offset);
-    proto_tree_add_item(tree, hf_saprouter_error_unknown, tvb, offset, len, FALSE); offset += len;
-
+    proto_tree_add_item(tree, hf_saprouter_error_error_count, tvb, offset, len, FALSE); offset += len;
     len = tvb_strsize(tvb, offset);
     proto_tree_add_item(tree, hf_saprouter_error_location, tvb, offset, len, FALSE); offset += len;
 
@@ -676,6 +675,8 @@ proto_register_saprouter(void)
 			{ "Error Number Text", "saprouter.errortext.errorno_text", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Error Number Text", HFILL }},
 		{ &hf_saprouter_error_location,
 			{ "Location", "saprouter.errortext.location", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Location", HFILL }},
+		{ &hf_saprouter_error_error_count,
+			{ "Error Count", "saprouter.errortext.error_count", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Error Count", HFILL }},
 		{ &hf_saprouter_error_unknown,
 			{ "Unknown field", "saprouter.errortext.unknown", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Error Information Unknown field", HFILL }},
 
