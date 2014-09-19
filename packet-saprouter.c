@@ -387,8 +387,7 @@ static void
 dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 {
     guint8 opcode = 0;
-    guint16 client_count = 0, client_count_actual = 0;
-    guint32 offset = 0, eyecatcher_length = 0, route_length = 0, route_offset = 0, text_length = 0;
+    guint32 offset = 0, eyecatcher_length = 0;
     conversation_t *conversation = NULL;
     saprouter_session_state *session_state = NULL;
     proto_item *ti = NULL, *ri = NULL, *ei = NULL, *ci = NULL, *admin_password = NULL;
@@ -455,6 +454,8 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
             case 12:  /* Trace Connection */
             case 13:  /* Trace Connection */
             {
+                guint16 client_count = 0, client_count_actual = 0;
+
                 /* Retrieve the client count first */
             	if (opcode == 6){
                     offset+=2; /* Skip 2 bytes for Cancel Route request*/
@@ -488,7 +489,9 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 
     /* Route Message Type */
     } else if (tvb_strneql(tvb, offset, SAPROUTER_TYPE_ROUTE_STRING, eyecatcher_length) == 0){
-        col_set_str(pinfo->cinfo, COL_INFO, "Route Message");
+        guint32 route_length = 0, route_offset = 0;
+
+    	col_set_str(pinfo->cinfo, COL_INFO, "Route Message");
 
         /* Get the route length/offset */
         route_length = tvb_get_ntohl(tvb, offset + SAPROUTER_ROUTE_LENGTH_OFFSET);
@@ -535,6 +538,8 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
         col_set_str(pinfo->cinfo, COL_INFO, (opcode==0)? "Error Information" : "Control Message");
 
         if (tree){
+            guint32 text_length = 0;
+
             proto_item_append_text(ti, (opcode==0)? ", Error Information" : ", Control Message");
             /* Add the fields */
             proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, offset, eyecatcher_length, FALSE); offset += eyecatcher_length;

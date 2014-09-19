@@ -1810,14 +1810,13 @@ dissect_sapdiag_uievent(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gui
 
 static void
 dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_tree *item_value_tree, proto_tree *parent_tree, guint32 offset, guint8 item_type, guint8 item_id, guint8 item_sid, guint32 item_length){
-    guint8 i = 0, eventarray = 0; /* TODO: Unsued variable eventarray */
-    guint32 l = 0;
 
     /* SES item */
-    if (item_type==0x01){ /* TODO: Incomplete dissection of this item */
+    if (item_type==0x01){
+        guint8 event_array = 0;
 		check_length(pinfo, item_value_tree, 16, item_length, "SES");
 
-		eventarray = tvb_get_guint8(tvb, offset);
+		event_array = tvb_get_guint8(tvb, offset);
 		add_item_value_uint8(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 1, "Event Array");offset+=1;
 		add_item_value_uint8(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 1, "Event ID 1"); offset+=1;
 		add_item_value_uint8(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 1, "Event ID 2"); offset+=1;
@@ -1833,6 +1832,12 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
 		offset+=2;
 		add_item_value_uint8(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 1, "Dim Row"); offset+=1;
 		add_item_value_uint8(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 1, "Dim Col"); offset+=1;
+
+		/* TODO: Incomplete dissection of this item */
+		/* If the preference is set, report the item as partially dissected in the expert info */
+		if (global_sapdiag_highlight_items){
+			expert_add_info_format(pinfo, item, PI_UNDECODED, PI_WARN, "The SES item is dissected partially (event array = 0x%.2x)", event_array);
+		}
 
 	} else if (item_type==0x10 && item_id==0x04 && item_sid==0x26){		/* Dialog Step Number */
 		check_length(pinfo, item_value_tree, 4, item_length, "Dialog Step Number");
@@ -1906,11 +1911,12 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
 		add_item_value_uint16(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 2, "Internal Mode Number"); offset+=2;
 
 	} else if (item_type==0x10 && item_id==0x06 && item_sid==0x13){		/* GUI_FKEY */
-        l = offset+item_length;
-        offset++;
+        guint32 length = offset+item_length;
+        offset++;  /* TODO: Skip one byte here */
 		offset+=add_item_value_stringz(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, "Virtual key number", 1);
-        while (offset<l)
+        while ((offset < length) && tvb_offset_exists(tvb, offset)){
     		offset+=add_item_value_stringz(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, "String number", 1);
+        }
         /* If the preference is set, report the item as partially dissected in the expert info */
         if (global_sapdiag_highlight_items){
             expert_add_info_format(pinfo, item, PI_UNDECODED, PI_WARN, "The Diag Item is dissected partially (0x%.2x, 0x%.2x, 0x%.2x)", item_type, item_id, item_sid);
@@ -1934,11 +1940,13 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
 		add_item_value_uint16(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 2, "User ID"); offset+=2;
 
 	} else if (item_type==0x10 && item_id==0x06 && item_sid==0x1f){		/* IMode uuids 2 */
-		if (!check_length(pinfo, item_value_tree, 1 + 17*tvb_get_guint8(tvb, offset), item_length, "IMode uuids") ) return;
+		guint8 uuids = tvb_get_guint8(tvb, offset);
+		if (!check_length(pinfo, item_value_tree, 1 + 17 * uuids, item_length, "IMode uuids") ) return;
 		add_item_value_uint8(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 1, "Number of uuids"); offset+=1;
-        for (i=tvb_get_guint8(tvb, offset-1);i>0;i--){
+		while ((uuids > 0) && (tvb_offset_exists(tvb, offset + 16 + 1))){
         	add_item_value_hexstring(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 16, "UUID"); offset+=16;
     		add_item_value_uint8(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 1, "Active context"); offset+=1;
+    		uuids--;
         }
 	} else if (item_type==0x10 && item_id==0x06 && item_sid==0x22){		/* Auto logout time */
 		check_length(pinfo, item_value_tree, 4, item_length, "Auto logout time");
@@ -1962,18 +1970,18 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
 		offset+=add_item_value_stringz(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, "Kernel patch level", 1);
 
     } else if (item_type==0x10 && item_id==0x09 && item_sid==0x0b){		/* Dynt Focus */
-		l=offset+item_length;
+        guint32 length = offset+item_length;
         add_item_value_uint8(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 1, "Focus Num of Area ID"); offset+=1;
 		add_item_value_uint16(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 2, "Focus Row"); offset+=2;
 		add_item_value_uint16(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 2, "Focus Col"); offset+=2;
 		add_item_value_uint16(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 2, "Focus Row Offset"); offset+=2;
 		add_item_value_uint16(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 2, "Focus Col Offset"); offset+=2;
 		/* Container IDs up to 30 */
-		if (l-offset > 30){
+		if (length-offset > 30){
             expert_add_info_format(pinfo, item, PI_MALFORMED, PI_WARN, "The Dynt Focus contains more than 30 Container IDs (%d)", offset);
 		}
 		/* Dissect all the remaining container IDs */
-        while(offset<l){
+        while((offset < length) && tvb_offset_exists(tvb, offset)){
     		add_item_value_uint8(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 1, "Focus Container ID"); offset+=1;
         }
 
@@ -2347,8 +2355,6 @@ check_sapdiag_dp(tvbuff_t *tvb, guint32 offset){
 static void
 dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 {
-	guint32 offset = 0, payload_offset = 0;
-
 	/* Add the protocol to the column */
 	col_add_str(pinfo->cinfo, COL_PROTOCOL, "SAPDIAG");
 	/* Clear out stuff in the info column */
@@ -2357,6 +2363,7 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 	if (tree) { /* we are being asked for details */
 
 		guint8 compress = 0, error_flag = 0;
+		guint32 offset = 0;
 		proto_item *sapdiag = NULL, *header = NULL, *com_flag = NULL, *compression_header = NULL, *payload = NULL, *rl = NULL;
 		proto_tree *sapdiag_tree = NULL, *header_tree = NULL, *com_flag_tree = NULL, *compression_header_tree = NULL, *payload_tree = NULL;
 		tvbuff_t *next_tvb;
@@ -2420,9 +2427,8 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 
 		/* If the message is compressed */
 		} else if ((compress == 0x01) && (tvb_length_remaining(tvb, offset) > 0)){
-			int rt = 0;
 			guint8 *decompressed_buffer;
-			guint32 reported_length = 0, uncompress_length = 0;
+			guint32 reported_length = 0, uncompress_length = 0, payload_offset = 0;;
 
 			/* Add the compression header subtree */
 			compression_header = proto_tree_add_item(sapdiag_tree, hf_sapdiag_compress_header, tvb, offset, 8, FALSE);
@@ -2444,6 +2450,8 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 			proto_tree_add_item(compression_header_tree, hf_sapdiag_special, tvb, offset, 1, FALSE); offset++;
 
 			if (global_sapdiag_decompress == TRUE){
+				int rt = 0;
+
 				/* Allocate the buffer only in the scope of current packet, using the reported length */
 				decompressed_buffer = (guint8 *)wmem_alloc0(wmem_packet_scope(), reported_length);
 				if (!decompressed_buffer){

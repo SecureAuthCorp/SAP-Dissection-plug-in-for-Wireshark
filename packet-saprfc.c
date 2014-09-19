@@ -401,7 +401,6 @@ void proto_reg_handoff_saprfc(void);
 static void
 dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree){
 
-	int rt = 0;
 	guint8 *decompressed_buffer;
 	guint32 reported_length = 0, uncompress_length = 0, offset = 0, initial_offset = 0;
 
@@ -430,6 +429,8 @@ dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 	proto_tree_add_item(compression_header_tree, hf_saprfc_table_special, tvb, offset, 1, FALSE); offset++;
 
 	if (global_saprfc_decompress == TRUE){
+		int rt = 0;
+
 		/* Allocate the buffer only in the scope of current packet, using the
 		 * reported length */
 		decompressed_buffer = (guint8 *)wmem_alloc0(wmem_packet_scope(), reported_length);
@@ -675,7 +676,7 @@ dissect_saprfc_rfcheader(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
 		/* Add the RFC header subtree */
 		header = proto_tree_add_item(tree, hf_saprfc_rfcheader, tvb, offset, 28, FALSE);
 		header_tree = proto_item_add_subtree(header, ett_saprfc);
-		/* TODO: Unused variable header_tree */
+		/* TODO: Warning unused variable header_tree */
 		offset += 28;
 
 		/* Add the unicode header subtree */

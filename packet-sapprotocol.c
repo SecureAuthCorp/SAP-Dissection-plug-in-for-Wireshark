@@ -73,7 +73,7 @@ void proto_reg_handoff_sap_protocol(void);
 static guint
 get_sap_protocol_pdu_len(packet_info *pinfo _U_, tvbuff_t *tvb, int offset)
 {
-	return ((guint)tvb_get_ntohl(tvb, offset - offset) + 4);
+	return ((guint)tvb_get_ntohl(tvb, 0) + 4);
 }
 
 

@@ -48,8 +48,6 @@ void proto_reg_handoff_sapsnc(void);
 static void
 dissect_sapsnc(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 {
-	guint32 offset = 0;
-
 	/* Add the protocol to the column */
 	col_add_str(pinfo->cinfo, COL_PROTOCOL, ", SAPSNC");
 	/* Clear out stuff in the info column */
@@ -57,6 +55,7 @@ dissect_sapsnc(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 
 	if (tree) { /* we are being asked for details */
 
+		guint32 offset = 0;
 		proto_item *sapsnc = NULL, *sapsnc_frame = NULL;
 		proto_tree *sapsnc_tree = NULL, *sapsnc_frame_tree = NULL;
 

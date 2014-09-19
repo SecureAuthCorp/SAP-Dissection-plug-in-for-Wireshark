@@ -1004,14 +1004,14 @@ dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
             break;
         }
         case 0x46:{			/* MS_IP_PORT_TO_NAME */
-            guint32 address_ipv4 = 0, name_length = 0;
-            struct e_in6_addr address_ipv6;
+            guint32 name_length = 0;
 
             if (opcode_version == 0x01){
-                address_ipv4 = tvb_get_ipv4(tvb, offset);
+            	guint32 address_ipv4 = tvb_get_ipv4(tvb, offset);
                 proto_tree_add_ipv4(tree, hf_sapms_ip_to_name_address4, tvb, offset, 4, address_ipv4); offset+=4; length-=4;
         	} else if (opcode_version == 0x02){
-                tvb_get_ipv6(tvb, offset, &address_ipv6);
+        		struct e_in6_addr address_ipv6;
+        		tvb_get_ipv6(tvb, offset, &address_ipv6);
                 proto_tree_add_ipv6(tree, hf_sapms_ip_to_name_address6, tvb, offset, 16, (guint8 *)&address_ipv6); offset+=16; length-=16;
         	}
 
@@ -1049,9 +1049,6 @@ dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
 static void
 dissect_sapms(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 {
-    guint8 flag=0, iflag = 0, opcode = 0, opcode_version = 0;
-    guint32 offset = 0, remaining_length = 0;
-
 	/* Add the protocol to the column */
 	col_add_str(pinfo->cinfo, COL_PROTOCOL, "SAPMS");
 	/* Clear out stuff in the info column */
@@ -1059,6 +1056,7 @@ dissect_sapms(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 
 	if (tree) { /* we are being asked for details */
 
+	    guint32 offset = 0;
 		proto_item *ti = NULL, *oi = NULL, *msg_types = NULL;
 		proto_tree *sapms_tree = NULL, *sapms_opcode_tree = NULL, *msg_types_tree = NULL;
 
@@ -1068,7 +1066,10 @@ dissect_sapms(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 
         /* Check for the eye catcher string */
         if (tvb_strneql(tvb, offset, "**MESSAGE**\00", 12) == 0){
-            proto_tree_add_item(sapms_tree, hf_sapms_eyecatcher, tvb, offset, 12, FALSE); offset+=12;
+    	    guint8 flag=0, iflag = 0, opcode = 0, opcode_version = 0;
+    	    guint32 remaining_length = 0;
+
+    	    proto_tree_add_item(sapms_tree, hf_sapms_eyecatcher, tvb, offset, 12, FALSE); offset+=12;
             proto_tree_add_item(sapms_tree, hf_sapms_version, tvb, offset, 1, FALSE); offset+=1;
             proto_tree_add_item(sapms_tree, hf_sapms_errorno, tvb, offset, 1, FALSE); offset+=1;
             proto_tree_add_item(sapms_tree, hf_sapms_toname, tvb, offset, 40, FALSE); offset+=40;
