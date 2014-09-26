@@ -27,9 +27,18 @@ set(DISSECTOR_SRC
     packet-sapsnc.c
 )
 
+set(DISSECTOR_SUPPORT_SRC
+	sapdecompress.cpp
+	vpa105CsObjInt.cpp
+	vpa106cslzc.cpp
+	vpa107cslzh.cpp
+	vpa108csulzh.cpp
+)
+
 set(PLUGIN_FILES
 	plugin.c
 	${DISSECTOR_SRC}
+	${DISSECTOR_SUPPORT_SRC}
 )
 
 set(CLEAN_FILES
