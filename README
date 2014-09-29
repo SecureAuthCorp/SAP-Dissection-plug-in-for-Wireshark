@@ -1,4 +1,5 @@
 SAP Dissector Plugin for Wireshark
+==================================
 
 Copyright (C) 2014 Core Security Technologies
 
@@ -8,8 +9,8 @@ Consulting Services team of Core Security Technologies.
 Version 0.1.5 (XXX 2014)
 
 
-Overview:
-========
+Overview
+--------
 
 SAP Netweaver [1] is a technology platform for building and integrating SAP
 business applications. Communication between components uses different network
@@ -23,8 +24,8 @@ support is included for SAP's RFC and SNC protocols. Detailed information
 about the research can be found at [2], [3], [4], [5] and [6]. 
 
 
-Features:
-========
+Features
+--------
 
 This plugin counts on several different dissectors:
 
@@ -32,14 +33,14 @@ This plugin counts on several different dissectors:
 
     This is the dissector for SAP's Network Interface (NI) protocol. The 
     dissector handles the reassemble of fragmented TCP packets and identifies 
-    keep-alive messages (PING/PONG). It also calls the respective subdissector 
+    keep-alive messages (PING/PONG). It also calls the respective sub-dissector
     according to the port being used.
 
 - SAP Router Protocol dissector
 
     This dissector includes support for the SAP Router protocol, handling route,
     control messages and error information packets. The dissector also calls 
-    the SNC subdissector when SNC frames are found.
+    the SNC sub-dissector when SNC frames are found.
 
 - SAP Diag Protocol dissector
 
@@ -48,8 +49,8 @@ This plugin counts on several different dissectors:
     decompression of the payload data and includes dissection of relevant Diag 
     payload items, including Support Bits and common APPL/APPL4 items. 
     Wireshark's expert information capabilities are used to remark malformed or 
-    wrong packets. The dissector also calls the RFC subdissector when an 
-    embedded RFC call is found and the SNC subdissector when SNC frames are 
+    wrong packets. The dissector also calls the RFC sub-dissector when an 
+    embedded RFC call is found and the SNC sub-dissector when SNC frames are 
     found.
 
 - SAP Message Server Protocol dissector
@@ -72,10 +73,10 @@ This plugin counts on several different dissectors:
 	This dissector perform some basic parsing of SNC frames. 
     
 
-Installation & Build:
-====================
+Installation & Build
+--------------------
 
-This wireshark plugin is not distributed as part of the Wireshark source. The 
+This Wireshark plugin is not distributed as part of the Wireshark source. The 
 following steps are required to compile the plugin:
 
 1) Download Wireshark version 1.10 source from [7] or checkout the code from 
@@ -93,8 +94,8 @@ following steps are required to compile the plugin:
    Non-Windows Build: Add plugins/sap directory to Makefile.am, configure.in 
    and plugins/Makefile.am.
    
-   This step can be done using the patch file provided. At the root directory 
-   run:
+   This step can be performed using the patch file provided. At the root
+   directory run:
    
    git apply plugins/sap/wireshark.patch
 
@@ -104,9 +105,12 @@ It's worth mentioning that compression libraries for SAP Diag/RFC protocol are
 originally written in C++, thus the entire plugin needs to be compiled for C++. 
 See Wireshark's portability notes for more information [9].
 
+It was reported that compiling Wireshark on OS X requires fixing link for the
+gettext library if it was installed using home-brew.
 
-Example uses:
-============
+
+Example uses
+------------
 
 SAP Diag Gui Logon Password filter:
 
@@ -123,15 +127,15 @@ The same results can be achieved also using expert info (security group):
 sapdiag and expert.group==security
 
 
-License:
-=======
+License
+-------
 
-This wireshark plugin is distributed under the GPLv2 license. Check the COPYING 
+This Wireshark plugin is distributed under the GPLv2 license. Check the COPYING 
 file for more details.
 
 
-References:
-==========
+References
+----------
 
 [1] http://www.sap.com/platform/netweaver/index.epx
 [2] http://corelabs.coresecurity.com/index.php?module=Wiki&action=view&type=tool&name=SAP_Dissection_plu-gin_for_Wireshark
@@ -144,8 +148,8 @@ References:
 [9] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-1.10
 
 
-Contact:
-=======
+Contact
+-------
 
 Whether you want to report a bug or give some suggestions on this package, drop 
 us a few lines at oss@coresecurity.com or contact the author email 
