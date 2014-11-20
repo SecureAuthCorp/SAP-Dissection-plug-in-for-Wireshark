@@ -1627,11 +1627,17 @@ dissect_sapdiag_dyntatom(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
 	    proto_tree_add_item(atom_item_attr_tree, hf_sapdiag_item_dynt_atom_item_attr_DIAG_BSD_COMBOSTYLE, tvb, offset, 1, FALSE);
         offset+=1; atom_item_length-=1;
 
+        /* If the attribute is set to invisible we're dealing probably with a password field */
+        if (attr & SAPDIAG_ATOM_ATTR_DIAG_BSD_INVISIBLE){
+            expert_add_info_format(pinfo, atom_item, PI_SECURITY, PI_WARN, "Password field?");
+        }
+
         switch (etype){
             case 114:{  /* DIAG_DGOTYP_FNAME */
                 add_item_value_string(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset, atom_item_length, "Text", 1);
                 proto_item_append_text(atom, ", Text=%s", tvb_get_ephemeral_string(tvb, offset, atom_item_length)); offset+=atom_item_length;
                 break;
+
             } case 115:{ /* DIAG_DGOTYP_PUSHBUTTON_2 */
                 add_item_value_uint8(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset, 1, "V Length"); offset+=1; atom_item_length-=1;
                 add_item_value_uint8(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset, 1, "V Height"); offset+=1; atom_item_length-=1;
@@ -1640,6 +1646,7 @@ dissect_sapdiag_dyntatom(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
                 offset+=add_item_value_stringz(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset, "Text", 1);
                 offset+=add_item_value_stringz(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset, "Function Code", 1);
                 break;
+
             } case 116:{ /* DIAG_DGOTYP_TABSTRIP_BUTTON */
                 add_item_value_uint8(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset, 1, "V Length"); offset+=1; atom_item_length-=1;
                 add_item_value_uint8(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset, 1, "V Height"); offset+=1; atom_item_length-=1;
@@ -1651,6 +1658,7 @@ dissect_sapdiag_dyntatom(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
                 offset+=add_item_value_stringz(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset, "Function Code", 1);
                 offset+=add_item_value_stringz(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset, "ID", 1);
                 break;
+
             } case 118:  /* DIAG_DGOTYP_CHECKBUTTON_1" */
               case 119:{ /* DIAG_DGOTYP_RADIOBUTTON_1 */
                 /* If the preference is set, report the item as partially dissected in the expert info */
@@ -1658,10 +1666,12 @@ dissect_sapdiag_dyntatom(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
                     expert_add_info_format(pinfo, atom_item, PI_UNDECODED, PI_WARN, "The Diag Atom is dissected partially (0x%.2x)", etype);
                 }
                 break;
-            } case 120:{ /* DIAG_DGOTYP_XMLPROP */
+
+              } case 120:{ /* DIAG_DGOTYP_XMLPROP */
                 add_item_value_string(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset, atom_item_length, "XMLProp", 1);
                 proto_item_append_text(atom, ", XMLProp=%s", tvb_get_ephemeral_string(tvb, offset, atom_item_length)); offset+=atom_item_length;
                 break;
+
             } case 121:  /* DIAG_DGOTYP_EFIELD_1 */
               case 122:  /* DIAG_DGOTYP_OFIELD_1 */
               case 123:{ /* DIAG_DGOTYP_KEYWORD_1_1 */
@@ -1671,12 +1681,15 @@ dissect_sapdiag_dyntatom(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
                 add_item_value_uint8(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset, 1, "MLen"); offset+=1; atom_item_length-=1;
                 add_item_value_uint16(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset, 2, "MaxNrChars"); offset+=2; atom_item_length-=2;
 		        add_item_value_string(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset, atom_item_length, "Text", 0); offset+=atom_item_length;
+
                 break;
-            } case 127:{ /* DIAG_DGOTYP_FRAME_1 */
+
+              } case 127:{ /* DIAG_DGOTYP_FRAME_1 */
                 add_item_value_uint16(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset, 2, "DRows"); offset+=2; atom_item_length-=2;
                 add_item_value_uint16(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset, 2, "DCols"); offset+=2; atom_item_length-=2;
                 add_item_value_string(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset, atom_item_length, "Text", 1); offset+=atom_item_length;
                 break;
+
             } case 129:{ /* DIAG_DGOTYP_RADIOBUTTON_3 */
                 add_item_value_uint8(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset, 1, "Button"); offset+=1; atom_item_length-=1;
                 add_item_value_uint16(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset,2, "Visible Label Length"); offset+=2; atom_item_length-=2;
@@ -1686,6 +1699,7 @@ dissect_sapdiag_dyntatom(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
                 add_item_value_uint16(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset, 2, "Text Length"); offset+=2; atom_item_length-=2;
                 add_item_value_string(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset, atom_item_length, "Text", 1); offset+=atom_item_length;
                 break;
+
             } case 130:  /* DIAG_DGOTYP_EFIELD_2 */
               case 131:  /* DIAG_DGOTYP_OFIELD_2 */
               case 132:{ /* DIAG_DGOTYP_KEYWORD_2 */
@@ -1695,10 +1709,6 @@ dissect_sapdiag_dyntatom(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
                 add_item_value_uint16(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset, 2, "MaxNrChars"); offset+=2; atom_item_length-=2;
 		        add_item_value_string(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset, atom_item_length, "Text", 0); offset+=atom_item_length;
 
-                /* If the attribute is set to invisible we're dealing probably with a password field */
-                if (attr & SAPDIAG_ATOM_ATTR_DIAG_BSD_INVISIBLE)
-                    expert_add_info_format(pinfo, atom_item, PI_SECURITY, PI_WARN, "Password field?");
-
                 break;
             } default:
                 /* If the preference is set, report the item as unknown in the expert info */
@@ -1706,6 +1716,7 @@ dissect_sapdiag_dyntatom(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
                     expert_add_info_format(pinfo, atom_item, PI_UNDECODED, PI_WARN, "The Diag Atom has a unknown type that is not dissected (%d)", etype);
                 }
                 offset+=atom_item_length;
+
                 break;
         }
     }
