@@ -1886,8 +1886,14 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
 		add_item_value_uint8(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 1, "Flag 2"); offset+=1;
 
 	} else if (item_type==0x10 && item_id==0x04 && item_sid==0x1d){		/* GUI patch level */
-		check_length(pinfo, item_value_tree, 1, item_length, "GUI patch level");
-		add_item_value_uint8(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 1, "GUI patch level"); offset+=1;
+
+		/* GUI Patch level could be a string in old versions, or a single byte integer in newer ones */
+		if (item_length == 2){
+			add_item_value_string(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 2, "GUI patch level"); offset+=2;
+		} else {
+			check_length(pinfo, item_value_tree, 1, item_length, "GUI patch level");
+			add_item_value_uint8(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 1, "GUI patch level"); offset+=1;
+		}
 
 	} else if (item_type==0x10 && item_id==0x04 && item_sid==0x24){		/* Display Size */
 		check_length(pinfo, item_value_tree, 8, item_length, "Display Size");
