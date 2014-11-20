@@ -116,12 +116,13 @@ Example uses
 
 SAP Diag Gui Logon Password filter:
 
-`DYNT_ATOM` items contains data entered into screen fields. The following filter 
-could be used for identify the packets with filled fields, in search for 
-interesting data. Early packets in a Diag session probably contains values for 
-fields username and password.
+`DYNT_ATOM` items contains data entered into screen fields. The following
+filter could be used for identifying packets containing fields marked as
+"invisible" (fields that are masked in the SAP GUI screen) in search for
+sensitive data. Early packets in a Diag session probably contains values for
+user id and password fields.
 
-	sapdiag.item.value.dyntatom.item.type == 130
+	sapdiag.item.value.dyntatom.item.attr.INVISIBLE == 1
 
 The same results can be achieved also using expert info (security group):
 
