@@ -2243,6 +2243,7 @@ get_appl_string(guint8 item_id, guint8 item_sid){
 
 static void
 dissect_sapdiag_payload(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, proto_tree *parent_tree, guint32 offset){
+	gint item_value_remaining_length;
 	guint8 item_type, item_long, item_id, item_sid;
 	guint32 item_length, item_value_length;
 	const char *item_name_string = NULL;
@@ -2347,8 +2348,14 @@ dissect_sapdiag_payload(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, pro
 		/* Add the item value */
 		if (item_value_length > 0){
 			/* Check if the item length is valid */
-			if ((guint32)tvb_length_remaining(tvb, offset) < item_value_length){
+			item_value_remaining_length = tvb_length_remaining(tvb, offset);
+			if (item_value_remaining_length < 0){
+				expert_add_info_format(pinfo, il, PI_MALFORMED, PI_ERROR, "Invalid offset");
+				return;
+			}
+			if ((guint32)item_value_remaining_length < item_value_length){
 				expert_add_info_format(pinfo, il, PI_MALFORMED, PI_WARN, "The item length is invalid");
+				item_value_length = (guint32)item_value_remaining_length;
 			}
 			item_value = proto_tree_add_item(item_tree, hf_sapdiag_item_value, tvb, offset, item_value_length, FALSE); 
 			item_value_tree = proto_item_add_subtree(item_value, ett_sapdiag);
@@ -2437,13 +2444,13 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 			gchar  *error_message = NULL;
 			guint32 error_message_length = 0;
 
-			error_message_length = tvb_length_remaining(tvb, offset) - 1;
+			error_message_length = (guint32)tvb_length_remaining(tvb, offset) - 1;
 			error_message = tvb_get_unicode_string(tvb, offset, error_message_length, ENC_LITTLE_ENDIAN);
 			proto_tree_add_string(sapdiag_tree, hf_sapdiag_error_message, tvb, offset, error_message_length, error_message);
 			g_free(error_message);
 
 		/* If the message is compressed */
-		} else if ((compress == 0x01) && (tvb_length_remaining(tvb, offset) > 0)){
+		} else if ((compress == 0x01) && (tvb_length_remaining(tvb, offset) >= 8)){
 			guint8 *decompressed_buffer;
 			guint32 reported_length = 0, uncompress_length = 0, payload_offset = 0;;
 
@@ -2521,7 +2528,7 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 			}
 
 		/* Message encrypted with SNC */
-		} else if (((compress == 0x02)||(compress == 0x03))&&(tvb_length_remaining(tvb, offset) > 0)){
+		} else if (((compress == 0x02) || (compress == 0x03)) && (tvb_length_remaining(tvb, offset) > 0)){
 
 			/* Call the SNC dissector */
 			dissect_sapdiag_snc_frame(tvb, pinfo, tree, offset);

@@ -219,14 +219,14 @@ static guint32
 dissect_serviceport(guchar *port){
     guint32 portnumber = 0;
 
-    if (g_ascii_isdigit(port[0])){ 
-        portnumber = strtol(port, NULL, 10);
-    } else if ( (strlen(port)>5) && g_str_has_prefix(port, "sapdp") ){
-        portnumber = 3200 + strtol(port+5, NULL, 10);
-    } else if ( (strlen(port)>5) && g_str_has_prefix(port, "sapgw") ){
-        portnumber = 3300 + strtol(port+5, NULL, 10);
-    } else if ( (strlen(port)>5) && g_str_has_prefix(port, "sapms") ){
-        portnumber = 3600 + strtol(port+5, NULL, 10);
+    if (g_ascii_isdigit(port[0])){
+        portnumber = (guint32)strtoul(port, NULL, 10);
+    } else if ((strlen(port)>5) && g_str_has_prefix(port, "sapdp")){
+        portnumber = 3200 + (guint32)strtoul(port+5, NULL, 10);
+    } else if ((strlen(port)>5) && g_str_has_prefix(port, "sapgw")){
+        portnumber = 3300 + (guint32)strtoul(port+5, NULL, 10);
+    } else if ((strlen(port)>5) && g_str_has_prefix(port, "sapms")){
+        portnumber = 3600 + (guint32)strtoul(port+5, NULL, 10);
     }
     return (portnumber);
 }

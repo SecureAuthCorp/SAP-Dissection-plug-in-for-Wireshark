@@ -228,7 +228,7 @@ dissect_sapenqueue_server_admin(tvbuff_t *tvb, packet_info *pinfo, proto_tree *t
 
         		    /* Set the max length to the remaining of the packet, just in case a malformed packet arrives */
         		    if (!tvb_offset_exists(tvb, offset + pattern_length)) {
-        		    	pattern_length = tvb_length_remaining(tvb, offset);
+        		    	pattern_length = (guint8)tvb_length_remaining(tvb, offset);
         				expert_add_info_format(pinfo, trace_request_pattern, PI_MALFORMED, PI_WARN, "The reported length is incorrect");
         		    }
         		    proto_tree_add_item(trace_request_pattern_tree, hf_sapenqueue_server_admin_trace_pattern_value, tvb, offset, pattern_length, FALSE); offset += pattern_length;
@@ -267,6 +267,7 @@ dissect_sapenqueue_conn_admin(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tre
 	switch (opcode){
 		case 0x01:		/* Parameter Request */
 		case 0x02:{		/* Parameter Response */
+			gint name_length_remaining = 0;
 			guint8 length = 0, total_length = 0;
 			guint32 count = 0, id = 0, name_length = 0;
 			proto_item *params = NULL, *param = NULL;
@@ -306,8 +307,13 @@ dissect_sapenqueue_conn_admin(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tre
 	        		proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_len, tvb, offset, 4, FALSE); offset += 4;
 
 	        		/* If the reported length is not correct, use the remaining of the packet as length */
-	        		if (tvb_length_remaining(tvb, offset) < name_length) {
-	        			name_length = tvb_length_remaining(tvb, offset);
+	        		name_length_remaining = tvb_length_remaining(tvb, offset);
+	        		if (name_length_remaining < 0){
+	        			expert_add_info_format(pinfo, param, PI_MALFORMED, PI_ERROR, "Invalid offset");
+	        			break;
+	        		}
+	        		if ((guint32)name_length_remaining < name_length) {
+	        			name_length = (guint32)name_length_remaining;
         				expert_add_info_format(pinfo, param, PI_MALFORMED, PI_WARN, "The reported length is incorrect");
 	        		}
 

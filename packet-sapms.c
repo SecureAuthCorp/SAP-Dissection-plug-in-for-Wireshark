@@ -681,7 +681,7 @@ dissect_sapms_client(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
     proto_tree *client_tree = NULL, *msg_types_tree = NULL;
     struct e_in6_addr address_ipv6;
     guint32 address_ipv4 = 0;
-    gint client_length = 0;
+    gint client_length = 0, client_length_remaining = 0;
 
     /* Chose the client length according to the version number */
     if (opcode_version == 0x01){  			/* This version was seen in the older releases (6.40) */
@@ -699,9 +699,14 @@ dissect_sapms_client(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
         }
 	}
 
-    if (tvb_length_remaining(tvb, offset) < client_length){
-        expert_add_info_format(pinfo, tree, PI_MALFORMED, PI_WARN, "Invalid client length (expected=%d, actual=%d)", client_length, tvb_length_remaining(tvb, offset));
-    	return (client_length);
+    client_length_remaining = tvb_length_remaining(tvb, offset);
+    if (client_length_remaining < 0){
+        expert_add_info_format(pinfo, tree, PI_MALFORMED, PI_WARN, "Invalid offset");
+    	return (0);
+    }
+    if (client_length_remaining < client_length){
+        expert_add_info_format(pinfo, tree, PI_MALFORMED, PI_WARN, "Invalid client length (expected=%d, actual=%d)", client_length, client_length_remaining);
+    	return (client_length_remaining);
     }
 
     /* Add the client tree */
@@ -1066,8 +1071,8 @@ dissect_sapms(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 
         /* Check for the eye catcher string */
         if (tvb_strneql(tvb, offset, "**MESSAGE**\00", 12) == 0){
+    	    gint remaining_length = 0;
     	    guint8 flag=0, iflag = 0, opcode = 0, opcode_version = 0;
-    	    guint32 remaining_length = 0;
 
     	    proto_tree_add_item(sapms_tree, hf_sapms_eyecatcher, tvb, offset, 12, FALSE); offset+=12;
             proto_tree_add_item(sapms_tree, hf_sapms_version, tvb, offset, 1, FALSE); offset+=1;
@@ -1121,7 +1126,7 @@ dissect_sapms(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
                     col_append_fstr(pinfo->cinfo, COL_INFO, ", Opcode=%s", val_to_str(opcode, hf_sapms_opcode_vals, "Unknown"));
 
 		            /* Add the opcode value subtree */
-                    remaining_length = (guint32)tvb_length_remaining(tvb, offset);
+                    remaining_length = tvb_length_remaining(tvb, offset);
                     if (remaining_length > 0){
 		                oi = proto_tree_add_item(sapms_tree, hf_sapms_opcode_value, tvb, offset, remaining_length, FALSE);
 		                sapms_opcode_tree = proto_item_add_subtree(oi, ett_sapms);
@@ -1138,7 +1143,7 @@ dissect_sapms(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
                     proto_tree_add_item(sapms_tree, hf_sapms_adm_recno, tvb, offset, 11, FALSE); offset+=11;
 
 		            /* Add the records subtree */
-                    remaining_length = (guint32)tvb_length_remaining(tvb, offset);
+                    remaining_length = tvb_length_remaining(tvb, offset);
                     if (remaining_length > 0){
                         dissect_sapms_adm_record(tvb, pinfo, sapms_tree, offset, remaining_length);
                     }
