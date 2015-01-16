@@ -1,3 +1,21 @@
+2015-01-16 Martin Gallo <mgallo@coresecurity.com>
+
+	* - Version v0.1.5 released.
+	* - Added travis script for testing builds.
+	* - Fixed compilation on OSX. Thanks Valeriy !
+	* - General minor fixes and code improvements.
+	* packet-sapdiag.c: Added dissection of error messages, fixed parsing
+	of some atom items for old versions.
+	* packet-sapdiag.c: Better highlighting of all invisible fields as
+	potential passwords. Fixed parsing of GUI patch level item for old
+	versions. Thanks Victor for the feedback !
+	* packet-sapenqueue.c: Added dissection of admin trace requests.
+	* packet-saprouter.c: Added dissection of error fields. Route strings
+	field are now search-able.
+	* sapdecompress.h: Improved routines and added handling of some error
+	conditions.
+	* saphelpers.h: Fixed use of helpers on different dissectors.
+
 2014-03-25 Martin Gallo <mgallo@coresecurity.com>
 
 	* - Version v0.1.4 released at Troopers'14.

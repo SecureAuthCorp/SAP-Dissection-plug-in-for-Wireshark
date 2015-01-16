@@ -16,13 +16,13 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "CompanyName", "The Wireshark developer community, http://www.wireshark.org/\0"
+            VALUE "CompanyName", "Core Security\0"
             VALUE "FileDescription", "@PACKAGE@ dissector\0"
             VALUE "FileVersion", "@MODULE_VERSION@\0"
             VALUE "InternalName", "@PACKAGE@ @MODULE_VERSION@\0"
-            VALUE "LegalCopyright", "Copyright © 1998 Gerald Combs <gerald@wireshark.org>, Gilbert Ramirez <gram@alumni.rice.edu> and others\0"
+            VALUE "LegalCopyright", "Copyright ï¿½ 2015 Core Security, Martin Gallo <mgallo@coresecurity.com>\0"
             VALUE "OriginalFilename", "@PLUGIN_NAME@.dll\0"
-            VALUE "ProductName", "Wireshark\0"
+            VALUE "ProductName", "SAP dissection plug-in for Wireshark\0"
             VALUE "ProductVersion", "@VERSION@\0"
             VALUE "Comments", "Build with @MSVC_VARIANT@\0"
         END
