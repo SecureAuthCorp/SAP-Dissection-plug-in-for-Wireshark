@@ -156,6 +156,11 @@ static int hf_sapenqueue_conn_admin_param_name = -1;
 
 static gint ett_sapenqueue = -1;
 
+/* Expert info */
+static expert_field ei_sapenqueue_pattern_invalid_length= EI_INIT;
+static expert_field ei_sapenqueue_support_invalid_offset = EI_INIT;
+static expert_field ei_sapenqueue_support_invalid_length = EI_INIT;
+
 /* Protocol handle */
 static dissector_handle_t sapenqueue_handle;
 
@@ -229,7 +234,7 @@ dissect_sapenqueue_server_admin(tvbuff_t *tvb, packet_info *pinfo, proto_tree *t
         		    /* Set the max length to the remaining of the packet, just in case a malformed packet arrives */
         		    if (!tvb_offset_exists(tvb, offset + pattern_length)) {
         		    	pattern_length = (guint8)tvb_captured_length_remaining(tvb, offset);
-        				expert_add_info_format(pinfo, trace_request_pattern, PI_MALFORMED, PI_WARN, "The reported length is incorrect");
+        				expert_add_info(pinfo, trace_request_pattern, &ei_sapenqueue_pattern_invalid_length);
         		    }
         		    proto_tree_add_item(trace_request_pattern_tree, hf_sapenqueue_server_admin_trace_pattern_value, tvb, offset, pattern_length, FALSE); offset += pattern_length;
 
@@ -309,12 +314,12 @@ dissect_sapenqueue_conn_admin(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tre
 	        		/* If the reported length is not correct, use the remaining of the packet as length */
 	        		name_length_remaining = tvb_captured_length_remaining(tvb, offset);
 	        		if (name_length_remaining < 0){
-	        			expert_add_info_format(pinfo, param, PI_MALFORMED, PI_ERROR, "Invalid offset");
+	        			expert_add_info(pinfo, param, &ei_sapenqueue_support_invalid_offset);
 	        			break;
 	        		}
 	        		if ((guint32)name_length_remaining < name_length) {
 	        			name_length = (guint32)name_length_remaining;
-        				expert_add_info_format(pinfo, param, PI_MALFORMED, PI_WARN, "The reported length is incorrect");
+        				expert_add_info(pinfo, param, &ei_sapenqueue_support_invalid_length);
 	        		}
 
 	        		proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_value, tvb, offset, name_length, FALSE); offset += name_length;
@@ -527,7 +532,16 @@ proto_register_sapenqueue(void)
         &ett_sapenqueue
     };
 
-    /* Register the protocol */
+    /* Register the expert info */
+	static ei_register_info ei[] = {
+		{ &ei_sapenqueue_pattern_invalid_length, { "sapenque.server_admin.trace.pattern.length.invalid", PI_MALFORMED, PI_WARN, "The reported length is incorrect", EXPFILL }},
+		{ &ei_sapenqueue_support_invalid_offset, { "sapenque.conn_admin.params.param.length.invalid", PI_MALFORMED, PI_ERROR, "Invalid offset", EXPFILL }},
+		{ &ei_sapenqueue_support_invalid_length, { "sapenque.conn_admin.params.param.length.invalid", PI_MALFORMED, PI_WARN, "The reported length is incorrect", EXPFILL }},
+	};
+
+	expert_module_t* sapenqueue_expert;
+
+	/* Register the protocol */
     proto_sapenqueue = proto_register_protocol (
         "SAP Enqueue Protocol",    /* name       */
         "SAPENQUEUE",        /* short name */
@@ -536,6 +550,9 @@ proto_register_sapenqueue(void)
 
     proto_register_field_array(proto_sapenqueue, hf, array_length(hf));
     proto_register_subtree_array(ett, array_length(ett));
+
+	sapenqueue_expert = expert_register_protocol(proto_sapenqueue);
+	expert_register_field_array(sapenqueue_expert, ei, array_length(ei));
 
     register_dissector("sapenqueue", dissect_sapenqueue, proto_sapenqueue);
 
