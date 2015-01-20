@@ -412,7 +412,7 @@ dissect_sapenqueue(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 
 
 static gboolean
-dissect_sapenqueue_heur(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data){
+dissect_sapenqueue_heur(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_){
     conversation_t *conversation = NULL;
 
 	/* If the first 4 bytes are the magic bytes, we can guess that the
