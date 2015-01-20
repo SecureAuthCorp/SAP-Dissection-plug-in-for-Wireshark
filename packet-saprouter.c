@@ -21,6 +21,8 @@
 
 #include "config.h"
 
+#include <stdlib.h>
+
 #include <epan/packet.h>
 #include <epan/prefs.h>
 #include <epan/expert.h>
@@ -188,6 +190,12 @@ static int hf_saprouter_admin_address_mask = -1;
 
 static gint ett_saprouter = -1;
 
+/* Expert info */
+static expert_field ei_saprouter_route_password_found = EI_INIT;
+static expert_field ei_saprouter_route_invalid_length = EI_INIT;
+static expert_field ei_saprouter_info_password_found = EI_INIT;
+static expert_field ei_saprouter_invalid_client_ids = EI_INIT;
+
 /* Global port preference */
 static range_t *global_saprouter_port_range;
 
@@ -273,7 +281,7 @@ dissect_routestring(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32
 
             /* If a password was found, add a expert warning in the security category */
             if (len > 1){
-                expert_add_info_format(pinfo, route_password, PI_SECURITY, PI_WARN, "Route password found");
+                expert_add_info(pinfo, route_password, &ei_saprouter_route_password_found);
             }
         }
         offset += len;
@@ -375,8 +383,6 @@ dissect_saprouter_snc_frame(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
 			/* Create a new tvb buffer and call the dissector */
 			next_tvb = tvb_new_subset(tvb, offset, -1, -1);
 			call_dissector(snc_handle, next_tvb, pinfo, tree);
-		} else {
-	    	expert_add_info_format(pinfo, tree, PI_UNDECODED, PI_WARN, "SAP SNC dissector not found !");
 		}
     }
 
@@ -404,8 +410,6 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 			session_state->src_hostname = NULL; session_state->src_port = 0; session_state->src_password = NULL;
 			session_state->dest_hostname = NULL; session_state->dest_port = 0; session_state->dest_password = NULL;
 			conversation_add_proto_data(conversation, proto_saprouter, session_state);
-        } else{
-        	expert_add_info_format(pinfo, NULL, PI_UNDECODED, PI_ERROR, "Error allocating buffer for tracking Router session");
         }
     }
 
@@ -441,7 +445,7 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
                 /* Check if a password was supplied */
                 if (tvb_offset_exists(tvb, offset) && (tvb_strsize(tvb, offset) > 0)){
                     admin_password = proto_tree_add_item(saprouter_tree, hf_saprouter_admin_password, tvb, offset, tvb_strsize(tvb, offset), FALSE);
-                    expert_add_info_format(pinfo, admin_password, PI_SECURITY, PI_WARN, "Info request password");
+                    expert_add_info(pinfo, admin_password, &ei_saprouter_info_password_found);
                 }
                 break;
             }
@@ -476,7 +480,7 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 
             	/* Check if the actual count of IDs differes from the reported number */
             	if ((client_count_actual != client_count) || tvb_captured_length_remaining(tvb, offset)>0){
-            		expert_add_info_format(pinfo, clients_tree, PI_MALFORMED, PI_WARN, "Client IDs list is malformed");
+            		expert_add_info(pinfo, clients_tree, &ei_saprouter_invalid_client_ids);
             	}
 
                 break;
@@ -510,7 +514,7 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
             proto_tree_add_item(saprouter_tree, hf_saprouter_route_offset, tvb, offset, 4, FALSE); offset+=4;
             /* Add the route tree */
             if ((guint32)tvb_captured_length_remaining(tvb, offset) != route_length){
-                expert_add_info_format(pinfo, saprouter_tree, PI_MALFORMED, PI_WARN, "The route length is invalid (remaining=%d, route_length=%d)", tvb_captured_length_remaining(tvb, offset), route_length);
+                expert_add_info_format(pinfo, saprouter_tree, &ei_saprouter_route_invalid_length, "Route string length is invalid (remaining=%d, route_length=%d)", tvb_captured_length_remaining(tvb, offset), route_length);
                 route_length = (guint32)tvb_captured_length_remaining(tvb, offset);
             }
             ri = proto_tree_add_item(saprouter_tree, hf_saprouter_route, tvb, offset, route_length, FALSE);
@@ -713,7 +717,16 @@ proto_register_saprouter(void)
         &ett_saprouter
     };
 
+    /* Register the expert info */
+	static ei_register_info ei[] = {
+		{ &ei_saprouter_route_password_found, { "saprouter.routestring.password", PI_SECURITY, PI_WARN, "Route password found", EXPFILL }},
+		{ &ei_saprouter_info_password_found, { "saprouter.password", PI_SECURITY, PI_WARN, "Info password found", EXPFILL }},
+		{ &ei_saprouter_route_invalid_length, { "saprouter.routestring.routelength.invalid", PI_MALFORMED, PI_WARN, "The route string length is invalid", EXPFILL }},
+		{ &ei_saprouter_invalid_client_ids, { "saprouter.client_ids.invalid", PI_MALFORMED, PI_WARN, "Client IDs list is malformed", EXPFILL }},
+	};
+
     module_t *saprouter_module;
+	expert_module_t* saprouter_expert;
 
     /* Register the protocol */
     proto_saprouter = proto_register_protocol (
@@ -724,6 +737,9 @@ proto_register_saprouter(void)
 
     proto_register_field_array(proto_saprouter, hf, array_length(hf));
     proto_register_subtree_array(ett, array_length(ett));
+
+    saprouter_expert = expert_register_protocol(proto_saprouter);
+	expert_register_field_array(saprouter_expert, ei, array_length(ei));
 
     register_dissector("saprouter", dissect_saprouter, proto_saprouter);
 
