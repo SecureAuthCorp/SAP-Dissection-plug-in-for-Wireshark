@@ -86,6 +86,7 @@ void
 dissect_sap_protocol_payload(tvbuff_t *tvb, guint32 offset, packet_info *pinfo, proto_tree *tree, guint16 sport, guint16 dport){
 	guint16 low_port = 0, high_port = 0;
 	tvbuff_t *next_tvb = NULL;
+	heur_dtbl_entry_t *hdtbl_entry = NULL;
 
 	/* Set the new tvb for further dissection of the payload */
 	next_tvb = tvb_new_subset_remaining(tvb, offset);
@@ -103,7 +104,7 @@ dissect_sap_protocol_payload(tvbuff_t *tvb, guint32 offset, packet_info *pinfo, 
 	/* Try with the heuristic dissectors first */
 	/* TODO: When the protocol is guessed via heuristic dissector (Enqueue
 	 * Server), the NI Protocol tree is missed. */
-	if (dissector_try_heuristic(heur_subdissector_list, next_tvb, pinfo, tree, NULL)) {
+	if (dissector_try_heuristic(heur_subdissector_list, next_tvb, pinfo, tree, &hdtbl_entry, NULL)) {
 		return;
 	}
 
