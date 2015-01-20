@@ -49,6 +49,9 @@ static int hf_sap_protocol_pong = -1;
 
 static gint ett_sap_protocol = -1;
 
+/* Expert info */
+static expert_field ei_sap_invalid_length = EI_INIT;
+
 /* Global port preference */
 static range_t *global_sap_protocol_port_range;
 
@@ -71,7 +74,7 @@ void proto_reg_handoff_sap_protocol(void);
  * Get the SAPNI pdu length
  */
 static guint
-get_sap_protocol_pdu_len(packet_info *pinfo _U_, tvbuff_t *tvb, int offset)
+get_sap_protocol_pdu_len(packet_info *pinfo _U_, tvbuff_t *tvb, int offset _U_)
 {
 	return ((guint)tvb_get_ntohl(tvb, 0) + 4);
 }
@@ -155,8 +158,8 @@ dissect_sap_protocol_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree
 		sap_protocol_length = proto_tree_add_item(sap_protocol_tree, hf_sap_protocol_length, tvb, 0, 4, FALSE);
 
 		/* Add expert info in case of no match between the given length and the actual one */
-		if (tvb_reported_length(tvb) != length + 4) {  
-			expert_add_info_format(pinfo, sap_protocol_length, PI_MALFORMED, PI_WARN, "The reported length is incorrect");
+		if (tvb_reported_length(tvb) != length + 4) {
+			expert_add_info(pinfo, sap_protocol_length, &ei_sap_invalid_length);
 		}
 
 		/* Add the payload subtree */
@@ -217,7 +220,13 @@ proto_register_sap_protocol(void)
 		&ett_sap_protocol
 	};
 
+	/* Register the expert info */
+	static ei_register_info ei[] = {
+		{ &ei_sap_invalid_length, { "sapni.length.invalid", PI_MALFORMED, PI_WARN, "The reported length is incorrect", EXPFILL }},
+	};
+
 	module_t *sap_protocol_module;
+	expert_module_t* sap_protocol_expert;
 
 	/* Register the protocol */
 	proto_sap_protocol = proto_register_protocol (
@@ -228,6 +237,9 @@ proto_register_sap_protocol(void)
 
 	proto_register_field_array(proto_sap_protocol, hf, array_length(hf));
 	proto_register_subtree_array(ett, array_length(ett));
+
+	sap_protocol_expert = expert_register_protocol(proto_sap_protocol);
+	expert_register_field_array(sap_protocol_expert, ei, array_length(ei));
 
 	register_dissector("sapni", dissect_sap_protocol, proto_sap_protocol);
 
