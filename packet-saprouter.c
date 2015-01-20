@@ -469,13 +469,13 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
             	/* Parse the list of client IDs */
             	ci = proto_tree_add_item(saprouter_tree, hf_saprouter_admin_client_ids, tvb, offset, 4*client_count, FALSE);
                 clients_tree = proto_item_add_subtree(ci, ett_saprouter);
-            	while (tvb_offset_exists(tvb, offset) && tvb_length_remaining(tvb, offset)>=4){
+            	while (tvb_offset_exists(tvb, offset) && tvb_captured_length_remaining(tvb, offset)>=4){
                     proto_tree_add_item(clients_tree, hf_saprouter_admin_client_id, tvb, offset, 4, FALSE); offset+=4;
                     client_count_actual+=1;
             	}
 
             	/* Check if the actual count of IDs differes from the reported number */
-            	if ((client_count_actual != client_count) || tvb_length_remaining(tvb, offset)>0){
+            	if ((client_count_actual != client_count) || tvb_captured_length_remaining(tvb, offset)>0){
             		expert_add_info_format(pinfo, clients_tree, PI_MALFORMED, PI_WARN, "Client IDs list is malformed");
             	}
 
@@ -509,9 +509,9 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
             proto_tree_add_item(saprouter_tree, hf_saprouter_route_length, tvb, offset, 4, FALSE); offset+=4;
             proto_tree_add_item(saprouter_tree, hf_saprouter_route_offset, tvb, offset, 4, FALSE); offset+=4;
             /* Add the route tree */
-            if ((guint32)tvb_length_remaining(tvb, offset) != route_length){
-                expert_add_info_format(pinfo, saprouter_tree, PI_MALFORMED, PI_WARN, "The route length is invalid (remaining=%d, route_length=%d)", tvb_length_remaining(tvb, offset), route_length);
-                route_length = (guint32)tvb_length_remaining(tvb, offset);
+            if ((guint32)tvb_captured_length_remaining(tvb, offset) != route_length){
+                expert_add_info_format(pinfo, saprouter_tree, PI_MALFORMED, PI_WARN, "The route length is invalid (remaining=%d, route_length=%d)", tvb_captured_length_remaining(tvb, offset), route_length);
+                route_length = (guint32)tvb_captured_length_remaining(tvb, offset);
             }
             ri = proto_tree_add_item(saprouter_tree, hf_saprouter_route, tvb, offset, route_length, FALSE);
             route_tree = proto_item_add_subtree(ri, ett_saprouter);

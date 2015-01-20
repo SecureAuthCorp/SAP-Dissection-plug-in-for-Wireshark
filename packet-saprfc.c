@@ -443,7 +443,7 @@ dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 
 		/* Decompress the payload */
 		rt = decompress_packet(tvb_get_ptr(tvb, initial_offset, -1),
-				tvb_length_remaining(tvb, initial_offset),
+				tvb_captured_length_remaining(tvb, initial_offset),
 				decompressed_buffer,
 				&uncompress_length);
 
@@ -690,7 +690,7 @@ dissect_saprfc_rfcheader(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
 		proto_tree_add_item(header_unicode_tree, hf_saprfc_ucheader_returncode, tvb, offset, 4, FALSE); offset+=4;
 
 		/* Check the payload length */
-		if (tvb_length_remaining(tvb, offset) > 0){
+		if (tvb_captured_length_remaining(tvb, offset) > 0){
 			/* Add the payload subtree */
 			payload = proto_tree_add_item(tree, hf_saprfc_payload, tvb, offset, -1, FALSE);
 			payload_tree = proto_item_add_subtree(payload, ett_saprfc);

@@ -2348,7 +2348,7 @@ dissect_sapdiag_payload(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, pro
 		/* Add the item value */
 		if (item_value_length > 0){
 			/* Check if the item length is valid */
-			item_value_remaining_length = tvb_length_remaining(tvb, offset);
+			item_value_remaining_length = tvb_captured_length_remaining(tvb, offset);
 			if (item_value_remaining_length < 0){
 				expert_add_info_format(pinfo, il, PI_MALFORMED, PI_ERROR, "Invalid offset");
 				return;
@@ -2370,7 +2370,7 @@ check_sapdiag_dp(tvbuff_t *tvb, guint32 offset){
 
 	/* Since there's no SAP Diag mode 0xff, if the first byte is a 0xFF the
 	 * packet probably holds an initialization DP Header */
-	if ((tvb_length_remaining(tvb, offset) >= 200 + 8) && tvb_get_guint8(tvb, offset) == 0xFF){
+	if ((tvb_captured_length_remaining(tvb, offset) >= 200 + 8) && tvb_get_guint8(tvb, offset) == 0xFF){
 		return (TRUE);
 	}
     return (FALSE);
@@ -2440,17 +2440,17 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 		proto_tree_add_item(header_tree, hf_sapdiag_compress, tvb, offset, 1, FALSE); offset++;
 
 		/* Check for error messages */
-		if ((error_flag != 0x00) && (tvb_length_remaining(tvb, offset) > 0)){
+		if ((error_flag != 0x00) && (tvb_captured_length_remaining(tvb, offset) > 0)){
 			gchar  *error_message = NULL;
 			guint32 error_message_length = 0;
 
-			error_message_length = (guint32)tvb_length_remaining(tvb, offset) - 1;
+			error_message_length = (guint32)tvb_captured_length_remaining(tvb, offset) - 1;
 			error_message = tvb_get_unicode_string(tvb, offset, error_message_length, ENC_LITTLE_ENDIAN);
 			proto_tree_add_string(sapdiag_tree, hf_sapdiag_error_message, tvb, offset, error_message_length, error_message);
 			g_free(error_message);
 
 		/* If the message is compressed */
-		} else if ((compress == 0x01) && (tvb_length_remaining(tvb, offset) >= 8)){
+		} else if ((compress == 0x01) && (tvb_captured_length_remaining(tvb, offset) >= 8)){
 			guint8 *decompressed_buffer;
 			guint32 reported_length = 0, uncompress_length = 0, payload_offset = 0;;
 
@@ -2487,7 +2487,7 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 
 				/* Decompress the payload */
 				rt = decompress_packet(tvb_get_ptr(tvb, payload_offset, -1),
-						tvb_length_remaining(tvb, payload_offset),
+						tvb_captured_length_remaining(tvb, payload_offset),
 						decompressed_buffer,
 						&uncompress_length);
 
@@ -2528,7 +2528,7 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 			}
 
 		/* Message encrypted with SNC */
-		} else if (((compress == 0x02) || (compress == 0x03)) && (tvb_length_remaining(tvb, offset) > 0)){
+		} else if (((compress == 0x02) || (compress == 0x03)) && (tvb_captured_length_remaining(tvb, offset) > 0)){
 
 			/* Call the SNC dissector */
 			dissect_sapdiag_snc_frame(tvb, pinfo, tree, offset);
@@ -2536,7 +2536,7 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
         /* Uncompressed payload */
 		} else {
 			/* Check the payload length */
-			if (tvb_length_remaining(tvb, offset) > 0){
+			if (tvb_captured_length_remaining(tvb, offset) > 0){
 				/* Add the payload subtree */
 				payload = proto_tree_add_item(sapdiag_tree, hf_sapdiag_payload, tvb, offset, -1, FALSE);
 				payload_tree = proto_item_add_subtree(payload, ett_sapdiag);
