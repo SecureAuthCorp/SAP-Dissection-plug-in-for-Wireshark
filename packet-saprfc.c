@@ -378,6 +378,12 @@ static int hf_saprfc_payload = -1;
 
 static gint ett_saprfc = -1;
 
+/* Expert info */
+static expert_field ei_saprfc_invalid_decompresssion = EI_INIT;
+static expert_field ei_saprfc_invalid_decompress_length = EI_INIT;
+static expert_field ei_saprfc_unknown_item = EI_INIT;
+
+
 /* Global decompress preference */
 static gboolean global_saprfc_decompress = TRUE;
 
@@ -435,7 +441,6 @@ dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 		 * reported length */
 		decompressed_buffer = (guint8 *)wmem_alloc0(wmem_packet_scope(), reported_length);
 		if (!decompressed_buffer){
-			expert_add_info_format(pinfo, NULL, PI_UNDECODED, PI_ERROR, "Error allocating buffer for decompress the RFC table");
 			return;
 		}
 
@@ -451,14 +456,14 @@ dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 		 * occurred. The dissector continues trying to add the payload,
 		 * however the returned size should be 0.  */
 		if (rt < 0){
-			expert_add_info_format(pinfo, compression_header, PI_MALFORMED, PI_WARN, "Decompression of payload failed with return code %d (%s)", rt, val_to_str(rt, hf_decompress_return_code_vals, "Unknown"));
+			expert_add_info_format(pinfo, compression_header, &ei_saprfc_invalid_decompresssion, "Decompression of payload failed with return code %d (%s)", rt, val_to_str(rt, hf_decompress_return_code_vals, "Unknown"));
 		}
 
 		/* Check the length returned for the compression routine. If differs
 		 * with the reported, use the actual one and add an expert info
 		 * warning. */
 		if (uncompress_length != reported_length){
-			expert_add_info_format(pinfo, rl, PI_MALFORMED, PI_WARN, "The uncompressed payload length (%d) differs with the reported length (%d)", uncompress_length, reported_length);
+			expert_add_info_format(pinfo, rl, &ei_saprfc_invalid_decompress_length, "The uncompressed payload length (%d) differs with the reported length (%d)", uncompress_length, reported_length);
 		}
 
 		/* TODO: Add the return code to the tree */
@@ -500,7 +505,6 @@ dissect_saprfc_tables(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint
 	/* Allocate the buffer only in the scope of current packet */
 	reassemble_buffer = (guint8 *)wmem_alloc(wmem_packet_scope(), reassemble_length);
 	if (!reassemble_buffer){
-		expert_add_info_format(pinfo, NULL, PI_UNDECODED, PI_ERROR, "Error allocating buffer for reassemble the RFC table");
 		return;
 	}
 
@@ -590,7 +594,7 @@ dissect_saprfc_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_t
     } else {
         /* If the preference is set, report the item as unknown in the expert info */
         if (global_saprfc_highlight_items){
-            expert_add_info_format(pinfo, item, PI_UNDECODED, PI_WARN, "The RFC item has a unknown type that is not dissected (%d %d %d %d)", item_id1, item_id2, item_id3, item_id4);
+            expert_add_info_format(pinfo, item, &ei_saprfc_unknown_item, "The RFC item has a unknown type that is not dissected (%d %d %d %d)", item_id1, item_id2, item_id3, item_id4);
         }
     }
 }
@@ -1208,7 +1212,15 @@ proto_register_saprfc(void)
 		&ett_saprfc
 	};
 
+    /* Register the expert info */
+	static ei_register_info ei[] = {
+		{ &ei_saprfc_invalid_decompresssion, { "saprfc.table.compression.failed", PI_MALFORMED, PI_WARN, "Decompression of payload failed", EXPFILL }},
+		{ &ei_saprfc_invalid_decompress_length, { "saprfc.table.compression.uncomplength.invalid", PI_MALFORMED, PI_WARN, "The uncompressed payload length differs with the reported length", EXPFILL }},
+		{ &ei_saprfc_unknown_item, { "saprfc.item.unknown", PI_UNDECODED, PI_WARN, "The RFC item has a unknown type that is not dissected", EXPFILL }},
+	};
+
 	module_t *saprfc_module;
+	expert_module_t* saprfc_expert;
 
 	/* Register the protocol */
 	proto_saprfc = proto_register_protocol (
@@ -1219,6 +1231,9 @@ proto_register_saprfc(void)
 
 	proto_register_field_array(proto_saprfc, hf, array_length(hf));
 	proto_register_subtree_array(ett, array_length(ett));
+
+	saprfc_expert = expert_register_protocol(proto_saprfc);
+	expert_register_field_array(saprfc_expert, ei, array_length(ei));
 
 	register_dissector("saprfc", dissect_saprfc, proto_saprfc);
 	register_dissector("saprfcinternal", dissect_saprfc_internal, proto_saprfc);
