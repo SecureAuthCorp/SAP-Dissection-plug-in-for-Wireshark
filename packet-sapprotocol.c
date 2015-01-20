@@ -126,8 +126,8 @@ dissect_sap_protocol_payload(tvbuff_t *tvb, guint32 offset, packet_info *pinfo, 
  * calling the sub-dissector according to the port number. It also identifies
  * PING/PONG packets at the SAPNI layer.
  */
-static void
-dissect_sap_protocol_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
+static int
+dissect_sap_protocol_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_)
 {
 	guint32 length = 0;
 	proto_item *ti = NULL, *sap_protocol_length = NULL;
@@ -183,6 +183,9 @@ dissect_sap_protocol_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree
 	} else if (length > 0){
 		dissect_sap_protocol_payload(tvb, 4, pinfo, tree, pinfo->srcport, pinfo->destport);
 	}
+
+	/* TODO: We need to return the *actual* length processed */
+	return (length);
 }
 
 /*
@@ -192,7 +195,7 @@ static void
 dissect_sap_protocol(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 {
 	tcp_dissect_pdus(tvb, pinfo, tree, global_sap_protocol_desegment, SAP_PROTOCOL_HEADER_LEN,
-		get_sap_protocol_pdu_len, dissect_sap_protocol_message);
+		get_sap_protocol_pdu_len, dissect_sap_protocol_message, NULL);
 }
 
 void
