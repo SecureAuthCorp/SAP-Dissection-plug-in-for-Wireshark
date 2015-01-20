@@ -2,7 +2,7 @@
 # ===========
 # SAP Dissector Plugin for Wireshark
 #
-# Copyright (C) 2014 Core Security Technologies
+# Copyright (C) 2015 Core Security Technologies
 #
 # The plugin was designed and developed by Martin Gallo from the Security
 # Consulting Services team of Core Security Technologies.
