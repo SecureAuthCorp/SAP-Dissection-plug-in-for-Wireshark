@@ -708,8 +708,7 @@ dissect_saprfc_rfcheader(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
 
 
 static void
-dissect_saprfc_monitor_cmd(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint8 version, guint32 offset){
-	// TODO: Warning unused version parameter
+dissect_saprfc_monitor_cmd(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint8 version _U_, guint32 offset){
 	guint8 opcode;
 
 	opcode = tvb_get_guint8(tvb, offset);
