@@ -874,7 +874,7 @@ dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
             break;
         }
         case 0x0a:{         /* MS_GET_HWID */
-	        proto_tree_add_none_format(tree, hf_sapms_opcode_value, tvb, offset, length, "Hardware ID: %s", tvb_get_ephemeral_string(tvb, offset, length));
+	        proto_tree_add_none_format(tree, hf_sapms_opcode_value, tvb, offset, length, "Hardware ID: %s", tvb_get_string_enc(wmem_packet_scope(), tvb, offset, length, ENC_ASCII));
             break;
         }
         case 0x11:{			/* MS_GET_STATISTIC */
@@ -903,7 +903,7 @@ dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
             	while (length>1){
             		string_length = tvb_find_line_end(tvb, offset, -1, NULL, FALSE);
             		if (string_length>0){
-            			proto_tree_add_none_format(tree, hf_sapms_opcode_value, tvb, offset, string_length, "%s", tvb_get_ephemeral_string(tvb, offset, string_length));
+            			proto_tree_add_none_format(tree, hf_sapms_opcode_value, tvb, offset, string_length, "%s", tvb_get_string_enc(wmem_packet_scope(), tvb, offset, string_length, ENC_ASCII));
             			offset+=string_length; length-=string_length;
             		}
             		offset+=1; length-=1;
