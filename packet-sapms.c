@@ -586,6 +586,15 @@ static int hf_sapms_server_lst_sys_service = -1;
 
 static gint ett_sapms = -1;
 
+/* Expert info */
+static expert_field ei_sapms_adm_opcode_partial = EI_INIT;
+static expert_field ei_sapms_opcode_partial = EI_INIT;
+static expert_field ei_sapms_unknown_version = EI_INIT;
+static expert_field ei_sapms_client_invalid_offset = EI_INIT;
+static expert_field ei_sapms_client_invalid_length = EI_INIT;
+static expert_field ei_sapms_text_invalid_length = EI_INIT;
+static expert_field ei_sapms_ip_invalid_length = EI_INIT;
+
 /* Global port preference */
 static range_t *global_sapms_port_range;
 
@@ -665,7 +674,7 @@ dissect_sapms_adm_record(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
             default:{
                 proto_tree_add_item(record_tree, hf_sapms_adm_record_value, tvb, offset, 100, FALSE); offset+=100; length-=100;
                 if (global_sapms_highlight_items){
-                    expert_add_info_format(pinfo, record_tree, PI_UNDECODED, PI_WARN, "The ADM opcode is dissected partially (0x%.2x)", adm_opcode);
+                    expert_add_info_format(pinfo, record_tree, &ei_sapms_adm_opcode_partial, "The ADM opcode is dissected partially (0x%.2x)", adm_opcode);
                 }
                 break;
             }
@@ -695,17 +704,17 @@ dissect_sapms_client(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
     } else {								/* Default to version 4 */
     	client_length = 160;
         if (global_sapms_highlight_items){
-            expert_add_info_format(pinfo, tree, PI_UNDECODED, PI_WARN, "This version has not been seen, dissection of this packet could be wrong for this version (0x%.2x)", opcode_version);
+            expert_add_info_format(pinfo, tree, &ei_sapms_unknown_version, "This version has not been seen, dissection of this packet could be wrong for this version (0x%.2x)", opcode_version);
         }
 	}
 
     client_length_remaining = tvb_captured_length_remaining(tvb, offset);
     if (client_length_remaining < 0){
-        expert_add_info_format(pinfo, tree, PI_MALFORMED, PI_WARN, "Invalid offset");
+        expert_add_info(pinfo, tree, &ei_sapms_client_invalid_offset);
     	return (0);
     }
     if (client_length_remaining < client_length){
-        expert_add_info_format(pinfo, tree, PI_MALFORMED, PI_WARN, "Invalid client length (expected=%d, actual=%d)", client_length, client_length_remaining);
+        expert_add_info_format(pinfo, tree, &ei_sapms_client_invalid_length, "Invalid client length (expected=%d, actual=%d)", client_length, client_length_remaining);
     	return (client_length_remaining);
     }
 
@@ -916,7 +925,7 @@ dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
             proto_tree_add_item(tree, hf_sapms_text_length, tvb, offset, 4, FALSE); offset+=4; length-=4;
             /* Check length */
             if (text_length != length ){
-            	expert_add_info_format(pinfo, tree, PI_MALFORMED, PI_WARN, "Invalid length (expected=%d, actual=%d)", text_length, length);
+            	expert_add_info_format(pinfo, tree, &ei_sapms_text_invalid_length, "Invalid text length (expected=%d, actual=%d)", text_length, length);
             }
             proto_tree_add_item(tree, hf_sapms_text_value, tvb, offset, length, FALSE); offset+=length;        
             break;
@@ -981,7 +990,7 @@ dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
                 tvb_get_ipv6(tvb, offset, &address_ipv6);
                 proto_tree_add_ipv6(tree, hf_sapms_logon_address6, tvb, offset, 16, (guint8 *)&address_ipv6); offset+=16; length-=16;
             } else { /* Add expert info if wrong IPv6 address length */
-            	expert_add_info_format(pinfo, tree, PI_MALFORMED, PI_WARN, "Invalid length (%d) or data", address6_length);
+            	expert_add_info_format(pinfo, tree, &ei_sapms_ip_invalid_length, "Invalid IPv6 address length (%d) or data", address6_length);
             }
 
             break;
@@ -1041,7 +1050,7 @@ dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
         }
         default:{
             if (global_sapms_highlight_items){
-                expert_add_info_format(pinfo, tree, PI_UNDECODED, PI_WARN, "The opcode is dissected partially (0x%.2x)", opcode);
+                expert_add_info_format(pinfo, tree, &ei_sapms_opcode_partial, "The opcode is dissected partially (0x%.2x)", opcode);
             }
             break;
         }
@@ -1448,7 +1457,19 @@ proto_register_sapms(void)
 		&ett_sapms
 	};
 
+    /* Register the expert info */
+	static ei_register_info ei[] = {
+		{ &ei_sapms_adm_opcode_partial, { "sapms.adm.record.opcode.unknown", PI_UNDECODED, PI_WARN, "The ADM opcode is dissected partially", EXPFILL }},
+		{ &ei_sapms_opcode_partial, { "sapms.opcode.unknown", PI_UNDECODED, PI_WARN, "The opcode is dissected partially", EXPFILL }},
+		{ &ei_sapms_unknown_version, { "sapms.serverlst.unknown", PI_UNDECODED, PI_WARN, "This version has not been seen, dissection of this packet could be wrong for this version", EXPFILL }},
+		{ &ei_sapms_client_invalid_offset, { "sapms.serverlst.offset.invalid",  PI_MALFORMED, PI_WARN, "Invalid offset", EXPFILL }},
+		{ &ei_sapms_client_invalid_length, { "sapms.serverlst.length.invalid", PI_MALFORMED, PI_WARN, "Invalid client length", EXPFILL }},
+		{ &ei_sapms_text_invalid_length, { "sapms.text.length.invalid", PI_MALFORMED, PI_WARN, "Invalid text length", EXPFILL }},
+		{ &ei_sapms_ip_invalid_length, { "sapms.logon.address6.invalid", PI_MALFORMED, PI_WARN, "Invalid IPv6 address length or data", EXPFILL }},
+	};
+
 	module_t *sapms_module;
+	expert_module_t* sapms_expert;
 
 	/* Register the protocol */
 	proto_sapms = proto_register_protocol (
@@ -1461,6 +1482,9 @@ proto_register_sapms(void)
 
 	proto_register_field_array(proto_sapms, hf, array_length(hf));
 	proto_register_subtree_array(ett, array_length(ett));
+
+	sapms_expert = expert_register_protocol(proto_sapms);
+	expert_register_field_array(sapms_expert, ei, array_length(ei));
 
 	/* Register the preferences */
 	sapms_module = prefs_register_protocol(proto_sapms, proto_reg_handoff_sapms);
