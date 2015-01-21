@@ -1536,8 +1536,7 @@ add_item_value_uint32(tvbuff_t *tvb, proto_item *item, proto_tree *tree, int hf,
 
 void
 add_item_value_string(tvbuff_t *tvb, proto_item *item, proto_tree *tree, int hf, guint32 offset, guint32 length, const char *text, int show_in_tree){
-	guint8 *string = NULL;
-	string = tvb_get_ephemeral_string(tvb, offset, length);
+	guint8 *string = tvb_get_string_enc(wmem_packet_scope(), tvb, offset, length, ENC_ASCII);
 	proto_tree_add_none_format(tree, hf, tvb, offset, length, "%s: %s", text, string);
 	if (show_in_tree) proto_item_append_text(item, ", %s=%s", text, string);
 }
@@ -1546,7 +1545,7 @@ add_item_value_string(tvbuff_t *tvb, proto_item *item, proto_tree *tree, int hf,
 guint32
 add_item_value_stringz(tvbuff_t *tvb, proto_item *item, proto_tree *tree, int hf, guint32 offset, const char *text, int show_in_tree){
     guint32 length = tvb_strsize(tvb, offset);
-	guint8 *string = tvb_get_ephemeral_string(tvb, offset, length - 1);
+	guint8 *string = tvb_get_string_enc(wmem_packet_scope(), tvb, offset, length - 1, ENC_ASCII);
 	proto_tree_add_none_format(tree, hf, tvb, offset, length, "%s: %s", text, string);
 	if (show_in_tree) proto_item_append_text(item, ", %s=%s", text, string);
     return (length);
@@ -2445,9 +2444,8 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 			guint32 error_message_length = 0;
 
 			error_message_length = (guint32)tvb_captured_length_remaining(tvb, offset) - 1;
-			error_message = tvb_get_unicode_string(tvb, offset, error_message_length, ENC_LITTLE_ENDIAN);
+			error_message = tvb_get_string_enc(wmem_packet_scope(), tvb, offset, error_message_length, ENC_LITTLE_ENDIAN|ENC_UTF_16);
 			proto_tree_add_string(sapdiag_tree, hf_sapdiag_error_message, tvb, offset, error_message_length, error_message);
-			g_free(error_message);
 
 		/* If the message is compressed */
 		} else if ((compress == 0x01) && (tvb_captured_length_remaining(tvb, offset) >= 8)){
