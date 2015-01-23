@@ -1128,8 +1128,21 @@ static int hf_SAPDIAG_SUPPORT_BIT_UNKNOWN_3 = -1;
 static int hf_SAPDIAG_SUPPORT_BIT_GUI_SIGNATURE_COLOR = -1;
 static int hf_SAPDIAG_SUPPORT_BIT_MAX_WSIZE = -1;
 
-
 static gint ett_sapdiag = -1;
+
+/* Expert info */
+static expert_field ei_sapdiag_item_unknown = EI_INIT;
+static expert_field ei_sapdiag_item_partial = EI_INIT;
+static expert_field ei_sapdiag_item_unknown_length = EI_INIT;
+static expert_field ei_sapdiag_item_offset_invalid = EI_INIT;
+static expert_field ei_sapdiag_item_length_invalid = EI_INIT;
+static expert_field ei_sapdiag_atom_item_unknown = EI_INIT;
+static expert_field ei_sapdiag_atom_item_partial = EI_INIT;
+static expert_field ei_sapdiag_atom_item_malformed = EI_INIT;
+static expert_field ei_sapdiag_dynt_focus_more_cont_ids = EI_INIT;
+static expert_field ei_sapdiag_password_field = EI_INIT;
+static expert_field ei_sapdiag_invalid_decompresssion = EI_INIT;
+static expert_field ei_sapdiag_invalid_decompress_length = EI_INIT;
 
 /* Global decompress preference */
 static gboolean global_sapdiag_decompress = TRUE;
@@ -1471,9 +1484,7 @@ dissect_sapdiag_rfc_call(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
 	    	/* Create a new tvb buffer and call the dissector */
 	        next_tvb = tvb_new_subset(tvb, offset, item_length, item_length);
             call_dissector(rfc_handle, next_tvb, pinfo, tree);
-	    } else {
-	    	expert_add_info_format(pinfo, tree, PI_UNDECODED, PI_WARN, "SAP RFC dissector not found !");
-		}
+	    }
     }
 
 }
@@ -1494,8 +1505,6 @@ dissect_sapdiag_snc_frame(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, g
 	    	/* Create a new tvb buffer and call the dissector */
 			next_tvb = tvb_new_subset(tvb, offset, -1, -1);
 			call_dissector(snc_handle, next_tvb, pinfo, tree);
-		} else {
-	    	expert_add_info_format(pinfo, tree, PI_UNDECODED, PI_WARN, "SAP SNC dissector not found !");
 		}
     }
 
@@ -1504,7 +1513,7 @@ dissect_sapdiag_snc_frame(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, g
 gboolean
 check_length(packet_info *pinfo, proto_tree *tree, guint32 expected, guint32 real, const char *name_string){
 	if (expected != real){
-		expert_add_info_format(pinfo, tree, PI_MALFORMED, PI_WARN, "%s length is invalid", name_string);
+		expert_add_info_format(pinfo, tree, &ei_sapdiag_item_length_invalid, "Item %s length is invalid", name_string);
         return (FALSE);
     } else return (TRUE);
 }
@@ -1582,7 +1591,7 @@ dissect_sapdiag_dyntatom(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
         /* Check the atom_tree for NULL values. If the atom_tree wasn't created at this point, the atom
          * starts with an item different to 114 or 120. */
         if (atom_tree == NULL){
-            expert_add_info_format(pinfo, tree, PI_MALFORMED, PI_WARN, "The Diag Atom is malformed");
+            expert_add_info(pinfo, tree, &ei_sapdiag_atom_item_malformed);
             break;
         }
 
@@ -1628,7 +1637,7 @@ dissect_sapdiag_dyntatom(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
 
         /* If the attribute is set to invisible we're dealing probably with a password field */
         if (attr & SAPDIAG_ATOM_ATTR_DIAG_BSD_INVISIBLE){
-            expert_add_info_format(pinfo, atom_item, PI_SECURITY, PI_WARN, "Password field?");
+            expert_add_info(pinfo, atom_item, &ei_sapdiag_password_field);
         }
 
         switch (etype){
@@ -1662,7 +1671,7 @@ dissect_sapdiag_dyntatom(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
               case 119:{ /* DIAG_DGOTYP_RADIOBUTTON_1 */
                 /* If the preference is set, report the item as partially dissected in the expert info */
                 if (global_sapdiag_highlight_items){
-                    expert_add_info_format(pinfo, atom_item, PI_UNDECODED, PI_WARN, "The Diag Atom is dissected partially (0x%.2x)", etype);
+                    expert_add_info_format(pinfo, atom_item, &ei_sapdiag_atom_item_partial, "The Diag Atom is dissected partially (0x%.2x)", etype);
                 }
                 break;
 
@@ -1712,7 +1721,7 @@ dissect_sapdiag_dyntatom(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
             } default:
                 /* If the preference is set, report the item as unknown in the expert info */
                 if (global_sapdiag_highlight_items){
-                    expert_add_info_format(pinfo, atom_item, PI_UNDECODED, PI_WARN, "The Diag Atom has a unknown type that is not dissected (%d)", etype);
+                    expert_add_info_format(pinfo, atom_item, &ei_sapdiag_atom_item_unknown, "The Diag Atom has a unknown type that is not dissected (%d)", etype);
                 }
                 offset+=atom_item_length;
 
@@ -1814,7 +1823,7 @@ dissect_sapdiag_uievent(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gui
     }
 
     if (i>0)
-        expert_add_info_format(pinfo, tree, PI_MALFORMED, PI_WARN, "Number of Container IDs (%d) is invalid", container_nrs);
+        expert_add_info_format(pinfo, tree, &ei_sapdiag_dynt_focus_more_cont_ids, "Number of Container IDs (%d) is invalid", container_nrs);
 
 }
 
@@ -1846,7 +1855,7 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
 		/* TODO: Incomplete dissection of this item */
 		/* If the preference is set, report the item as partially dissected in the expert info */
 		if (global_sapdiag_highlight_items){
-			expert_add_info_format(pinfo, item, PI_UNDECODED, PI_WARN, "The SES item is dissected partially (event array = 0x%.2x)", event_array);
+			expert_add_info_format(pinfo, item, &ei_sapdiag_item_partial, "The SES item is dissected partially (event array = 0x%.2x)", event_array);
 		}
 
 	} else if (item_type==0x10 && item_id==0x04 && item_sid==0x26){		/* Dialog Step Number */
@@ -1935,7 +1944,7 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
         }
         /* If the preference is set, report the item as partially dissected in the expert info */
         if (global_sapdiag_highlight_items){
-            expert_add_info_format(pinfo, item, PI_UNDECODED, PI_WARN, "The Diag Item is dissected partially (0x%.2x, 0x%.2x, 0x%.2x)", item_type, item_id, item_sid);
+            expert_add_info_format(pinfo, item, &ei_sapdiag_item_partial, "The Diag Item is dissected partially (0x%.2x, 0x%.2x, 0x%.2x)", item_type, item_id, item_sid);
         }
 
 	} else if (item_type==0x10 && item_id==0x06 && item_sid==0x14){		/* GUI_FKEYT */
@@ -1944,7 +1953,7 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
 		offset+=add_item_value_stringz(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, "Virtual key text", 1);
         /* If the preference is set, report the item as partially dissected in the expert info */
         if (global_sapdiag_highlight_items){
-            expert_add_info_format(pinfo, item, PI_UNDECODED, PI_WARN, "The Diag Item is dissected partially (0x%.2x, 0x%.2x, 0x%.2x)", item_type, item_id, item_sid);
+            expert_add_info_format(pinfo, item, &ei_sapdiag_item_partial, "The Diag Item is dissected partially (0x%.2x, 0x%.2x, 0x%.2x)", item_type, item_id, item_sid);
         }
 
 	} else if (item_type==0x10 && item_id==0x06 && item_sid==0x16){		/* RFC Diag Block Size */
@@ -1994,7 +2003,7 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
 		add_item_value_uint16(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 2, "Focus Col Offset"); offset+=2;
 		/* Container IDs up to 30 */
 		if (length-offset > 30){
-            expert_add_info_format(pinfo, item, PI_MALFORMED, PI_WARN, "The Dynt Focus contains more than 30 Container IDs (%d)", offset);
+            expert_add_info_format(pinfo, item, &ei_sapdiag_dynt_focus_more_cont_ids, "The Dynt Focus contains more than 30 Container IDs (%d)", offset);
 		}
 		/* Dissect all the remaining container IDs */
         while((offset < length) && tvb_offset_exists(tvb, offset)){
@@ -2124,7 +2133,7 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
 
         /* If the preference is set, report the item as partially dissected in the expert info */
         if (global_sapdiag_highlight_items){
-            expert_add_info_format(pinfo, item, PI_UNDECODED, PI_WARN, "The Diag Item is dissected partially (0x%.2x, 0x%.2x, 0x%.2x)", item_type, item_id, item_sid);
+            expert_add_info_format(pinfo, item, &ei_sapdiag_item_partial, "The Diag Item is dissected partially (0x%.2x, 0x%.2x, 0x%.2x)", item_type, item_id, item_sid);
         }
 
     /* GUI Packet state */
@@ -2190,7 +2199,7 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
     } else {
         /* If the preference is set, report the item as unknown in the expert info */
         if (global_sapdiag_highlight_items){
-            expert_add_info_format(pinfo, item, PI_UNDECODED, PI_WARN, "The Diag Item has a unknown type that is not dissected (0x%.2x, 0x%.2x, 0x%.2x)", item_type, item_id, item_sid);
+            expert_add_info_format(pinfo, item, &ei_sapdiag_item_unknown, "The Diag Item has a unknown type that is not dissected (0x%.2x, 0x%.2x, 0x%.2x)", item_type, item_id, item_sid);
         }
     }
 
@@ -2282,7 +2291,7 @@ dissect_sapdiag_payload(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, pro
             case 0x08:{ /* OCK */
                 /* If the preference is set, report the item as partially dissected in the expert info */
                 if (global_sapdiag_highlight_items){
-                    expert_add_info_format(pinfo, item, PI_UNDECODED, PI_WARN, "Diag Type of unknown length (0x%.2x)", item_type);
+                    expert_add_info_format(pinfo, item, &ei_sapdiag_item_unknown_length, "Diag Type of unknown length (0x%.2x)", item_type);
                 }
                 break;
             }
@@ -2349,11 +2358,11 @@ dissect_sapdiag_payload(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, pro
 			/* Check if the item length is valid */
 			item_value_remaining_length = tvb_captured_length_remaining(tvb, offset);
 			if (item_value_remaining_length < 0){
-				expert_add_info_format(pinfo, il, PI_MALFORMED, PI_ERROR, "Invalid offset");
+				expert_add_info(pinfo, il, &ei_sapdiag_item_offset_invalid);
 				return;
 			}
 			if ((guint32)item_value_remaining_length < item_value_length){
-				expert_add_info_format(pinfo, il, PI_MALFORMED, PI_WARN, "The item length is invalid");
+				expert_add_info(pinfo, il, &ei_sapdiag_item_length_invalid);
 				item_value_length = (guint32)item_value_remaining_length;
 			}
 			item_value = proto_tree_add_item(item_tree, hf_sapdiag_item_value, tvb, offset, item_value_length, FALSE); 
@@ -2477,7 +2486,6 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 				/* Allocate the buffer only in the scope of current packet, using the reported length */
 				decompressed_buffer = (guint8 *)wmem_alloc0(wmem_packet_scope(), reported_length);
 				if (!decompressed_buffer){
-					expert_add_info_format(pinfo, NULL, PI_UNDECODED, PI_ERROR, "Error allocating buffer for decompress the Diag payload");
 					return;
 				}
 
@@ -2492,13 +2500,13 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 				/* Check the return code and add a expert info warning if an error occurred. The dissector continues trying to add
 				adding the payload, however the returned size should be 0.  */
 				if (rt < 0){
-					expert_add_info_format(pinfo, compression_header, PI_MALFORMED, PI_WARN, "Decompression of payload failed with return code %d (%s)", rt, val_to_str(rt, hf_decompress_return_code_vals, "Unknown"));
+					expert_add_info_format(pinfo, compression_header, &ei_sapdiag_invalid_decompresssion, "Decompression of payload failed with return code %d (%s)", rt, val_to_str(rt, hf_decompress_return_code_vals, "Unknown"));
 				}
 
 				/* Check the length returned for the compression routine. If differs with the reported, use the actual one and add
 				an expert info warning. */
 				if (uncompress_length != reported_length){
-					expert_add_info_format(pinfo, rl, PI_MALFORMED, PI_WARN, "The uncompressed payload length (%d) differs with the reported length (%d)", uncompress_length, reported_length);
+					expert_add_info_format(pinfo, rl, &ei_sapdiag_invalid_decompress_length, "The uncompressed payload length (%d) differs with the reported length (%d)", uncompress_length, reported_length);
 				}
 
 				/* Add the return code to the tree */
@@ -3409,7 +3417,23 @@ proto_register_sapdiag(void)
 		&ett_sapdiag
 	};
 
+    /* Register the expert info */
+	static ei_register_info ei[] = {
+		{ &ei_sapdiag_item_unknown, { "sapdiag.item.unknown", PI_UNDECODED, PI_WARN, "The Diag Item has a unknown type that is not dissected", EXPFILL }},
+		{ &ei_sapdiag_item_length_invalid, { "sapdiag.item.length.invalid", PI_MALFORMED, PI_WARN, "Item length is invalid", EXPFILL }},
+		{ &ei_sapdiag_item_offset_invalid, { "sapdiag.item.offset.invalid", PI_MALFORMED, PI_ERROR, "Invalid offset", EXPFILL }},
+		{ &ei_sapdiag_atom_item_malformed, { "sapdiag.item.value.dyntatom.invalid", PI_MALFORMED, PI_WARN, "The Diag Atom is malformed", EXPFILL }},
+		{ &ei_sapdiag_password_field, { "sapdiag.item.value.dyntatom.item.password", PI_SECURITY, PI_WARN, "Password field?", EXPFILL }},
+		{ &ei_sapdiag_atom_item_partial, { "sapdiag.item.value.dyntatom.item.unknown", PI_UNDECODED, PI_WARN, "The Diag Atom is dissected partially", EXPFILL }},
+		{ &ei_sapdiag_atom_item_unknown, { "sapdiag.item.value.dyntatom.item.unknown", PI_UNDECODED, PI_WARN, "The Diag Atom has a unknown type that is not dissected", EXPFILL }},
+		{ &ei_sapdiag_dynt_focus_more_cont_ids, { "sapdiag.item.value.uievent.containernrs.invalid", PI_MALFORMED, PI_WARN, "Number of Container IDs is invalid", EXPFILL }},
+		{ &ei_sapdiag_item_unknown_length, { "sapdiag.item.length.unknown", PI_UNDECODED, PI_WARN, "Diag Type of unknown length", EXPFILL }},
+		{ &ei_sapdiag_invalid_decompresssion, { "sapdiag.header.compression.invalid", PI_MALFORMED, PI_WARN, "Decompression of payload failed", EXPFILL }},
+		{ &ei_sapdiag_invalid_decompress_length, { "sapdiag.header.compression.uncomplength.invalid", PI_MALFORMED, PI_WARN, "The uncompressed payload length differs with the reported length", EXPFILL }},
+	};
+
 	module_t *sapdiag_module;
+	expert_module_t* sapdiag_expert;
 
 	/* Register the protocol */
 	proto_sapdiag = proto_register_protocol (
@@ -3420,6 +3444,9 @@ proto_register_sapdiag(void)
 
 	proto_register_field_array(proto_sapdiag, hf, array_length(hf));
 	proto_register_subtree_array(ett, array_length(ett));
+
+	sapdiag_expert = expert_register_protocol(proto_sapdiag);
+	expert_register_field_array(sapdiag_expert, ei, array_length(ei));
 
     register_dissector("sapdiag", dissect_sapdiag, proto_sapdiag);
 
