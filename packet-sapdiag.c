@@ -1677,7 +1677,7 @@ dissect_sapdiag_dyntatom(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
 
               } case 120:{ /* DIAG_DGOTYP_XMLPROP */
                 add_item_value_string(tvb, atom_item, atom_item_tree, hf_sapdiag_item_value, offset, atom_item_length, "XMLProp", 1);
-                proto_item_append_text(atom, ", XMLProp=%s", tvb_get_ephemeral_string(tvb, offset, atom_item_length)); offset+=atom_item_length;
+                proto_item_append_text(atom, ", XMLProp=%s", tvb_get_string_enc(wmem_packet_scope(), tvb, offset, atom_item_length, ENC_ASCII)); offset+=atom_item_length;
                 break;
 
             } case 121:  /* DIAG_DGOTYP_EFIELD_1 */
