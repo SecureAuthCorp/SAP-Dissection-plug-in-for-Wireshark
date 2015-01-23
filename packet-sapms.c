@@ -1426,7 +1426,7 @@ proto_register_sapms(void)
         { &hf_sapms_logon_address6_length,
             { "Logon Address IPv6 Length", "sapms.logon.addr6_length", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP MS Logon Address IPv6 Length", HFILL }},
         { &hf_sapms_logon_address6,
-            { "Logon Address IPv6", "sapms.logon.address6", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS Logon Address IPv6", HFILL }},
+            { "Logon Address IPv6", "sapms.logon.address6", FT_IPv6, BASE_NONE, NULL, 0x0, "SAP MS Logon Address IPv6", HFILL }},
 
 		{ &hf_sapms_shutdown_reason_length,
 			{ "Shutdown Reason Length", "sapms.shutdown.reason_length", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP MS Shutdown Reason Length", HFILL }},
