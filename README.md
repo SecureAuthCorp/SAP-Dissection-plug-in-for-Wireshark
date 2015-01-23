@@ -81,7 +81,7 @@ Installation & Build
 This Wireshark plugin is not distributed as part of the Wireshark source. The 
 following steps are required to compile the plugin:
 
-1) Download Wireshark version 1.10 source from [7] or checkout the code from 
+1) Download Wireshark version 1.12 source from [7] or checkout the code from 
    the source repository [8].
 
 2) Decompress the package.
@@ -155,7 +155,7 @@ References
 
 [8] https://code.wireshark.org/review/wireshark
 
-[9] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-1.10
+[9] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-1.12
 
 
 Contact
