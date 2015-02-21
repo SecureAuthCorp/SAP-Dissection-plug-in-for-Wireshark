@@ -19,11 +19,11 @@ business applications. Communication between components uses different network
 protocols. While some of them are standard and well-known protocols, other
 are proprietaries and public information is not available.
 
-This plugin provides dissection on SAP's NI, Message Server, Router, Diag and
-Enqueue protocols. The dissectors are based on information acquired at
-researching the different protocols and services. Additional experimental
-support is included for SAP's RFC and SNC protocols. Detailed information
-about the research can be found at [2], [3], [4], [5] and [6]. 
+This Wireshark plugin  provides dissection on SAP's NI, Message Server,
+Router, Diag and Enqueue protocols. The dissectors are based on information
+acquired at researching the different protocols and services. Additional
+experimental support is included for SAP's RFC and SNC protocols. Detailed
+information about the research can be found at [2], [3], [4], [5] and [6]. 
 
 
 Features
@@ -86,26 +86,21 @@ following steps are required to compile the plugin:
 
 2) Decompress the package.
 
-3) Run the auto configuration script (`autogen.sh`) and compile the source.
+3) Configure and build the package, as described in Wireshark's development
+   guide [9].
 
 4) Copy the SAP Wireshark Plugin to a new `plugins/sap` directory.
 
-5) Windows Build: Add plugins/sap directory to `Makefile.nmake` and 
-   `plugins/Makefile.am`.
-   
-   Non-Windows Build: Add `plugins/sap` directory to `Makefile.am`, `configure.in`
-   and `plugins/Makefile.am`.
-   
-   This step can be performed using the patch file provided. At the root
-   directory run:
-   
+5) Configure the plugin to be included in the build process. This step can be
+   performed using the patch file provided. At the root directory run:
+
 	git apply plugins/sap/wireshark.patch
 
-6) Compile and install as described in Wireshark `INSTALL` file.
+6) Perform a new build including the plugin.
 
 It's worth mentioning that compression libraries for SAP Diag/RFC protocol are 
 originally written in C++, thus the entire plugin needs to be compiled for C++. 
-See Wireshark's portability notes for more information [9].
+See Wireshark's portability notes for more information [10].
 
 It was reported that compiling Wireshark on OS X requires fixing link for the
 gettext library if it was installed using home-brew.
@@ -155,7 +150,9 @@ References
 
 [8] https://code.wireshark.org/review/wireshark
 
-[9] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-1.12
+[9] https://www.wireshark.org/docs/wsdg_html_chunked/
+
+[10] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-1.12
 
 
 Contact
