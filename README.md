@@ -57,7 +57,8 @@ This plugin counts on several different dissectors:
 
 - SAP Message Server Protocol dissector
 
-    This module dissects the packets used by SAP's Message Server Protocol.
+    This module dissects the packets used by SAP's Message Server Protocol in
+    its binary non-HTTP format, for both internal and external ports.
 
 - SAP Enqueue Protocol dissector
 
@@ -121,7 +122,7 @@ user id and password fields.
 
 The same results can be achieved also using expert info (security group):
 
-	sapdiag and expert.group==security
+	sapdiag.item.value.dyntatom.item.password
 
 
 License
