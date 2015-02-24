@@ -7,7 +7,7 @@ env:
     - WIRESHARK_BRANCH=master-1.12
   matrix:
     - BUILD_CMAKE=no
-    #- BUILD_CMAKE=yes
+    - BUILD_CMAKE=yes
 before_install: 
   - sudo apt-get update -qq
   - sudo apt-get install libglib2.0-dev libpcap-dev flex bison make qt-sdk libgtk-3-dev -qq
