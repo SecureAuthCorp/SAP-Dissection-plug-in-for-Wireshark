@@ -13,6 +13,8 @@
 *.a
 *.la
 *.lo
+.libs
+.deps
 
 # Shared objects (inc. Windows DLLs)
 *.dll
@@ -27,3 +29,8 @@
 *.i*86
 *.x86_64
 *.hex
+
+# Wireshark files
+Makefile
+Makefile.in
+plugin.c
