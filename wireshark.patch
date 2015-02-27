@@ -48,13 +48,13 @@ index 0739c6d..5bc372f 100644
  	../plugins/irda/packet-irda.c \
  	../plugins/m2m/packet-m2m.c \
  	../plugins/m2m/wimax_tlv.c \
-+	../plugins/sap/packet-sapdiag.c \
-+	../plugins/sap/packet-sapenqueue.c \
-+	../plugins/sap/packet-saprouter.c \
-+	../plugins/sap/packet-sapprotocol.c \
-+	../plugins/sap/packet-saprfc.c \
-+	../plugins/sap/packet-sapms.c \
-+	../plugins/sap/packet-sapsnc.c \
++	../plugins/sap/src/packet-sapdiag.c \
++	../plugins/sap/src/packet-sapenqueue.c \
++	../plugins/sap/src/packet-saprouter.c \
++	../plugins/sap/src/packet-sapprotocol.c \
++	../plugins/sap/src/packet-saprfc.c \
++	../plugins/sap/src/packet-sapms.c \
++	../plugins/sap/src/packet-sapsnc.c \
  	../plugins/wimax/crc.c \
  	../plugins/wimax/crc_data.c \
  	../plugins/wimax/mac_hd_generic_decoder.c \

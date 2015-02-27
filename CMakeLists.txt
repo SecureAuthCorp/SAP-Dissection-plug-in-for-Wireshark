@@ -18,21 +18,21 @@
 # ==============
 
 set(DISSECTOR_SRC
-	packet-sapdiag.c
-	packet-sapenqueue.c
-	packet-saprouter.c
-	packet-sapprotocol.c
-	packet-saprfc.c
-    packet-sapms.c
-    packet-sapsnc.c
+	src/packet-sapdiag.c
+	src/packet-sapenqueue.c
+	src/packet-saprouter.c
+	src/packet-sapprotocol.c
+	src/packet-saprfc.c
+	src/packet-sapms.c
+	src/packet-sapsnc.c
 )
 
 set(DISSECTOR_SUPPORT_SRC
-	sapdecompress.cpp
-	vpa105CsObjInt.cpp
-	vpa106cslzc.cpp
-	vpa107cslzh.cpp
-	vpa108csulzh.cpp
+	src/sapdecompress.cpp
+	src/vpa105CsObjInt.cpp
+	src/vpa106cslzc.cpp
+	src/vpa107cslzh.cpp
+	src/vpa108csulzh.cpp
 )
 
 set(PLUGIN_FILES
