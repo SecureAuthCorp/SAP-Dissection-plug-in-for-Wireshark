@@ -34,3 +34,7 @@
 Makefile
 Makefile.in
 plugin.c
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
