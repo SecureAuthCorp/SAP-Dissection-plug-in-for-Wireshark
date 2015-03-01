@@ -28,7 +28,7 @@ before_install:
 
 install:
   - if [ ${BUILD_CMAKE} == "yes" ]; then mkdir build && cd build && cmake -DBUILD_wireshark=OFF -DBUILD_tshark=ON -DBUILD_rawshark=OFF -DBUILD_dumpcap=OFF -DBUILD_text2pcap=OFF -DBUILD_mergecap=OFF -DBUILD_reordercap=OFF -DBUILD_editcap=OFF -DBUILD_captype=OFF -DBUILD_capinfos=OFF -DBUILD_randpkt=OFF -DBUILD_dftest=OFF -DBUILD_rawshark=OFF ..; else ./autogen.sh && ./configure --disable-wireshark --disable-editcap --disable-captype -disable-capinfos --disable-mergecap --disable-dumpcap --disable-reordercap --disable-text2pcap --disable-randpkt --disable-dftest --disable-rawshark; fi
-  - if [ ${BUILD_CMAKE} == "yes" ]; then make sap; else make -C plugins/sap; fi
+  - if [ ${BUILD_CMAKE} == "yes" ]; then make tshark && make sap; else make tshark && make -C plugins/sap; fi
 
 script: 
   - python plugins/sap/tests/__init__.py
