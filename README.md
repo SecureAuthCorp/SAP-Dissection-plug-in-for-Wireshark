@@ -3,10 +3,10 @@ SAP Dissector Plugin for Wireshark
 
 [![Build Status](https://travis-ci.org/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark.svg?branch=master)](https://travis-ci.org/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark)
 
-Copyright (C) 2015 Core Security Technologies
+Copyright (C) 2015 by Martin Gallo, Core Security
 
 The plugin was designed and developed by Martin Gallo from the Security 
-Consulting Services team of Core Security Technologies.
+Consulting Services team of Core Security.
 
 Version 0.2.1-dev (XXX 2015)
 
@@ -14,16 +14,18 @@ Version 0.2.1-dev (XXX 2015)
 Overview
 --------
 
-SAP Netweaver [1] is a technology platform for building and integrating SAP
-business applications. Communication between components uses different network
-protocols. While some of them are standard and well-known protocols, other
-are proprietaries and public information is not available.
+[SAP Netweaver](http://www.sap.com/platform/netweaver/index.epx) [1] is a 
+technology platform for building and integrating SAP business applications.
+Communication between components uses different network protocols. While
+some of them are standard and well-known protocols, others are proprietaries
+and public information is not available.
 
-This Wireshark plugin  provides dissection on SAP's NI, Message Server,
-Router, Diag and Enqueue protocols. The dissectors are based on information
-acquired at researching the different protocols and services. Additional
-experimental support is included for SAP's RFC and SNC protocols. Detailed
-information about the research can be found at [2], [3], [4], [5] and [6]. 
+This [Wireshark](http://www.wireshark.org/) [2] plugin  provides dissection
+of SAP's NI, Message Server, Router, Diag and Enqueue protocols. The
+dissectors are based on information acquired at researching the different
+protocols and services. Additional experimental support is included for SAP's
+RFC and SNC protocols. Detailed information about the research can be found
+at [3], [4], [5], [6] and [7]. 
 
 
 Features
@@ -62,8 +64,8 @@ This plugin counts on several different dissectors:
 
 - SAP Enqueue Protocol dissector
 
-	This module dissects packets used by SAP's Standalone Enqueue and
-	Replication Servers.
+    This module dissects packets used by SAP's Standalone Enqueue and
+    Replication Servers.
 
 - SAP RFC (Remote Function Call) Protocol dissector (experimental)
 
@@ -82,13 +84,13 @@ Installation & Build
 This Wireshark plugin is not distributed as part of the Wireshark source. The 
 following steps are required to compile the plugin:
 
-1) Download Wireshark version 1.12 source from [7] or checkout the code from 
-   the source repository [8].
+1) Download [Wireshark version 1.12 source](http://www.wireshark.org/download.html) [8]
+   or checkout the code from the [source repository](https://code.wireshark.org/review/wireshark) [9].
 
 2) Decompress the package.
 
-3) Configure and build the package, as described in Wireshark's development
-   guide [9].
+3) Configure and build the package, as described in [Wireshark's development
+   guide](https://www.wireshark.org/docs/wsdg_html_chunked/) [10].
 
 4) Copy the SAP Wireshark Plugin to a new `plugins/sap` directory.
 
@@ -101,10 +103,11 @@ following steps are required to compile the plugin:
 
 It's worth mentioning that compression libraries for SAP Diag/RFC protocol are 
 originally written in C++, thus the entire plugin needs to be compiled for C++. 
-See Wireshark's portability notes for more information [10].
+See [Wireshark's portability notes](https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-1.12)
+for more information [11].
 
 It was reported that compiling Wireshark on OS X requires fixing link for the
-gettext library if it was installed using home-brew.
+`gettext` library if it was installed using `home-brew`.
 
 
 Example uses
@@ -137,28 +140,30 @@ References
 
 [1] http://www.sap.com/platform/netweaver/index.epx
 
-[2] http://corelabs.coresecurity.com/index.php?module=Wiki&action=view&type=tool&name=SAP_Dissection_plu-gin_for_Wireshark
+[2] http://www.wireshark.org/
 
-[3] http://www.coresecurity.com/content/sap-netweaver-dispatcher-multiple-vulnerabilities
+[3] http://corelabs.coresecurity.com/index.php?module=Wiki&action=view&type=tool&name=SAP_Dissection_plu-gin_for_Wireshark
 
-[4] http://www.coresecurity.com/content/SAP-netweaver-msg-srv-multiple-vulnerabilities
+[4] http://www.coresecurity.com/content/sap-netweaver-dispatcher-multiple-vulnerabilities
 
-[5] http://corelabs.coresecurity.com/index.php?module=Wiki&action=view&type=publication&name=Uncovering_SAP_vulnerabilities
+[5] http://www.coresecurity.com/content/SAP-netweaver-msg-srv-multiple-vulnerabilities
 
-[6] http://corelabs.coresecurity.com/index.php?module=Wiki&action=view&type=publication&name=saps_network_protocols_revisited
+[6] http://corelabs.coresecurity.com/index.php?module=Wiki&action=view&type=publication&name=Uncovering_SAP_vulnerabilities
 
-[7] http://www.wireshark.org/download.html
+[7] http://corelabs.coresecurity.com/index.php?module=Wiki&action=view&type=publication&name=saps_network_protocols_revisited
 
-[8] https://code.wireshark.org/review/wireshark
+[8] http://www.wireshark.org/download.html
 
-[9] https://www.wireshark.org/docs/wsdg_html_chunked/
+[9] https://code.wireshark.org/review/wireshark
 
-[10] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-1.12
+[10] https://www.wireshark.org/docs/wsdg_html_chunked/
+
+[11] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-1.12
 
 
 Contact
 -------
 
 Whether you want to report a bug or give some suggestions on this package, drop 
-us a few lines at oss@coresecurity.com or contact the author email 
-mgallo@coresecurity.com.
+us a few lines at `oss@coresecurity.com` or contact the author email 
+`mgallo@coresecurity.com`.
