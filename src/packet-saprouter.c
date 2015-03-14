@@ -260,7 +260,7 @@ dissect_routestring(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32
 
         /* Dissect the hostname string */
         len = tvb_strsize(tvb, offset);
-        hostname = tvb_get_string_enc(wmem_packet_scope(), tvb, offset, len - 1, ENC_ASCII);
+        hostname = tvb_get_string_enc(wmem_file_scope(), tvb, offset, len - 1, ENC_ASCII);
         if (tree){
         	proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_hostname, tvb, offset, len, FALSE);
         }
@@ -276,7 +276,7 @@ dissect_routestring(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32
 
         /* Dissect the password string */
         len = tvb_strsize(tvb, offset);
-        password = tvb_get_string_enc(wmem_packet_scope(), tvb, offset, len - 1, ENC_ASCII);
+        password = tvb_get_string_enc(wmem_file_scope(), tvb, offset, len - 1, ENC_ASCII);
         if (tree){
         	route_password = proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_password, tvb, offset, len, FALSE);
 
