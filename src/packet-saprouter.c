@@ -153,6 +153,7 @@ static int hf_saprouter_route_string_password = -1;
 /* Error Information/Control Messages */
 static int hf_saprouter_opcode = -1;
 static int hf_saprouter_return_code = -1;
+static int hf_saprouter_unknown = -1;
 
 /* Error Information Messages */
 static int hf_saprouter_error_length = -1;
@@ -560,6 +561,7 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
                     ei = proto_tree_add_item(saprouter_tree, hf_saprouter_error_string, tvb, offset, text_length, FALSE);
                     text_tree = proto_item_add_subtree(ei, ett_saprouter);
                     dissect_errorstring(tvb, text_tree, offset);
+                    offset += text_length;
                 }
 
             /* Control Message */
@@ -567,7 +569,8 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
             	proto_tree_add_item(saprouter_tree, hf_saprouter_control_length, tvb, offset, 4, FALSE); offset+=4;
             	if ((text_length >0) && tvb_offset_exists(tvb, offset+text_length)){
             		/* Add the control string tree */
-                    proto_tree_add_item(saprouter_tree, hf_saprouter_control_string, tvb, offset, text_length, FALSE); offset+=text_length;
+                    proto_tree_add_item(saprouter_tree, hf_saprouter_control_string, tvb, offset, text_length, FALSE);
+                    offset += text_length;
             	}
 
             	/* Dissect the SNC Frame for SNC opcodes */
@@ -576,6 +579,7 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
             	}
 
             }
+            proto_tree_add_item(saprouter_tree, hf_saprouter_unknown, tvb, offset, 4, FALSE); offset+=4;
 
         }
 
@@ -648,6 +652,8 @@ proto_register_saprouter(void)
             { "Operation Code", "saprouter.opcode", FT_UINT8, BASE_DEC, hf_saprouter_opcode_vals, 0x0, "SAP Router Operation Code", HFILL }},
         { &hf_saprouter_return_code,
             { "Return Code", "saprouter.returncode", FT_INT32, BASE_DEC, hf_saprouter_return_code_vals, 0x0, "SAP Router Return Code", HFILL }},
+		{ &hf_saprouter_unknown,
+			{ "Unknown field", "saprouter.unknown", FT_INT32, BASE_DEC, NULL, 0x0, "SAP Router Unknown field", HFILL }},
 
         /* NI Error Information messages */
         { &hf_saprouter_error_length,
