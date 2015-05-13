@@ -1,3 +1,20 @@
+2015-03-13 Martin Gallo <mgallo@coresecurity.com>
+
+	* - Version v0.2.1 released.
+	* - Switched to Wireshark 1.12 trunk. Ported the plugin to the use of
+	new APIs (wmem, expert, etc.)
+	* - Fixed vulnerabilities in LZC and LZH compression libraries
+	(CVE-2015-2282 and CVE-2015-2278). Added test cases for checking proper
+	fixes.
+	* - Added basic packet parsing testing with travis, using pyshark. It
+	allows to check that the plugin is built and loaded correctly.
+	* - Moved to a layout with all source in "src" folder.
+	* - Test building with clang on travis.
+	* src/packet-saprouter.c: Added unknown field to router error
+	messages.
+	* src/packet-saprouter.c: Changed scope of hostname/password strings
+	allocations.
+
 2015-01-16 Martin Gallo <mgallo@coresecurity.com>
 
 	* - Version v0.1.5 released.
