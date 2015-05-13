@@ -23,11 +23,13 @@ import unittest
 from os import remove, path
 # Custom imports
 import sapni_test
+import sapdiag_test
 
 
 def suite():
     suite = unittest.TestSuite()
     suite.addTests(sapni_test.suite())
+    suite.addTests(sapdiag_test.suite())
     return suite
 
 
