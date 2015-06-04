@@ -8,7 +8,7 @@ Copyright (C) 2015 by Martin Gallo, Core Security
 The plugin was designed and developed by Martin Gallo from the Security 
 Consulting Services team of Core Security.
 
-Version 0.2.1 (May 2015)
+Version 0.2.2-dev (XXX 2015)
 
 
 Overview
