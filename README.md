@@ -138,7 +138,7 @@ Authors
 The library was designed and developed by Martin Gallo from the Security
 Consulting Services team of Core Security.
 
-## Contributors ##
+### Contributors ###
 
 Contributions made by:
 
