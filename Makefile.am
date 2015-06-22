@@ -25,7 +25,7 @@
 
 include $(top_srcdir)/Makefile.am.inc
 
-INCLUDES = -I$(top_srcdir)
+INCLUDES = -I$(top_srcdir) -I$(includedir)
 
 include Makefile.common
 

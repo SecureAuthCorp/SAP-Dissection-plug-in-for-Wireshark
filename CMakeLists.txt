@@ -17,6 +17,31 @@
 # GNU General Public License for more details.
 # ==============
 
+project(sap-wireshark-plugin C)
+
+cmake_minimum_required(VERSION 2.6)
+set(CMAKE_BACKWARDS_COMPATIBILITY 2.6)
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+
+IF ( NOT CMAKE_INSTALL_LIBDIR )
+  set(CMAKE_INSTALL_LIBDIR ~/.wireshark/plugins)
+ENDIF ( NOT CMAKE_INSTALL_LIBDIR )
+MESSAGE (STATUS "Plugin will be installed in: ${CMAKE_INSTALL_LIBDIR}")
+
+INCLUDE(UseMakeDissectorReg)
+  
+set(GLIB2_MIN_VERSION 2.4.0)
+
+find_package(GLIB2)
+include_directories (${GLIB2_INCLUDE_DIRS})
+
+find_package(Wireshark)
+include_directories (${WIRESHARK_INCLUDE_DIRS})
+
+set(LINK_MODE_LIB SHARED)
+set(LINK_MODE_MODULE MODULE)
+
+
 set(DISSECTOR_SRC
 	src/packet-sapdiag.c
 	src/packet-sapenqueue.c
@@ -66,11 +91,11 @@ add_library(sap ${LINK_MODE_MODULE}
 set_target_properties(sap PROPERTIES PREFIX "")
 set_target_properties(sap PROPERTIES LINK_FLAGS "${WS_LINK_FLAGS}")
 
-target_link_libraries(sap epan)
+target_link_libraries(sap wireshark)
 
 install(TARGETS sap
-	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/@CPACK_PACKAGE_NAME@/plugins/${CPACK_PACKAGE_VERSION} NAMELINK_SKIP
-	RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}/@CPACK_PACKAGE_NAME@/plugins/${CPACK_PACKAGE_VERSION}
-	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/@CPACK_PACKAGE_NAME@/plugins/${CPACK_PACKAGE_VERSION}
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} NAMELINK_SKIP
+	RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
