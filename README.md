@@ -78,8 +78,24 @@ This plugin counts on several different dissectors:
 Installation & Build
 --------------------
 
-This Wireshark plugin is not distributed as part of the Wireshark source. The 
-following steps are required to compile the plugin:
+This Wireshark plugin is not distributed as part of the Wireshark source. It
+can be build as a standalone plug-in, or as part of Wireshark.
+
+### As a standalone plug-in ###
+
+To build the plug-in on Debian/Ubuntu linux distributions:
+
+    sudo apt-get install wireshark wireshark-dev
+    mkdir build
+    cd build
+    cmake ..
+    make
+    make install
+
+
+### As part of Wireshark ###
+
+The following steps are required to compile the plugin as part of Wireshark:
 
 1) Download [Wireshark version 1.12 source](http://www.wireshark.org/download.html) [8]
    or checkout the code from the [source repository](https://code.wireshark.org/review/wireshark) [9].
@@ -96,7 +112,23 @@ following steps are required to compile the plugin:
 
 	git apply plugins/sap/wireshark.patch
 
-6) Perform a new build including the plugin.
+6) Perform a new build including the plugin. Using `cmake`:
+
+    mkdir build
+    cd build
+    cmake ..
+    make
+    sudo make install
+
+   Without using `cmake`:
+
+    ./autogen.sh
+    ./configure
+    make
+    sudo make install
+
+
+### Additional notes ###
 
 It's worth mentioning that compression libraries for SAP Diag/RFC protocol are 
 originally written in C++, thus the entire plugin needs to be compiled for C++. 
