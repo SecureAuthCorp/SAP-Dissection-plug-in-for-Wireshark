@@ -8,27 +8,47 @@ env:
   global:
     - WIRESHARK_BRANCH=master-1.12
   matrix:
-    - BUILD_CMAKE=no
-    - BUILD_CMAKE=yes
+    - BUILD_CMAKE=no BUILD_STANDALONE=no
+    - BUILD_CMAKE=yes BUILD_STANDALONE=no
+    - BUILD_CMAKE=yes BUILD_STANDALONE=yes
 
-before_install: 
+before_install:
+  - if [ $(BUILD_STANDALONE) == "yes" ]; then sudo sudo add-apt-repository ppa:wireshark-dev/stable -y; fi
+
   - sudo apt-get update -qq
-  - sudo apt-get install libglib2.0-dev libpcap-dev flex bison make qt-sdk libgtk-3-dev -qq
-  - sudo apt-get build-dep wireshark -qq
-  - mkdir ${HOME}/wireshark-$WIRESHARK_BRANCH
-  - cd ${HOME}/wireshark-$WIRESHARK_BRANCH
-  - git init
-  - git remote add -t $WIRESHARK_BRANCH -f origin https://github.com/wireshark/wireshark
-  - git checkout $WIRESHARK_BRANCH
-  - mkdir plugins/sap
-  - cp -R $TRAVIS_BUILD_DIR/* plugins/sap/
-  - git apply $TRAVIS_BUILD_DIR/wireshark.patch
+
+  - if [ $(BUILD_STANDALONE) == "yes" ]; then
+        sudo apt-get install wireshark wireshark-dev -qq;
+    fi
+
+  - if [ $(BUILD_STANDALONE) == "no" ]; then
+      sudo apt-get install libglib2.0-dev libpcap-dev flex bison make qt-sdk libgtk-3-dev -qq;
+      sudo apt-get build-dep wireshark -qq;
+      mkdir ${HOME}/wireshark-$WIRESHARK_BRANCH;
+      cd ${HOME}/wireshark-$WIRESHARK_BRANCH;
+      git init;
+      git remote add -t $WIRESHARK_BRANCH -f origin https://github.com/wireshark/wireshark;
+      git checkout $WIRESHARK_BRANCH;
+      mkdir plugins/sap;
+      cp -R $TRAVIS_BUILD_DIR/* plugins/sap/;
+      git apply $TRAVIS_BUILD_DIR/wireshark.patch;
+    fi
+
   - sudo apt-get install libxml2-dev libxslt-dev python-dev -qq
   - sudo pip install scapy pysap pyshark
 
 install:
-  - if [ ${BUILD_CMAKE} == "yes" ]; then mkdir build && cd build && cmake -DBUILD_wireshark=OFF -DBUILD_tshark=ON -DBUILD_rawshark=OFF -DBUILD_dumpcap=OFF -DBUILD_text2pcap=OFF -DBUILD_mergecap=OFF -DBUILD_reordercap=OFF -DBUILD_editcap=OFF -DBUILD_captype=OFF -DBUILD_capinfos=OFF -DBUILD_randpkt=OFF -DBUILD_dftest=OFF -DBUILD_rawshark=OFF .. && make tshark && make sap && cd run; fi
-  - if [ ${BUILD_CMAKE} == "no" ]; then ./autogen.sh && ./configure --disable-wireshark --disable-editcap --disable-captype -disable-capinfos --disable-mergecap --disable-dumpcap --disable-reordercap --disable-text2pcap --disable-randpkt --disable-dftest --disable-rawshark && make; fi 
+  - if [ $(BUILD_STANDALONE) == "no" && ${BUILD_CMAKE} == "yes" ]; then
+      mkdir build && cd build && cmake -DBUILD_wireshark=OFF -DBUILD_tshark=ON -DBUILD_rawshark=OFF -DBUILD_dumpcap=OFF -DBUILD_text2pcap=OFF -DBUILD_mergecap=OFF -DBUILD_reordercap=OFF -DBUILD_editcap=OFF -DBUILD_captype=OFF -DBUILD_capinfos=OFF -DBUILD_randpkt=OFF -DBUILD_dftest=OFF -DBUILD_rawshark=OFF .. && make tshark && make sap && cd run;
+    fi
+
+  - if [ $(BUILD_STANDALONE) == "no" && ${BUILD_CMAKE} == "no" ]; then
+      ./autogen.sh && ./configure --disable-wireshark --disable-editcap --disable-captype -disable-capinfos --disable-mergecap --disable-dumpcap --disable-reordercap --disable-text2pcap --disable-randpkt --disable-dftest --disable-rawshark && make;
+    fi
+
+  - if [ $(BUILD_STANDALONE) == "yes" ]; then
+      cmake . && make && make install;
+    fi
 
 script: 
   - python ${HOME}/wireshark-$WIRESHARK_BRANCH/plugins/sap/tests/__init__.py
