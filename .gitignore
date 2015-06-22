@@ -41,4 +41,9 @@ __pycache__/
 
 # IDEs
 .project
+.pydevproject
 .settings
+
+# Vagrant files
+.vagrant
+
