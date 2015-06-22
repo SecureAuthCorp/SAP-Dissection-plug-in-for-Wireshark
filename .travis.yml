@@ -51,5 +51,9 @@ install:
     fi
 
 script: 
-  - python ${HOME}/wireshark-$WIRESHARK_BRANCH/plugins/sap/tests/__init__.py
-
+  - if [ $(BUILD_STANDALONE) == "no" ]; then
+      python ${HOME}/wireshark-$WIRESHARK_BRANCH/plugins/sap/tests/__init__.py;
+    fi
+  - if [ $(BUILD_STANDALONE) == "yes" ]; then
+      python ${TRAVIS_BUILD_DIR}/tests/__init__.py;
+    fi
