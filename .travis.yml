@@ -18,7 +18,7 @@ before_install:
   - sudo apt-get update -qq
 
   - if [ $(BUILD_STANDALONE) == "yes" ]; then
-        sudo apt-get install wireshark wireshark-dev -qq;
+        sudo apt-get install wireshark wireshark-dev tshark -qq;
     fi
 
   - if [ $(BUILD_STANDALONE) == "no" ]; then
