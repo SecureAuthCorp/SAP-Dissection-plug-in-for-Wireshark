@@ -16,10 +16,8 @@
 # wireshark does not install its library with pkg-config information,
 # so we need to manually find the libraries and headers
 
-FIND_PATH( WIRESHARK_INCLUDE_DIRS epan/packet.h PATH_SUFFIXES wireshark )
+FIND_PATH( WIRESHARK_INCLUDE_DIRS epan/column-info.h PATH_SUFFIXES wireshark )
 FIND_LIBRARY( WIRESHARK_LIBRARIES wireshark )
-
-MESSAGE ( STATUS "Include dires ${WIRESHARK_INCLUDE_DIRS} Libraries ${WIRESHARK_LIBRARIES}" )
 
 # Report results
 IF ( WIRESHARK_LIBRARIES AND WIRESHARK_INCLUDE_DIRS )
@@ -28,3 +26,8 @@ ELSE ( WIRESHARK_LIBRARIES AND WIRESHARK_INCLUDE_DIRS )
   MESSAGE( SEND_ERROR "Could NOT find the wireshark library and headers" )
 ENDIF ( WIRESHARK_LIBRARIES AND WIRESHARK_INCLUDE_DIRS )
 
+IF (WIRESHARK_FOUND) 
+  MESSAGE (STATUS "Found wireshark libs at ${WIRESHARK_INCLUDE_DIRS}")
+ELSE()
+  MESSAGE (STATUS "Wireshark libs not found!")
+ENDIF()
