@@ -46,7 +46,7 @@ install:
       ./autogen.sh && ./configure --disable-wireshark --disable-editcap --disable-captype -disable-capinfos --disable-mergecap --disable-dumpcap --disable-reordercap --disable-text2pcap --disable-randpkt --disable-dftest --disable-rawshark && make;
     fi
 
-  - if [ ${BUILD_STANDALONE{ == "yes" ]; then
+  - if [ ${BUILD_STANDALONE} == "yes" ]; then
       cmake . && make && make install;
     fi
 
