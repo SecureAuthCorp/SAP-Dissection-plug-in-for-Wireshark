@@ -112,15 +112,7 @@ The following steps are required to compile the plugin as part of Wireshark:
 
 	git apply plugins/sap/wireshark.patch
 
-6) Perform a new build including the plugin. Using `cmake`:
-
-    mkdir build
-    cd build
-    cmake ..
-    make
-    sudo make install
-
-   Without using `cmake`:
+6) Perform a new build including the plugin.
 
     ./autogen.sh
     ./configure
