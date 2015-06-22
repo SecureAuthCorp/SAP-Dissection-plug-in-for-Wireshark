@@ -79,11 +79,11 @@ Installation & Build
 --------------------
 
 This Wireshark plugin is not distributed as part of the Wireshark source. It
-can be build as a standalone plug-in, or as part of Wireshark.
+can be build as a standalone plugin, or as part of Wireshark.
 
-### As a standalone plug-in ###
+### As a standalone plugin ###
 
-To build the plug-in on Debian/Ubuntu linux distributions:
+To build the plugin on Debian/Ubuntu linux distributions:
 
     sudo apt-get install wireshark wireshark-dev
     mkdir build
