@@ -38,11 +38,11 @@ before_install:
   - sudo -H pip install pysap pyshark
 
 install:
-  - if [ ${BUILD_STANDALONE} == "no" && ${BUILD_CMAKE} == "yes" ]; then
+  - if [ ${BUILD_STANDALONE} == "no" -a ${BUILD_CMAKE} == "yes" ]; then
       mkdir build && cd build && cmake -DBUILD_wireshark=OFF -DBUILD_tshark=ON -DBUILD_rawshark=OFF -DBUILD_dumpcap=OFF -DBUILD_text2pcap=OFF -DBUILD_mergecap=OFF -DBUILD_reordercap=OFF -DBUILD_editcap=OFF -DBUILD_captype=OFF -DBUILD_capinfos=OFF -DBUILD_randpkt=OFF -DBUILD_dftest=OFF -DBUILD_rawshark=OFF .. && make tshark && make sap && cd run;
     fi
 
-  - if [ ${BUILD_STANDALONE} == "no" && ${BUILD_CMAKE} == "no" ]; then
+  - if [ ${BUILD_STANDALONE} == "no" -a ${BUILD_CMAKE} == "no" ]; then
       ./autogen.sh && ./configure --disable-wireshark --disable-editcap --disable-captype -disable-capinfos --disable-mergecap --disable-dumpcap --disable-reordercap --disable-text2pcap --disable-randpkt --disable-dftest --disable-rawshark && make;
     fi
 
