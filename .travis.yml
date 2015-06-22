@@ -8,8 +8,8 @@ env:
   global:
     - WIRESHARK_BRANCH=master-1.12
   matrix:
-    - BUILD_CMAKE=no BUILD_STANDALONE=no
-    - BUILD_CMAKE=yes BUILD_STANDALONE=yes
+    - BUILD_STANDALONE=no
+    - BUILD_STANDALONE=yes
 
 before_install:
   - if [ ${BUILD_STANDALONE} == "yes" ]; then sudo sudo add-apt-repository ppa:wireshark-dev/stable -y; fi
@@ -37,7 +37,7 @@ before_install:
   - sudo -H pip install pysap pyshark
 
 install:
-  - if [ ${BUILD_STANDALONE} == "no" -a ${BUILD_CMAKE} == "no" ]; then
+  - if [ ${BUILD_STANDALONE} == "no" ]; then
       ./autogen.sh && ./configure --disable-wireshark --disable-editcap --disable-captype -disable-capinfos --disable-mergecap --disable-dumpcap --disable-reordercap --disable-text2pcap --disable-randpkt --disable-dftest --disable-rawshark && make;
     fi
 
