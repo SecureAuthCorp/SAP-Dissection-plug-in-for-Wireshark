@@ -5,13 +5,13 @@ SAP Dissector Plugin for Wireshark
 
 Copyright (C) 2015 by Martin Gallo, Core Security
 
-Version 0.2.2-dev (XXX 2015)
+Version 0.2.2 (June 2015)
 
 
 Overview
 --------
 
-[SAP Netweaver](http://www.sap.com/platform/netweaver/index.epx) [1] is a 
+[SAP Netweaver](http://www.sap.com/platform/netweaver/index.epx) [1] is a
 technology platform for building and integrating SAP business applications.
 Communication between components uses different network protocols. While
 some of them are standard and well-known protocols, others are proprietaries
@@ -22,7 +22,7 @@ of SAP's NI, Message Server, Router, Diag and Enqueue protocols. The
 dissectors are based on information acquired at researching the different
 protocols and services. Additional experimental support is included for SAP's
 RFC and SNC protocols. Detailed information about the research can be found
-at [3], [4], [5], [6] and [7]. 
+at [3], [4], [5], [6] and [7].
 
 
 Features
@@ -32,26 +32,26 @@ This plugin counts on several different dissectors:
 
 - SAP NI Protocol dissector
 
-    This is the dissector for SAP's Network Interface (NI) protocol. The 
-    dissector handles the reassemble of fragmented TCP packets and identifies 
-    keep-alive messages (`PING`/`PONG`). It also calls the respective sub-dissector
-    according to the port being used.
+    This is the dissector for SAP's Network Interface (NI) protocol. The
+    dissector handles the reassemble of fragmented TCP packets and identifies
+    keep-alive messages (`PING`/`PONG`). It also calls the respective
+    sub-dissector according to the port being used.
 
 - SAP Router Protocol dissector
 
     This dissector includes support for the SAP Router protocol, handling route,
-    control messages and error information packets. The dissector also calls 
+    control messages and error information packets. The dissector also calls
     the SNC sub-dissector when SNC frames are found.
 
 - SAP Diag Protocol dissector
 
-    The main dissector of the plugin. It dissects the main headers used by the 
-    Diag protocol: DP, Diag and Compression headers. The dissector also handles 
-    decompression of the payload data and includes dissection of relevant Diag 
-    payload items, including Support Bits and common `APPL`/`APPL4` items. 
-    Wireshark's expert information capabilities are used to remark malformed or 
-    wrong packets. The dissector also calls the RFC sub-dissector when an 
-    embedded RFC call is found and the SNC sub-dissector when SNC frames are 
+    The main dissector of the plugin. It dissects the main headers used by the
+    Diag protocol: DP, Diag and Compression headers. The dissector also handles
+    decompression of the payload data and includes dissection of relevant Diag
+    payload items, including Support Bits and common `APPL`/`APPL4` items.
+    Wireshark's expert information capabilities are used to remark malformed or
+    wrong packets. The dissector also calls the RFC sub-dissector when an
+    embedded RFC call is found and the SNC sub-dissector when SNC frames are
     found.
 
 - SAP Message Server Protocol dissector
@@ -66,14 +66,14 @@ This plugin counts on several different dissectors:
 
 - SAP RFC (Remote Function Call) Protocol dissector (experimental)
 
-    This dissector perform some basic dissection on the main components of the 
-    RFC protocol. It dissects general items and does some basic reassembling 
+    This dissector perform some basic dissection on the main components of the
+    RFC protocol. It dissects general items and does some basic reassembling
     and decompression of table contents.
-    
+
 - SAP SNC (Secure Network Connection) Protocol dissector (experimental)
 
-	This dissector perform some basic parsing of SNC frames. 
-    
+	This dissector perform some basic parsing of SNC frames.
+
 
 Installation & Build
 --------------------
@@ -112,15 +112,7 @@ The following steps are required to compile the plugin as part of Wireshark:
 
 	git apply plugins/sap/wireshark.patch
 
-6) Perform a new build including the plugin. Using `cmake`:
-
-    mkdir build
-    cd build
-    cmake ..
-    make
-    sudo make install
-
-   Without using `cmake`:
+6) Perform a new build including the plugin. At the root directory run:
 
     ./autogen.sh
     ./configure
@@ -130,8 +122,8 @@ The following steps are required to compile the plugin as part of Wireshark:
 
 ### Additional notes ###
 
-It's worth mentioning that compression libraries for SAP Diag/RFC protocol are 
-originally written in C++, thus the entire plugin needs to be compiled for C++. 
+It's worth mentioning that compression libraries for SAP Diag/RFC protocol are
+originally written in C++, thus the entire plugin needs to be compiled for C++.
 See [Wireshark's portability notes](https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-1.12)
 for more information [11].
 
@@ -213,6 +205,6 @@ References
 Contact
 -------
 
-Whether you want to report a bug or give some suggestions on this package, drop 
-us a few lines at `oss@coresecurity.com` or contact the author email 
+Whether you want to report a bug or give some suggestions on this package, drop
+us a few lines at `oss@coresecurity.com` or contact the author email
 `mgallo@coresecurity.com`.

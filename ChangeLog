@@ -1,3 +1,8 @@
+2015-06-24 Martin Gallo <mgallo@coresecurity.com>
+
+    * - Version v0.2.2 released.
+    * - The plugin can be build as a standalone plugin.
+
 2015-03-13 Martin Gallo <mgallo@coresecurity.com>
 
 	* - Version v0.2.1 released.
