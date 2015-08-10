@@ -51,7 +51,7 @@ $(PLUGIN_NAME).rc : moduleinfo.nmake
 	< plugin.rc.in > $@
 
 $(PLUGIN_NAME).dll $(PLUGIN_NAME).exp $(PLUGIN_NAME).lib : $(OBJECTS) $(LINK_PLUGIN_WITH) $(RESOURCE)
-	link -dll /out:$(PLUGIN_NAME).dll $(LDFLAGS) $(OBJECTS) $(LINK_PLUGIN_WITH) \
+	link -dll /out:$(PLUGIN_NAME).dll $(LDFLAGS) $(OBJECTS:src/=) $(LINK_PLUGIN_WITH) \
 	$(GLIB_LIBS) $(RESOURCE)
 
 #
@@ -100,7 +100,7 @@ plugin.c: $(DISSECTOR_SRC) moduleinfo.h ../../tools/make-dissector-reg
 !ENDIF
 
 clean:
-	rm -f $(OBJECTS) $(RESOURCE) plugin.c *.pdb \
+	rm -f $(OBJECTS:src/=) $(RESOURCE) plugin.c *.pdb \
 	    $(PLUGIN_NAME).dll $(PLUGIN_NAME).dll.manifest $(PLUGIN_NAME).lib \
 	    $(PLUGIN_NAME).exp $(PLUGIN_NAME).rc
 
