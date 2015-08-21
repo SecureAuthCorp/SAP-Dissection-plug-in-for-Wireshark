@@ -28,7 +28,7 @@ import pyshark
 from scapy.all import *
 
 
-pyshark.config.CONFIG_PATH = path.join(path.dirname(__file__), "pyshark.ini")
+TSHARK_PATH = "./tshark"
 
 
 def read_data_file(filename, unhex=True):
@@ -44,17 +44,16 @@ def read_data_file(filename, unhex=True):
 
 
 class WiresharkTestCase(unittest.TestCase):
-    
+
     tests_filename = "tests.pcap"
 
     def get_capture(self, pkt):
         """Write down a scapy packet to a pcap file and dissect it using
         tshark."""
         wrpcap(self.tests_filename, pkt)
-        cap = pyshark.FileCapture(self.tests_filename)
+        cap = pyshark.FileCapture(self.tests_filename, tshark_path=TSHARK_PATH)
         return cap
 
     def tearDown(self):
         if path.exists(self.tests_filename):
             remove(self.tests_filename)
-
