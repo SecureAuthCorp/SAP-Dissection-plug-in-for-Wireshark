@@ -200,7 +200,7 @@ dissect_sap_protocol_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree
 			if (router_handle){
 				/* Create a new tvb buffer and call the dissector */
 				next_tvb = tvb_new_subset(tvb, 4, -1, -1);
-				call_dissector(router_handle, next_tvb, pinfo, tree);
+				call_dissector_only(router_handle, next_tvb, pinfo, tree, NULL);
 			}
 		}
 
