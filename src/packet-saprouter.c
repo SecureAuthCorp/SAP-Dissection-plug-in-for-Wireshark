@@ -48,6 +48,7 @@
 
 /* SAP Router Eye Catcher strings */
 #define SAPROUTER_TYPE_ROUTE_STRING     "NI_ROUTE"
+#define SAPROUTER_TYPE_ROUTE_ACCEPT     "NI_PONG"
 #define SAPROUTER_TYPE_ERR_STRING       "NI_RTERR"
 #define SAPROUTER_TYPE_ADMIN_STRING     "ROUTER_ADM"
 
@@ -252,9 +253,9 @@ dissect_routestring(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32
         route_offset = offset; hostname = port = password = NULL;
 
         /* Create the subtree for this route hop */
-    	if (tree){
-    		route_hop = proto_tree_add_item(tree, hf_saprouter_route_string, tvb, offset, 0, FALSE);
-    		route_hop_tree = proto_item_add_subtree(route_hop, ett_saprouter);
+        if (tree){
+            route_hop = proto_tree_add_item(tree, hf_saprouter_route_string, tvb, offset, 0, FALSE);
+            route_hop_tree = proto_item_add_subtree(route_hop, ett_saprouter);
             proto_item_append_text(route_hop, ", nro %d", hop);
     	}
 
@@ -278,7 +279,7 @@ dissect_routestring(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32
         len = tvb_strsize(tvb, offset);
         password = tvb_get_string_enc(wmem_file_scope(), tvb, offset, len - 1, ENC_ASCII);
         if (tree){
-        	route_password = proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_password, tvb, offset, len, FALSE);
+            route_password = proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_password, tvb, offset, len, FALSE);
 
             /* If a password was found, add a expert warning in the security category */
             if (len > 1){
@@ -289,7 +290,7 @@ dissect_routestring(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32
 
         /* Adjust the size of the route hop item now that we know the size */
         if (tree){
-        	proto_item_set_len(route_hop, offset - route_offset);
+            proto_item_set_len(route_hop, offset - route_offset);
         }
 
         /* Get the service port in numeric format */
@@ -372,19 +373,19 @@ dissect_errorstring(tvbuff_t *tvb, proto_tree *tree, guint32 offset)
 static void
 dissect_saprouter_snc_frame(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset){
 
-	tvbuff_t *next_tvb = NULL;
+    tvbuff_t *next_tvb = NULL;
     dissector_handle_t snc_handle;
 
     /* Call the SNC dissector */
     if (global_saprouter_snc_dissection == TRUE){
-		snc_handle = find_dissector("sapsnc");
-		if (snc_handle){
-	    	/* Set the column to not writable so the SNC dissector doesn't override the Diag info */
-	    	col_set_writable(pinfo->cinfo, FALSE);
-			/* Create a new tvb buffer and call the dissector */
-			next_tvb = tvb_new_subset(tvb, offset, -1, -1);
-			call_dissector(snc_handle, next_tvb, pinfo, tree);
-		}
+        snc_handle = find_dissector("sapsnc");
+        if (snc_handle){
+            /* Set the column to not writable so the SNC dissector doesn't override the Diag info */
+            col_set_writable(pinfo->cinfo, FALSE);
+            /* Create a new tvb buffer and call the dissector */
+            next_tvb = tvb_new_subset(tvb, offset, -1, -1);
+            call_dissector(snc_handle, next_tvb, pinfo, tree);
+        }
     }
 
 }
@@ -406,11 +407,11 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
     if (!session_state){
         session_state = (saprouter_session_state *)wmem_alloc(wmem_file_scope(), sizeof(saprouter_session_state));
         if (session_state){
-			session_state->route_information = FALSE;
-        	session_state->route_accepted = FALSE;
-			session_state->src_hostname = NULL; session_state->src_port = 0; session_state->src_password = NULL;
-			session_state->dest_hostname = NULL; session_state->dest_port = 0; session_state->dest_password = NULL;
-			conversation_add_proto_data(conversation, proto_saprouter, session_state);
+            session_state->route_information = FALSE;
+            session_state->route_accepted = FALSE;
+            session_state->src_hostname = NULL; session_state->src_port = 0; session_state->src_password = NULL;
+            session_state->dest_hostname = NULL; session_state->dest_port = 0; session_state->dest_password = NULL;
+            conversation_add_proto_data(conversation, proto_saprouter, session_state);
         }
     }
 
@@ -462,27 +463,27 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
                 guint16 client_count = 0, client_count_actual = 0;
 
                 /* Retrieve the client count first */
-            	if (opcode == 6){
+                if (opcode == 6){
                     offset+=2; /* Skip 2 bytes for Cancel Route request*/
                     client_count = tvb_get_ntohs(tvb, offset);
                     proto_tree_add_item(saprouter_tree, hf_saprouter_admin_client_count_short, tvb, offset, 2, FALSE); offset+=2;
-            	} else {
-            		client_count = tvb_get_ntohl(tvb, offset);
-            		proto_tree_add_item(saprouter_tree, hf_saprouter_admin_client_count_int, tvb, offset, 4, FALSE); offset+=4;
-            	}
+                } else {
+                    client_count = tvb_get_ntohl(tvb, offset);
+                    proto_tree_add_item(saprouter_tree, hf_saprouter_admin_client_count_int, tvb, offset, 4, FALSE); offset+=4;
+                }
 
-            	/* Parse the list of client IDs */
-            	ci = proto_tree_add_item(saprouter_tree, hf_saprouter_admin_client_ids, tvb, offset, 4*client_count, FALSE);
+                /* Parse the list of client IDs */
+                ci = proto_tree_add_item(saprouter_tree, hf_saprouter_admin_client_ids, tvb, offset, 4*client_count, FALSE);
                 clients_tree = proto_item_add_subtree(ci, ett_saprouter);
-            	while (tvb_offset_exists(tvb, offset) && tvb_captured_length_remaining(tvb, offset)>=4){
+                while (tvb_offset_exists(tvb, offset) && tvb_captured_length_remaining(tvb, offset)>=4){
                     proto_tree_add_item(clients_tree, hf_saprouter_admin_client_id, tvb, offset, 4, FALSE); offset+=4;
                     client_count_actual+=1;
-            	}
+                }
 
-            	/* Check if the actual count of IDs differes from the reported number */
-            	if ((client_count_actual != client_count) || tvb_captured_length_remaining(tvb, offset)>0){
-            		expert_add_info(pinfo, clients_tree, &ei_saprouter_invalid_client_ids);
-            	}
+                /* Check if the actual count of IDs differes from the reported number */
+                if ((client_count_actual != client_count) || tvb_captured_length_remaining(tvb, offset)>0){
+                    expert_add_info(pinfo, clients_tree, &ei_saprouter_invalid_client_ids);
+                }
 
                 break;
             }
@@ -496,7 +497,7 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
     } else if (tvb_strneql(tvb, offset, SAPROUTER_TYPE_ROUTE_STRING, eyecatcher_length) == 0){
         guint32 route_length = 0, route_offset = 0;
 
-    	col_set_str(pinfo->cinfo, COL_INFO, "Route Message");
+        col_set_str(pinfo->cinfo, COL_INFO, "Route Message");
 
         /* Get the route length/offset */
         route_length = tvb_get_ntohl(tvb, offset + SAPROUTER_ROUTE_LENGTH_OFFSET);
@@ -566,47 +567,64 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 
             /* Control Message */
             } else {
-            	proto_tree_add_item(saprouter_tree, hf_saprouter_control_length, tvb, offset, 4, FALSE); offset+=4;
-            	if ((text_length >0) && tvb_offset_exists(tvb, offset+text_length)){
-            		/* Add the control string tree */
+                proto_tree_add_item(saprouter_tree, hf_saprouter_control_length, tvb, offset, 4, FALSE); offset+=4;
+                if ((text_length >0) && tvb_offset_exists(tvb, offset+text_length)){
+                    /* Add the control string tree */
                     proto_tree_add_item(saprouter_tree, hf_saprouter_control_string, tvb, offset, text_length, FALSE);
                     offset += text_length;
-            	}
+                }
 
-            	/* Dissect the SNC Frame for SNC opcodes */
-            	if (opcode == 70 || opcode == 71){
-            		dissect_saprouter_snc_frame(tvb, pinfo, tree, offset);
-            	}
+                /* Dissect the SNC Frame for SNC opcodes */
+                if (opcode == 70 || opcode == 71){
+                    dissect_saprouter_snc_frame(tvb, pinfo, tree, offset);
+                }
 
             }
             proto_tree_add_item(saprouter_tree, hf_saprouter_unknown, tvb, offset, 4, FALSE); offset+=4;
 
         }
 
+    /* Route Acceptance (NI_PONG) Message Type */
+    } else if (tvb_strneql(tvb, offset, SAPROUTER_TYPE_ROUTE_ACCEPT, eyecatcher_length) == 0){
+        /* Route information available */
+        if (session_state && session_state->route_information){
+        	session_state->route_accepted = TRUE;
+            col_add_fstr(pinfo->cinfo, COL_INFO, "Route from %s:%d to %s:%d accepted ", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
+            if (tree){
+                proto_item_append_text(ti, ", Route from %s:%d to %s:%d accepted ", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
+            }
+        }
+
     /* Uknown Message Type */
     } else {
         /* Route information available */
         if (session_state && session_state->route_information){
-        	/* TODO: Use the route_accepted boolean to track if a route request
-        	 * was accepted prior to consider route traffic. The NI Protocol
-        	 * dissector should pass NI_PONG packets to the Router dissector.
-        	 */
 
-        	/* TODO: Add a link to the packet were the route was requested
-        	 * (like TCP reassembled packets).
-        	 */
-            col_add_fstr(pinfo->cinfo, COL_INFO, "Unknown message or message routed from %s:%d to %s:%d ", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
-            if (tree){
-                proto_item_append_text(ti, ", Unknown message or message routed from %s:%d to %s:%d ", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
+            /* TODO: Add a link to the packet were the route was requested
+             * (like TCP reassembled packets).
+             */
+            /* Route accepted */
+            if (session_state->route_accepted){
+
+                col_add_fstr(pinfo->cinfo, COL_INFO, "Message routed from %s:%d to %s:%d ", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
+                if (tree){
+                    proto_item_append_text(ti, ", Message routed from %s:%d to %s:%d ", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
+                }
+
+            /* Route not accepted but some information available */
+            } else {
+                col_add_fstr(pinfo->cinfo, COL_INFO, "Message routed to unknown destination");
+                if (tree){
+                    proto_item_append_text(ti, ", Message routed to unknown destination");
+                }
             }
 
             /* Call the dissector in the NI protocol subdissectors table
-             * according to the route destination source/port numbers. */
-            dissect_sap_protocol_payload(tvb, offset, pinfo, tree,
-            							 session_state->src_port, session_state->dest_port);
+             * according to the route destination port number. */
+            dissect_sap_protocol_payload(tvb, offset, pinfo, tree, 0, session_state->dest_port);
 
-        /* No route information available */
         } else {
+            /* No route information available */
             col_add_fstr(pinfo->cinfo, COL_INFO, "Unknown message or message routed to unknown destination");
             if (tree){
                 proto_item_append_text(ti, ", Unknown message or message routed to unknown destination");

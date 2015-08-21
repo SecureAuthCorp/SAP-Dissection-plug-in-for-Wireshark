@@ -135,6 +135,9 @@ dissect_sap_protocol_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree
 	guint32 length = 0;
 	proto_item *ti = NULL, *sap_protocol_length = NULL;
 	proto_tree *sap_protocol_tree = NULL;
+	conversation_t *conversation = NULL;
+	tvbuff_t *next_tvb = NULL;
+	dissector_handle_t router_handle;
 
 	/* Add the protocol to the column */
 	col_set_str(pinfo->cinfo, COL_PROTOCOL, "SAPNI");
@@ -168,18 +171,37 @@ dissect_sap_protocol_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree
 		}
 	}
 
-	/* Check for NI_PING/NI_PONG values */
+	/* Check for NI_PING */
 	if ((length == 8)&&(tvb_strneql(tvb, 4, "NI_PING\00", 8) == 0)){
 		col_set_str(pinfo->cinfo, COL_INFO, "Ping Message");
 		if (tree){
 			proto_item_append_text(ti, ", Ping Message (keep-alive request)");
-            proto_tree_add_item(sap_protocol_tree, hf_sap_protocol_ping, tvb, 4, -1, FALSE);
+			proto_tree_add_item(sap_protocol_tree, hf_sap_protocol_ping, tvb, 4, -1, FALSE);
 		}
+
+	/* Chek for NI_PONG */
 	} else if ((length == 8)&&(tvb_strneql(tvb, 4, "NI_PONG\00", 8) == 0)){
 		col_set_str(pinfo->cinfo, COL_INFO, "Pong Message");
-		if (tree){
-			proto_item_append_text(ti, ", Pong Message (keep-alive response / route accepted)");
-            proto_tree_add_item(sap_protocol_tree, hf_sap_protocol_pong, tvb, 4, -1, FALSE);
+
+		/* We need to check if this is a keep-alive response, or it's part of
+		 * a SAP Router conversation and thus a route accepted message.
+		 */
+		conversation = find_conversation(pinfo->fd->num, &pinfo->src, &pinfo->dst,
+										 pinfo->ptype, pinfo->srcport, pinfo->destport, 0);
+		if (conversation == NULL){
+			proto_item_append_text(ti, ", Pong Message (keep-alive response)");
+			proto_tree_add_item(sap_protocol_tree, hf_sap_protocol_pong, tvb, 4, -1, FALSE);
+
+		} else {
+			proto_item_append_text(ti, ", Pong Message (route accepted)");
+
+			/* Call the SAP Router dissector */
+			router_handle = find_dissector("saprouter");
+			if (router_handle){
+				/* Create a new tvb buffer and call the dissector */
+				next_tvb = tvb_new_subset(tvb, 4, -1, -1);
+				call_dissector(router_handle, next_tvb, pinfo, tree);
+			}
 		}
 
 	/* Dissect the payload */
@@ -209,10 +231,10 @@ proto_register_sap_protocol(void)
 			{ "Length", "sapni.length", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP NI Protocol Message Length", HFILL }},
 		{ &hf_sap_protocol_payload,
 			{ "Payload", "sapni.payload", FT_NONE, BASE_NONE, NULL, 0x0, "SAP NI Protocol Payload", HFILL }},
-        { &hf_sap_protocol_ping,
-            { "Ping", "sapni.ping", FT_NONE, BASE_NONE, NULL, 0x0, "SAP NI Ping Message", HFILL }},
-        { &hf_sap_protocol_pong,
-            { "Pong", "sapni.pong", FT_NONE, BASE_NONE, NULL, 0x0, "SAP NI Pong Message", HFILL }},
+		{ &hf_sap_protocol_ping,
+			{ "Ping", "sapni.ping", FT_NONE, BASE_NONE, NULL, 0x0, "SAP NI Ping Message", HFILL }},
+		{ &hf_sap_protocol_pong,
+			{ "Pong", "sapni.pong", FT_NONE, BASE_NONE, NULL, 0x0, "SAP NI Pong Message", HFILL }},
 	};
 
 	/* Setup protocol subtree array */
