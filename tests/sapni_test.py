@@ -38,6 +38,16 @@ class WiresharkSAPNITestCase(WiresharkTestCase):
         self.assertIn('sapni', packet)
         self.assertEqual(int(packet['sapni'].length), 4)
 
+    def test_sapni_ping(self):
+        """Test dissection of a basic SAP NI PING packet. """
+        pkt = Ether()/IP()/TCP(dport=3299)/SAPNI()/"NI_PING\x00"
+        
+        packet = self.get_capture(pkt)[0]
+        
+        self.assertIn('sapni', packet)
+        self.assertEqual(int(packet['sapni'].length), 8)
+        self.assertIn('ping', dir(packet['sapni']))
+
 
 def suite():
     loader = unittest.TestLoader()
