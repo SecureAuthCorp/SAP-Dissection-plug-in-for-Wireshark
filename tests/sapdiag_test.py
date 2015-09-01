@@ -33,9 +33,9 @@ class WiresharkSAPDiagTestCase(WiresharkTestCase):
     def test_sapdiag_dissection(self):
         """Test dissection of a basic SAP Diag packet. """
         pkt = Ether()/IP()/TCP(dport=3200)/SAPNI()/SAPDiag()
-        
+
         packet = self.get_capture(pkt)[0]
-        
+
         self.assertIn('sapni', packet)
         self.assertEqual(int(packet['sapni'].length), 8)
 
@@ -47,7 +47,7 @@ class WiresharkSAPDiagTestCase(WiresharkTestCase):
         test_case = read_data_file('invalid_write_testcase.data', False)
 
         pkt = Ether()/IP()/TCP(dport=3200)/SAPNI()/Raw(str(SAPDiag(compress=1))[:-8])/test_case
-        
+
         packet = self.get_capture(pkt)[0]
 
         self.assertIn('sapdiag', packet)
@@ -59,7 +59,7 @@ class WiresharkSAPDiagTestCase(WiresharkTestCase):
         test_case = read_data_file('invalid_read_testcase.data', False)
 
         pkt = Ether()/IP()/TCP(dport=3200)/SAPNI()/Raw(str(SAPDiag(compress=1))[:-8])/test_case
-        
+
         packet = self.get_capture(pkt)[0]
 
         self.assertIn('sapdiag', packet)

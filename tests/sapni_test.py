@@ -21,8 +21,8 @@
 # Standard imports
 import unittest
 # External imports
-from scapy.all import *
 from pysap.SAPNI import SAPNI
+from scapy.all import Ether, IP, TCP
 # Custom imports
 from basetestcase import WiresharkTestCase
 
@@ -32,21 +32,31 @@ class WiresharkSAPNITestCase(WiresharkTestCase):
     def test_sapni_dissection(self):
         """Test dissection of a basic SAP NI packet. """
         pkt = Ether()/IP()/TCP(dport=3299)/SAPNI()/"LALA"
-        
+
         packet = self.get_capture(pkt)[0]
-        
+
         self.assertIn('sapni', packet)
         self.assertEqual(int(packet['sapni'].length), 4)
 
     def test_sapni_ping(self):
         """Test dissection of a basic SAP NI PING packet. """
         pkt = Ether()/IP()/TCP(dport=3299)/SAPNI()/"NI_PING\x00"
-        
+
         packet = self.get_capture(pkt)[0]
-        
+
         self.assertIn('sapni', packet)
         self.assertEqual(int(packet['sapni'].length), 8)
         self.assertIn('ping', dir(packet['sapni']))
+
+    def test_sapni_pong(self):
+        """Test dissection of a basic SAP NI PONG packet. """
+        pkt = Ether()/IP()/TCP(dport=3299)/SAPNI()/"NI_PONG\x00"
+
+        packet = self.get_capture(pkt)[0]
+
+        self.assertIn('sapni', packet)
+        self.assertEqual(int(packet['sapni'].length), 8)
+        self.assertIn('saprouter', packet)
 
 
 def suite():

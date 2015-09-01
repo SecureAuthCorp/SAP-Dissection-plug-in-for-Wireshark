@@ -50,7 +50,12 @@ class WiresharkTestCase(unittest.TestCase):
     def get_capture(self, pkt):
         """Write down a scapy packet to a pcap file and dissect it using
         tshark."""
+        # Remove the pcap if already exists 
+        if path.exists(self.tests_filename):
+            remove(self.tests_filename)
+        # Write it using scapy
         wrpcap(self.tests_filename, pkt)
+        # Parse it using pyshark
         cap = pyshark.FileCapture(self.tests_filename, tshark_path=TSHARK_PATH)
         return cap
 
