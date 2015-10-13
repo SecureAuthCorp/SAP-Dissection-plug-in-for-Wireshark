@@ -351,7 +351,7 @@ static int hf_saprfc_ucheader_ce = -1;
 static int hf_saprfc_ucheader_et = -1;
 static int hf_saprfc_ucheader_cs = -1;
 static int hf_saprfc_ucheader_returncode = -1;
-	
+
 static int hf_saprfc_item = -1;
 static int hf_saprfc_item_id1 = -1;
 static int hf_saprfc_item_id2 = -1;
@@ -389,7 +389,7 @@ static gboolean global_saprfc_decompress = TRUE;
 
 /* Global table reassembling preference */
 static gboolean global_saprfc_table_reassembly = TRUE;
-  
+
 /* Global port preference */
 static range_t *global_saprfc_port_range;
 
@@ -428,7 +428,7 @@ dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 	proto_item_append_text(compression_header, ", Uncompressed Len: %u", reported_length);
 
 	/* Add the algorithm */
-	proto_tree_add_item(compression_header_tree, hf_saprfc_table_algorithm, tvb, offset, 1, FALSE); offset++; 
+	proto_tree_add_item(compression_header_tree, hf_saprfc_table_algorithm, tvb, offset, 1, FALSE); offset++;
 	/* Add the magic bytes */
 	proto_tree_add_item(compression_header_tree, hf_saprfc_table_magic, tvb, offset, 2, FALSE); offset+=2;
 	/* Add the max bits */
@@ -481,7 +481,7 @@ dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 	} else {
 		/* Add the payload subtree */
 		proto_tree_add_item(tree, hf_saprfc_table_content, tvb, offset, -1, FALSE);
-	}	
+	}
 
     /* TODO: Dissect saprfc_payload */
 }
@@ -672,15 +672,18 @@ dissect_saprfc_payload(tvbuff_t *tvb, packet_info *info, proto_tree *tree, proto
 
 static void
 dissect_saprfc_rfcheader(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset){
-	proto_item *header = NULL, *header_unicode = NULL, *payload = NULL;
-	proto_tree *header_tree = NULL, *header_unicode_tree = NULL, *payload_tree = NULL;
+	proto_item *header_unicode = NULL, *payload = NULL;
+	proto_tree *header_unicode_tree = NULL, *payload_tree = NULL;
 
 	if (tree){
 
 		/* Add the RFC header subtree */
+		/* TODO: We're not parsing the header yet. Adding this to avoid a
+		compiler warning:
+
 		header = proto_tree_add_item(tree, hf_saprfc_rfcheader, tvb, offset, 28, FALSE);
 		header_tree = proto_item_add_subtree(header, ett_saprfc);
-		/* TODO: Warning unused variable header_tree */
+		*/
 		offset += 28;
 
 		/* Add the unicode header subtree */
@@ -1284,4 +1287,3 @@ proto_reg_handoff_saprfc(void)
 	saprfc_port_range = range_copy(global_saprfc_port_range);
 	range_foreach(saprfc_port_range, range_add_callback);
 }
-
