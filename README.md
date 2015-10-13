@@ -11,13 +11,13 @@ Version 0.2.3-dev (XXX 2015)
 Overview
 --------
 
-[SAP Netweaver](http://www.sap.com/platform/netweaver/index.epx) [1] is a
+[SAP Netweaver](https://www.sap.com/platform/netweaver/index.epx) [1] is a
 technology platform for building and integrating SAP business applications.
 Communication between components uses different network protocols. While
 some of them are standard and well-known protocols, others are proprietaries
 and public information is not available.
 
-This [Wireshark](http://www.wireshark.org/) [2] plugin  provides dissection
+This [Wireshark](https://www.wireshark.org/) [2] plugin  provides dissection
 of SAP's NI, Message Server, Router, Diag and Enqueue protocols. The
 dissectors are based on information acquired at researching the different
 protocols and services. Additional experimental support is included for SAP's
@@ -98,7 +98,7 @@ To build the plugin on Debian/Ubuntu linux distributions:
 
 The following steps are required to compile the plugin as part of Wireshark:
 
-1) Download [Wireshark version 1.12 source](http://www.wireshark.org/download.html) [8]
+1) Download [Wireshark version 1.12 source](https://www.wireshark.org/download.html) [8]
    or checkout the code from the [source repository](https://code.wireshark.org/review/wireshark) [9].
 
 2) Decompress the package.
@@ -204,21 +204,21 @@ Contributions made by:
 References
 ----------
 
-[1] http://www.sap.com/platform/netweaver/index.epx
+[1] https://www.sap.com/platform/netweaver/index.epx
 
-[2] http://www.wireshark.org/
+[2] https://www.wireshark.org/
 
-[3] http://www.coresecurity.com/corelabs-research/open-source-tools/sap-dissection-plug-in-wireshark
+[3] https://www.coresecurity.com/corelabs-research/open-source-tools/sap-dissection-plug-in-wireshark
 
-[4] http://www.coresecurity.com/content/sap-netweaver-dispatcher-multiple-vulnerabilities
+[4] https://www.coresecurity.com/content/sap-netweaver-dispatcher-multiple-vulnerabilities
 
-[5] http://www.coresecurity.com/content/SAP-netweaver-msg-srv-multiple-vulnerabilities
+[5] https://www.coresecurity.com/content/SAP-netweaver-msg-srv-multiple-vulnerabilities
 
-[6] http://www.coresecurity.com/corelabs-research/publications/uncovering-sap-vulnerabilities-reversing-and-breaking-diag-protocol-brucon2012
+[6] https://www.coresecurity.com/corelabs-research/publications/uncovering-sap-vulnerabilities-reversing-and-breaking-diag-protocol-brucon2012
 
-[7] http://www.coresecurity.com/corelabs-research/publications/sap-network-protocols-revisited
+[7] https://www.coresecurity.com/corelabs-research/publications/sap-network-protocols-revisited
 
-[8] http://www.wireshark.org/download.html
+[8] https://www.wireshark.org/download.html
 
 [9] https://code.wireshark.org/review/wireshark
 
