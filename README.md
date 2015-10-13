@@ -81,7 +81,9 @@ Installation & Build
 This Wireshark plugin is not distributed as part of the Wireshark source. It
 can be build as a standalone plugin, or as part of Wireshark.
 
-### As a standalone plugin ###
+### Building on Linux ###
+
+#### As a standalone plugin ####
 
 To build the plugin on Debian/Ubuntu linux distributions:
 
@@ -92,8 +94,7 @@ To build the plugin on Debian/Ubuntu linux distributions:
     make
     make install
 
-
-### As part of Wireshark ###
+#### As part of Wireshark ####
 
 The following steps are required to compile the plugin as part of Wireshark:
 
@@ -120,15 +121,39 @@ The following steps are required to compile the plugin as part of Wireshark:
     sudo make install
 
 
+### Building on Windows ###
+
+Windows build can be only performed as part of the whole Wireshark. The
+following steps are required to compile the plugin on Windows:
+
+1) Follow the [step-to-step guide](https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html)
+for building Wireshark on Windows [12].
+
+2) Copy the SAP Wireshark Plugin to a new `plugins/sap` directory.
+
+3) Configure the plugin to be included in the build process. This step can be
+   performed using the patch file provided. At the root directory run:
+
+	git apply plugins/sap/wireshark.patch
+
+4) Perform a new build including the plugin. At the root directory run:
+
+    nmake -f Makefile.nmake all
+
+
+### Building on OSX ###
+
+The build process for OSX is similar to the one for Linux systems. It was
+reported that compiling Wireshark on OSX requires fixing link for the `gettext`
+library if it was installed using `home-brew`.
+
+
 ### Additional notes ###
 
 It's worth mentioning that compression libraries for SAP Diag/RFC protocol are
 originally written in C++, thus the entire plugin needs to be compiled for C++.
 See [Wireshark's portability notes](https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-1.12)
 for more information [11].
-
-It was reported that compiling Wireshark on OS X requires fixing link for the
-`gettext` library if it was installed using `home-brew`.
 
 
 Example uses
@@ -201,6 +226,7 @@ References
 
 [11] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-1.12
 
+[12] https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html
 
 Contact
 -------
