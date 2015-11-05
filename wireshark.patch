@@ -29,10 +29,10 @@ index d813784..1557e65 100644
  	-dlopen plugins/unistim/unistim.la \
  	-dlopen plugins/wimax/wimax.la \
 diff --git a/configure.ac b/configure.ac
-index e6aa52f..e175a7b 100644
+index df23c7e..7884b4a 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -2966,6 +2966,7 @@ AC_OUTPUT(
+@@ -2988,6 +2988,7 @@ AC_OUTPUT(
    plugins/mate/Makefile
    plugins/opcua/Makefile
    plugins/profinet/Makefile
@@ -41,7 +41,7 @@ index e6aa52f..e175a7b 100644
    plugins/unistim/Makefile
    plugins/wimax/Makefile
 diff --git a/epan/Makefile.am b/epan/Makefile.am
-index 0739c6d..5bc372f 100644
+index 4b9b95c..8f3ca8b 100644
 --- a/epan/Makefile.am
 +++ b/epan/Makefile.am
 @@ -235,6 +235,13 @@ plugin_src = \
@@ -71,7 +71,7 @@ index eb037e6..6040b32 100644
  	../../plugins/unistim/unistim.dll \
  	../../plugins/wimax/wimax.dll \
 diff --git a/packaging/nsis/wireshark.nsi b/packaging/nsis/wireshark.nsi
-index 6d4455b..6a62483 100644
+index 7f8a1a4..df7ca3d 100644
 --- a/packaging/nsis/wireshark.nsi
 +++ b/packaging/nsis/wireshark.nsi
 @@ -983,6 +983,7 @@ File "${STAGING_DIR}\plugins\${VERSION}\irda.dll"
