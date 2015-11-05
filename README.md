@@ -5,7 +5,7 @@ SAP Dissector Plugin for Wireshark
 
 Copyright (C) 2015 by Martin Gallo, Core Security
 
-Version 0.2.3-dev (XXX 2015)
+Version 0.2.3 (November 2015)
 
 
 Overview
@@ -199,6 +199,7 @@ Contributions made by:
   * Dave Hartley
   * Jean-Paul Roliers
   * Dongha Shin
+  * Luca Di Stefano
 
 
 References

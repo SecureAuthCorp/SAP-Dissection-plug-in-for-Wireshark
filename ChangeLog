@@ -1,3 +1,15 @@
+2015-11-05 Martin Gallo <mgallo@coresecurity.com>
+
+    * - Version v0.2.3 released.
+    * - Minor documentation improvements.
+    * - Fixed some issues in Windows builds.
+    * - Added some basic unit test on dissecting SAP Router packets.
+    * src/packet-saprouter.c: Better tracking of conversations. Now it's
+    possible to trace request response packets and see the route information
+    if the packet trace included that information (thanks Luca!).
+    * src/vpa108csulzh.cpp: Improved the fix for CVE-2015-2278 by
+    properly initializing arrays (thanks 'ret5ret'!).
+
 2015-06-24 Martin Gallo <mgallo@coresecurity.com>
 
     * - Version v0.2.2 released.
