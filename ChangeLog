@@ -17,83 +17,83 @@
 
 2015-03-13 Martin Gallo <mgallo@coresecurity.com>
 
-	* - Version v0.2.1 released.
-	* - Switched to Wireshark 1.12 trunk. Ported the plugin to the use of
-	new APIs (wmem, expert, etc.)
-	* - Fixed vulnerabilities in LZC and LZH compression libraries
-	(CVE-2015-2282 and CVE-2015-2278). Added test cases for checking proper
-	fixes.
-	* - Added basic packet parsing testing with travis, using pyshark. It
-	allows to check that the plugin is built and loaded correctly.
-	* - Moved to a layout with all source in "src" folder.
-	* - Test building with clang on travis.
-	* src/packet-saprouter.c: Added unknown field to router error
-	messages.
-	* src/packet-saprouter.c: Changed scope of hostname/password strings
-	allocations.
+    * - Version v0.2.1 released.
+    * - Switched to Wireshark 1.12 trunk. Ported the plugin to the use of
+    new APIs (wmem, expert, etc.)
+    * - Fixed vulnerabilities in LZC and LZH compression libraries
+    (CVE-2015-2282 and CVE-2015-2278). Added test cases for checking proper
+    fixes.
+    * - Added basic packet parsing testing with travis, using pyshark. It
+    allows to check that the plugin is built and loaded correctly.
+    * - Moved to a layout with all source in "src" folder.
+    * - Test building with clang on travis.
+    * src/packet-saprouter.c: Added unknown field to router error
+    messages.
+    * src/packet-saprouter.c: Changed scope of hostname/password strings
+    allocations.
 
 2015-01-16 Martin Gallo <mgallo@coresecurity.com>
 
-	* - Version v0.1.5 released.
-	* - Added travis script for testing builds.
-	* - Fixed compilation on OSX. Thanks Valeriy !
-	* - General minor fixes and code improvements.
-	* packet-sapdiag.c: Added dissection of error messages, fixed parsing
-	of some atom items for old versions.
-	* packet-sapdiag.c: Better highlighting of all invisible fields as
-	potential passwords. Fixed parsing of GUI patch level item for old
-	versions. Thanks Victor for the feedback !
-	* packet-sapenqueue.c: Added dissection of admin trace requests.
-	* packet-saprouter.c: Added dissection of error fields. Route strings
-	field are now search-able.
-	* sapdecompress.h: Improved routines and added handling of some error
-	conditions.
-	* saphelpers.h: Fixed use of helpers on different dissectors.
+    * - Version v0.1.5 released.
+    * - Added travis script for testing builds.
+    * - Fixed compilation on OSX. Thanks Valeriy !
+    * - General minor fixes and code improvements.
+    * packet-sapdiag.c: Added dissection of error messages, fixed parsing
+    of some atom items for old versions.
+    * packet-sapdiag.c: Better highlighting of all invisible fields as
+    potential passwords. Fixed parsing of GUI patch level item for old
+    versions. Thanks Victor for the feedback !
+    * packet-sapenqueue.c: Added dissection of admin trace requests.
+    * packet-saprouter.c: Added dissection of error fields. Route strings
+    field are now search-able.
+    * sapdecompress.h: Improved routines and added handling of some error
+    conditions.
+    * saphelpers.h: Fixed use of helpers on different dissectors.
 
 2014-03-25 Martin Gallo <mgallo@coresecurity.com>
 
-	* - Version v0.1.4 released at Troopers'14.
-	* - Changelog now in GNU format.
-	* - Switched to wireshark 1.10 trunk.
-	* - Moved to the use of the new memory allocation API (wmem) on all 
-	dissectors.
-	* packet-sapdiag.c: Fixed some support bits and added new ones found on SAP
-	GUI version 7.30.
-	* packet-sapdiag.c: Added dissection of new Diag Items: WindowsSize.
-	* packet-sapenqueue.c: New dissector. Parsing of Enqueue Server packets.
-	* packet-sapms.c: New dissector. Parsing of Message Server packets. 
-	* packet-sapprotocol.c: Subdissectors tables are now handled only on the
-	NI Protocol dissector. 
-	* packet-sapprotocol.h: Exported function to look at the NI Protocol
-	sub-dissector table.
-	* packet-saprfc.c: The RFC dissector now registeres two separate handlers:
-	one for internal calls (e.g. from SAP Diag dissector) and another for
-	external communications (e.g. RFC or Gateway Monitor). 
-	* packet-saprfc.c: Refactored almost all of the dissector code. Added lot
-	of new fields and fixed some issues. 
-	* packet-saprfc.c: Fixed reassemble of RFC tables. 
-	* packet-saprouter.c: Added dissection of Admin and Control messages.
-	* packet-saprouter.c: Protocol port preference changed to a range to cover
-	the port used by niping.
-	* packet-sapsnc.c: New dissector. Moved dissection of SNC frames to a new
-	dissector for using it as subdissector of both SAP Router and SAP Diag
-	packets.
-	* sapdecompress.h: Exported return code strings for using it in both Diag
-	and RFC dissectors.
-	* wireshark.patch: Switched patch file to GIT as the repository isn't
-	updated on SVN now.
+    * - Version v0.1.4 released at Troopers'14.
+    * - Changelog now in GNU format.
+    * - Switched to wireshark 1.10 trunk.
+    * - Moved to the use of the new memory allocation API (wmem) on all 
+    dissectors.
+    * packet-sapdiag.c: Fixed some support bits and added new ones found on SAP
+    GUI version 7.30.
+    * packet-sapdiag.c: Added dissection of new Diag Items: WindowsSize.
+    * packet-sapenqueue.c: New dissector. Parsing of Enqueue Server packets.
+    * packet-sapms.c: New dissector. Parsing of Message Server packets. 
+    * packet-sapprotocol.c: Subdissectors tables are now handled only on the
+    NI Protocol dissector. 
+    * packet-sapprotocol.h: Exported function to look at the NI Protocol
+    sub-dissector table.
+    * packet-saprfc.c: The RFC dissector now registeres two separate handlers:
+    one for internal calls (e.g. from SAP Diag dissector) and another for
+    external communications (e.g. RFC or Gateway Monitor). 
+    * packet-saprfc.c: Refactored almost all of the dissector code. Added lot
+    of new fields and fixed some issues. 
+    * packet-saprfc.c: Fixed reassemble of RFC tables. 
+    * packet-saprouter.c: Added dissection of Admin and Control messages.
+    * packet-saprouter.c: Protocol port preference changed to a range to cover
+    the port used by niping.
+    * packet-sapsnc.c: New dissector. Moved dissection of SNC frames to a new
+    dissector for using it as subdissector of both SAP Router and SAP Diag
+    packets.
+    * sapdecompress.h: Exported return code strings for using it in both Diag
+    and RFC dissectors.
+    * wireshark.patch: Switched patch file to GIT as the repository isn't
+    updated on SVN now.
 
 2013-03-22  Martin Gallo  <mgallo@coresecurity.com>
 
-	* - Version v0.1.3 released.
-	* packet-sapdiag.c, packet-saprfc.c: Fixed compilations errors on RFC and
-	Diag dissectors and removed some warnings.
+    * - Version v0.1.3 released.
+    * packet-sapdiag.c, packet-saprfc.c: Fixed compilations errors on RFC and
+    Diag dissectors and removed some warnings.
 
 2012-09-27  Martin Gallo  <mgallo@coresecurity.com>
 
-	* - Version v0.1.2 released at Brucon'12.
-	* packet-saprouter.c: Fixed minor issues and added dissection of Admin
-	requests. Thanks Dave (@nmonkee) for the feedback and reporting the issues.
+    * - Version v0.1.2 released at Brucon'12.
+    * packet-saprouter.c: Fixed minor issues and added dissection of Admin
+    requests. Thanks Dave (@nmonkee) for the feedback and reporting the issues.
     * packet-saprouter.c: Route and Admin passwords are highlighted as Security
     via expert warnings.
     * packet-sapdiag.c: Added dissection of new Diag Atom types, as used in NW
@@ -105,4 +105,4 @@
 
 2012-07-29  Martin Gallo  <mgallo@coresecurity.com>
 
-	* - Initial version v0.1.1 releaseed at Defcon 20.
+    * - Initial version v0.1.1 releaseed at Defcon 20.
