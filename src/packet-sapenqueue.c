@@ -389,7 +389,7 @@ dissect_sapenqueue(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
         proto_tree_add_item(sapenqueue_tree, hf_sapenqueue_length, tvb, offset, 4, FALSE); offset += 4;
         proto_tree_add_item(sapenqueue_tree, hf_sapenqueue_length_frag, tvb, offset, 4, FALSE); offset += 4;
         proto_tree_add_item(sapenqueue_tree, hf_sapenqueue_dest, tvb, offset, 1, FALSE); offset += 1;
-        if (dest == 0x06){ // This field is only relevant if the destination is Connection Admin
+        if (dest == 0x06){  /* This field is only relevant if the destination is Connection Admin */
         	proto_tree_add_item(sapenqueue_tree, hf_sapenqueue_conn_admin_opcode, tvb, offset, 1, FALSE);
 		}
         offset += 1;

@@ -260,7 +260,7 @@ static int hf_saprfc_lu = -1;
 static int hf_saprfc_tp = -1;
 static int hf_saprfc_conversation_id = -1;
 static int hf_saprfc_appc_header_version = -1;
-static int hf_saprfc_accept_info = -1;  // (EINFO PING CONN_EINFO EXTINITOPT GW_ACCEPT_DIST_TRACE (0xCB))
+static int hf_saprfc_accept_info = -1;  /* (EINFO PING CONN_EINFO EXTINITOPT GW_ACCEPT_DIST_TRACE (0xCB)) */
 static int hf_saprfc_accept_info_EINFO = -1;
 static int hf_saprfc_accept_info_PING = -1;
 static int hf_saprfc_accept_info_SNC = -1;
@@ -326,7 +326,7 @@ static int hf_saprfc_header_reqtype2_F_V_SEND_DATA = -1;
 static int hf_saprfc_header_reqtype2_F_V_RECEIVE = -1;
 static int hf_saprfc_header_reqtype2_F_V_FLUSH = -1;
 static int hf_saprfc_header_appc_rc = -1;
-static int hf_saprfc_header_sap_rc = -1;  // TODO: Add SAP Return values
+static int hf_saprfc_header_sap_rc = -1;  /* TODO: Add SAP Return values */
 static int hf_saprfc_header_conversation_id = -1;
 static int hf_saprfc_header_ncpic_parameters = -1;
 static int hf_saprfc_header_ncpic_parameters_sdest = -1;
@@ -828,7 +828,7 @@ dissect_saprfc_header(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint
 				proto_tree_add_item(params_tree, hf_saprfc_header_ncpic_parameters_tp, tvb, offset, 8, FALSE); offset+=8;
 				proto_tree_add_item(params_tree, hf_saprfc_header_ncpic_parameters_ctype, tvb, offset, 1, FALSE); offset+=1;
 				proto_tree_add_item(params_tree, hf_saprfc_header_ncpic_parameters_client_info, tvb, offset, 1, FALSE); offset+=1;
-				offset += 2; // Sum remaining bytes
+				offset += 2; /* Sum remaining bytes */
 				break;
 			}
 			case 0x0f:{		/* F_SET_PARTNER_LU_NAME */
@@ -840,7 +840,7 @@ dissect_saprfc_header(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint
 			case 0x17:{		/* F_SET_SECURITY_TYPE */
 				proto_tree_add_item(params_tree, hf_saprfc_header_ncpic_parameters_security_password, tvb, offset, 8, FALSE); offset+=8;
 				proto_tree_add_item(params_tree, hf_saprfc_header_ncpic_parameters_security_password_length, tvb, offset, 4, FALSE); offset+=4;
-				offset += 16; // Sum remaining bytes
+				offset += 16; /* Sum remaining bytes */
 				break;
 			}
 			default:{
@@ -890,8 +890,9 @@ dissect_saprfc(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 	req_type = tvb_get_guint8(tvb, offset + 1);
 
 	/* Check if the message is valid or it is an APPC header */
-	// TODO: We need to find a way of performing this check, as wireshark is
-	// stateless seems to be difficult to keep track of the requests/responses.
+	/* TODO: We need to find a way of performing this check, as Wireshark is
+	 * state-less seems to be difficult to keep track of the requests/responses.
+	 */
 	if (version > 0x03){
     	if (tree){
 			/* Add the main saprfc subtree */
@@ -923,10 +924,10 @@ dissect_saprfc(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 		case 0x03:		/* GW_NORMAL_CLIENT */
 		case 0x0b:{		/* GW_REGISTER_TP */
 			proto_tree_add_item(saprfc_tree, hf_saprfc_address, tvb, offset, 4, FALSE); offset+=4;
-			offset+=4;  // Skip 4 bytes here
+			offset+=4;  /* Skip 4 bytes here */
 			proto_tree_add_item(saprfc_tree, hf_saprfc_service, tvb, offset, 10, FALSE); offset+=10;
 			proto_tree_add_item(saprfc_tree, hf_saprfc_codepage, tvb, offset, 4, FALSE); offset+=4;
-			offset+=6;  // Skip 6 bytes here
+			offset+=6;  /* Skip 6 bytes here */
 			proto_tree_add_item(saprfc_tree, hf_saprfc_lu, tvb, offset, 8, FALSE); offset+=8;
 			proto_tree_add_item(saprfc_tree, hf_saprfc_tp, tvb, offset, 8, FALSE); offset+=8;
 			proto_tree_add_item(saprfc_tree, hf_saprfc_conversation_id, tvb, offset, 8, FALSE); offset+=8;

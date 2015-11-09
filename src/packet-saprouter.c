@@ -64,11 +64,11 @@ static const value_string hf_saprouter_opcode_vals[] = {
     { 0,	"Error information" },
     { 1, 	"Version Request" },
     { 2,	"Version Response" },
-    { 5,	"Send Handle (5)" },		// TODO: Check this opcodes
-    { 6, 	"Send Handle (6)" },		// TODO: Check this opcodes
-    { 8,	"Send Handle (8)" },		// TODO: Check this opcodes
-    { 70,	"SNC request" },			// TODO: Check this opcodes NiSncOpcode: NISNC_REQ
-    { 71,	"SNC handshake complete" },	// TODO: Check this opcodes NiSncOpcode: NISNC_ACK
+    { 5,	"Send Handle (5)" },		/* TODO: Check this opcodes */
+    { 6, 	"Send Handle (6)" },		/* TODO: Check this opcodes */
+    { 8,	"Send Handle (8)" },		/* TODO: Check this opcodes */
+    { 70,	"SNC request" },			/* TODO: Check this opcodes NiSncOpcode: NISNC_REQ */
+    { 71,	"SNC handshake complete" },	/* TODO: Check this opcodes NiSncOpcode: NISNC_ACK */
 };
 
 /* SAP Router Return Code values (as per SAP Note 63342 http://service.sap.com/sap/support/notes/63342) */
@@ -175,7 +175,7 @@ static int hf_saprouter_error_errorno = -1;
 static int hf_saprouter_error_errorno_text = -1;
 static int hf_saprouter_error_error_count = -1;
 static int hf_saprouter_error_location= -1;
-static int hf_saprouter_error_unknown= -1;  // TODO: Unknown fields
+static int hf_saprouter_error_unknown= -1;  /* TODO: Unknown fields */
 
 /* Control Messages */
 static int hf_saprouter_control_length = -1;

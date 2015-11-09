@@ -878,7 +878,7 @@ dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
             break;
         }
         case 0x11:{			/* MS_GET_STATISTIC */
-        	// XXX: Fill fields for statistics
+        	/* XXX: Fill fields for statistics */
         	break;
         }
         case 0x1C:{			/* MS_GET_CODEPAGE */
