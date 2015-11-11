@@ -375,6 +375,7 @@ static const value_string hf_sapdiag_dp_action_type_vals[] = {
 #define SAPDIAG_SUPPORT_BIT_IDA_ALV	0x10  /* 196 */
 #define SAPDIAG_SUPPORT_BIT_IDA_ALV_FRAGMENTS	0x20  /* 197 */
 #define SAPDIAG_SUPPORT_BIT_AMC	0x40  /* 198 */
+#define SAPDIAG_SUPPORT_BIT_EXTMODE_FONT_METRIC	0x80  /* 199 */
 
 
 /* SAP Diag DP Header New Status values */
@@ -1135,6 +1136,7 @@ static int hf_SAPDIAG_SUPPORT_BIT_SAP_PERSONAS = -1;
 static int hf_SAPDIAG_SUPPORT_BIT_IDA_ALV = -1;
 static int hf_SAPDIAG_SUPPORT_BIT_IDA_ALV_FRAGMENTS = -1;
 static int hf_SAPDIAG_SUPPORT_BIT_AMC = -1;
+static int hf_SAPDIAG_SUPPORT_BIT_EXTMODE_FONT_METRIC = -1;
 
 static gint ett_sapdiag = -1;
 
@@ -1478,6 +1480,7 @@ dissect_sapdiag_support_bits(tvbuff_t *tvb, proto_tree *tree, guint32 offset){
 	proto_tree_add_item(tree, hf_SAPDIAG_SUPPORT_BIT_IDA_ALV, tvb, offset, 1, FALSE);  /* 196 */
 	proto_tree_add_item(tree, hf_SAPDIAG_SUPPORT_BIT_IDA_ALV_FRAGMENTS, tvb, offset, 1, FALSE);  /* 197 */
 	proto_tree_add_item(tree, hf_SAPDIAG_SUPPORT_BIT_AMC, tvb, offset, 1, FALSE);  /* 198 */
+	proto_tree_add_item(tree, hf_SAPDIAG_SUPPORT_BIT_EXTMODE_FONT_METRIC, tvb, offset, 1, FALSE);  /* 199 */
 
 }
 
@@ -3357,6 +3360,9 @@ proto_register_sapdiag(void)
 			HFILL }},
 		{ &hf_SAPDIAG_SUPPORT_BIT_AMC,
 			{ "Support Bit AMC", "sapdiag.diag.supportbits.AMC", FT_BOOLEAN, 8, NULL, SAPDIAG_SUPPORT_BIT_AMC, "SAP Diag Support Bit AMC",
+			HFILL }},
+		{ &hf_SAPDIAG_SUPPORT_BIT_EXTMODE_FONT_METRIC,
+			{ "Support Bit EXTMODE_FONT_METRIC", "sapdiag.diag.supportbits.EXTMODE_FONT_METRIC", FT_BOOLEAN, 8, NULL, SAPDIAG_SUPPORT_BIT_EXTMODE_FONT_METRIC, "SAP Diag Support Bit EXTMODE_FONT_METRIC",
 			HFILL }},
 
         /* Dynt Atom */
