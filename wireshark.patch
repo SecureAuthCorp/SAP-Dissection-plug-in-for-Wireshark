@@ -1,14 +1,8 @@
-commit 897e0017d6dfba2a8045ba858e018e161c108d49
-Author: Martin Gallo <mgallo@coresecurity.com>
-Date:   Fri Jan 23 17:09:43 2015 -0300
-
-    Configured sap plugin.
-
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index eb50acc..ee904b4 100644
+index 61bdb9d..fe2beb4 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -704,6 +704,7 @@ if(ENABLE_PLUGINS)
+@@ -1042,6 +1042,7 @@ if(ENABLE_PLUGINS)
  		plugins/mate
  		plugins/opcua
  		plugins/profinet
@@ -17,10 +11,10 @@ index eb50acc..ee904b4 100644
  		plugins/unistim
  		plugins/wimax
 diff --git a/Makefile.am b/Makefile.am
-index d813784..1557e65 100644
+index 913e064..6ebd2d0 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -306,6 +306,7 @@ plugin_ldadd = $(_CUSTOM_plugin_ldadd_) \
+@@ -347,6 +347,7 @@ plugin_ldadd = $(_CUSTOM_plugin_ldadd_) \
  	-dlopen plugins/mate/mate.la \
  	-dlopen plugins/opcua/opcua.la \
  	-dlopen plugins/profinet/profinet.la \
@@ -29,10 +23,10 @@ index d813784..1557e65 100644
  	-dlopen plugins/unistim/unistim.la \
  	-dlopen plugins/wimax/wimax.la \
 diff --git a/configure.ac b/configure.ac
-index df23c7e..7884b4a 100644
+index 0dfa4ae..f8ba6f9 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -2988,6 +2988,7 @@ AC_OUTPUT(
+@@ -3255,6 +3255,7 @@ AC_OUTPUT(
    plugins/mate/Makefile
    plugins/opcua/Makefile
    plugins/profinet/Makefile
@@ -41,10 +35,10 @@ index df23c7e..7884b4a 100644
    plugins/unistim/Makefile
    plugins/wimax/Makefile
 diff --git a/epan/Makefile.am b/epan/Makefile.am
-index 4b9b95c..8f3ca8b 100644
+index c60e4c0..6dd0c9a 100644
 --- a/epan/Makefile.am
 +++ b/epan/Makefile.am
-@@ -235,6 +235,13 @@ plugin_src = \
+@@ -229,6 +229,13 @@ plugin_src = \
  	../plugins/irda/packet-irda.c \
  	../plugins/m2m/packet-m2m.c \
  	../plugins/m2m/wimax_tlv.c \
@@ -59,10 +53,10 @@ index 4b9b95c..8f3ca8b 100644
  	../plugins/wimax/crc_data.c \
  	../plugins/wimax/mac_hd_generic_decoder.c \
 diff --git a/packaging/nsis/Makefile.nmake b/packaging/nsis/Makefile.nmake
-index eb037e6..6040b32 100644
+index 0890b02..09ce568 100644
 --- a/packaging/nsis/Makefile.nmake
 +++ b/packaging/nsis/Makefile.nmake
-@@ -51,6 +51,7 @@ PLUGINS= \
+@@ -54,6 +54,7 @@ PLUGINS= \
  	../../plugins/mate/mate.dll \
  	../../plugins/opcua/opcua.dll \
  	../../plugins/profinet/profinet.dll \
@@ -71,22 +65,22 @@ index eb037e6..6040b32 100644
  	../../plugins/unistim/unistim.dll \
  	../../plugins/wimax/wimax.dll \
 diff --git a/packaging/nsis/wireshark.nsi b/packaging/nsis/wireshark.nsi
-index 7f8a1a4..df7ca3d 100644
+index b6b07e0..89ef303 100644
 --- a/packaging/nsis/wireshark.nsi
 +++ b/packaging/nsis/wireshark.nsi
-@@ -983,6 +983,7 @@ File "${STAGING_DIR}\plugins\${VERSION}\irda.dll"
- File "${STAGING_DIR}\plugins\${VERSION}\m2m.dll"
- File "${STAGING_DIR}\plugins\${VERSION}\opcua.dll"
- File "${STAGING_DIR}\plugins\${VERSION}\profinet.dll"
-+File "${STAGING_DIR}\plugins\${VERSION}\sap.dll"
- File "${STAGING_DIR}\plugins\${VERSION}\unistim.dll"
- File "${STAGING_DIR}\plugins\${VERSION}\wimax.dll"
- File "${STAGING_DIR}\plugins\${VERSION}\wimaxasncp.dll"
+@@ -962,6 +962,7 @@ File "${STAGING_DIR}\plugins\irda.dll"
+ File "${STAGING_DIR}\plugins\m2m.dll"
+ File "${STAGING_DIR}\plugins\opcua.dll"
+ File "${STAGING_DIR}\plugins\profinet.dll"
++File "${STAGING_DIR}\plugins\sap.dll"
+ File "${STAGING_DIR}\plugins\unistim.dll"
+ File "${STAGING_DIR}\plugins\wimax.dll"
+ File "${STAGING_DIR}\plugins\wimaxasncp.dll"
 diff --git a/plugins/Makefile.am b/plugins/Makefile.am
-index 0cca3cd..a588147 100644
+index 3e0a7a9..8faf23b 100644
 --- a/plugins/Makefile.am
 +++ b/plugins/Makefile.am
-@@ -30,6 +30,7 @@ SUBDIRS = $(_CUSTOM_SUBDIRS_) \
+@@ -31,6 +31,7 @@ SUBDIRS = $(_CUSTOM_SUBDIRS_) \
  	mate \
  	opcua \
  	profinet \
@@ -95,7 +89,7 @@ index 0cca3cd..a588147 100644
  	unistim \
  	wimax \
 diff --git a/plugins/Makefile.nmake b/plugins/Makefile.nmake
-index 2bf5a9c..6e675a7 100644
+index b6231a0..f9ab2a6 100644
 --- a/plugins/Makefile.nmake
 +++ b/plugins/Makefile.nmake
 @@ -13,6 +13,7 @@ PLUGIN_LIST = \
