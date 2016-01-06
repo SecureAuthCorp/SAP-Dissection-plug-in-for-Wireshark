@@ -6,7 +6,7 @@ compiler:
 
 env:
   global:
-    - WIRESHARK_BRANCH=master-1.12
+    - WIRESHARK_BRANCH=master-2.0
   matrix:
     - BUILD_STANDALONE=no
     - BUILD_STANDALONE=yes
