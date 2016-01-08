@@ -29,7 +29,7 @@ before_install:
       git checkout $WIRESHARK_BRANCH;
       mkdir plugins/sap;
       cp -R $TRAVIS_BUILD_DIR/* plugins/sap/;
-      git apply $TRAVIS_BUILD_DIR/wireshark.patch;
+      git apply $TRAVIS_BUILD_DIR/wireshark-$WIRESHARK_BRANCH.patch;
     fi
 
   - sudo apt-get install libxml2-dev libxslt-dev python-dev -qq

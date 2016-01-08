@@ -1,0 +1,102 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 61bdb9d..fe2beb4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1042,6 +1042,7 @@ if(ENABLE_PLUGINS)
+ 		plugins/mate
+ 		plugins/opcua
+ 		plugins/profinet
++		plugins/sap
+ 		plugins/stats_tree
+ 		plugins/unistim
+ 		plugins/wimax
+diff --git a/Makefile.am b/Makefile.am
+index 913e064..6ebd2d0 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -347,6 +347,7 @@ plugin_ldadd = $(_CUSTOM_plugin_ldadd_) \
+ 	-dlopen plugins/mate/mate.la \
+ 	-dlopen plugins/opcua/opcua.la \
+ 	-dlopen plugins/profinet/profinet.la \
++	-dlopen plugins/sap/sap.la \
+ 	-dlopen plugins/stats_tree/stats_tree.la \
+ 	-dlopen plugins/unistim/unistim.la \
+ 	-dlopen plugins/wimax/wimax.la \
+diff --git a/configure.ac b/configure.ac
+index 0dfa4ae..f8ba6f9 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3255,6 +3255,7 @@ AC_OUTPUT(
+   plugins/mate/Makefile
+   plugins/opcua/Makefile
+   plugins/profinet/Makefile
++  plugins/sap/Makefile
+   plugins/stats_tree/Makefile
+   plugins/unistim/Makefile
+   plugins/wimax/Makefile
+diff --git a/epan/Makefile.am b/epan/Makefile.am
+index c60e4c0..6dd0c9a 100644
+--- a/epan/Makefile.am
++++ b/epan/Makefile.am
+@@ -229,6 +229,13 @@ plugin_src = \
+ 	../plugins/irda/packet-irda.c \
+ 	../plugins/m2m/packet-m2m.c \
+ 	../plugins/m2m/wimax_tlv.c \
++	../plugins/sap/src/packet-sapdiag.c \
++	../plugins/sap/src/packet-sapenqueue.c \
++	../plugins/sap/src/packet-saprouter.c \
++	../plugins/sap/src/packet-sapprotocol.c \
++	../plugins/sap/src/packet-saprfc.c \
++	../plugins/sap/src/packet-sapms.c \
++	../plugins/sap/src/packet-sapsnc.c \
+ 	../plugins/wimax/crc.c \
+ 	../plugins/wimax/crc_data.c \
+ 	../plugins/wimax/mac_hd_generic_decoder.c \
+diff --git a/packaging/nsis/Makefile.nmake b/packaging/nsis/Makefile.nmake
+index 0890b02..09ce568 100644
+--- a/packaging/nsis/Makefile.nmake
++++ b/packaging/nsis/Makefile.nmake
+@@ -54,6 +54,7 @@ PLUGINS= \
+ 	../../plugins/mate/mate.dll \
+ 	../../plugins/opcua/opcua.dll \
+ 	../../plugins/profinet/profinet.dll \
++	../../plugins/sap/sap.dll \
+ 	../../plugins/stats_tree/stats_tree.dll \
+ 	../../plugins/unistim/unistim.dll \
+ 	../../plugins/wimax/wimax.dll \
+diff --git a/packaging/nsis/wireshark.nsi b/packaging/nsis/wireshark.nsi
+index b6b07e0..89ef303 100644
+--- a/packaging/nsis/wireshark.nsi
++++ b/packaging/nsis/wireshark.nsi
+@@ -962,6 +962,7 @@ File "${STAGING_DIR}\plugins\${VERSION}\irda.dll"
+ File "${STAGING_DIR}\plugins\${VERSION}\m2m.dll"
+ File "${STAGING_DIR}\plugins\${VERSION}\opcua.dll"
+ File "${STAGING_DIR}\plugins\${VERSION}\profinet.dll"
++File "${STAGING_DIR}\plugins\${VERSION}\sap.dll"
+ File "${STAGING_DIR}\plugins\${VERSION}\unistim.dll"
+ File "${STAGING_DIR}\plugins\${VERSION}\wimax.dll"
+ File "${STAGING_DIR}\plugins\${VERSION}\wimaxasncp.dll"
+diff --git a/plugins/Makefile.am b/plugins/Makefile.am
+index 3e0a7a9..8faf23b 100644
+--- a/plugins/Makefile.am
++++ b/plugins/Makefile.am
+@@ -31,6 +31,7 @@ SUBDIRS = $(_CUSTOM_SUBDIRS_) \
+ 	mate \
+ 	opcua \
+ 	profinet \
++	sap \
+ 	stats_tree \
+ 	unistim \
+ 	wimax \
+diff --git a/plugins/Makefile.nmake b/plugins/Makefile.nmake
+index b6231a0..f9ab2a6 100644
+--- a/plugins/Makefile.nmake
++++ b/plugins/Makefile.nmake
+@@ -13,6 +13,7 @@ PLUGIN_LIST = \
+ 	mate        \
+ 	opcua       \
+ 	profinet    \
++	sap         \
+ 	stats_tree  \
+ 	unistim     \
+ 	wimax       \
