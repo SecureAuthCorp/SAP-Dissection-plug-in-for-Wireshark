@@ -5,16 +5,16 @@ compiler:
   - gcc
 
 env:
-  global:
-    - WIRESHARK_BRANCH=master-1.12
-    - WIRESHARK_BRANCH=master-2.0
-  matrix:
-    - BUILD_STANDALONE=no
-    - BUILD_STANDALONE=yes
-    exclude:
-      # Since Ubuntu's ppa for wireshark dev only includes stable, we can test against 1.12 in standalone mode
-      - WIRESHARK_BRANCH=master-1.12
-        BUILD_STANDALONE=yes
+  - WIRESHARK_BRANCH=master-1.12
+  - WIRESHARK_BRANCH=master-2.0
+  - BUILD_STANDALONE=no
+  - BUILD_STANDALONE=yes
+
+# Since Wireshark's ppa only have stable version, we can't test standalone against 1.12 
+matrix:
+  exclude:
+    - env: WIRESHARK_BRANCH=master-1.12 BUILD_STANDALONE=yes
+
 
 before_install:
   - if [ ${BUILD_STANDALONE} == "yes" ]; then sudo sudo add-apt-repository ppa:wireshark-dev/stable -y; fi
