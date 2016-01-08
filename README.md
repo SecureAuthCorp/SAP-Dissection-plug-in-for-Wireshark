@@ -79,7 +79,8 @@ Installation & Build
 --------------------
 
 This Wireshark plugin is not distributed as part of the Wireshark source. It
-can be build as a standalone plugin, or as part of Wireshark.
+can be build as a standalone plugin, or as part of Wireshark, and is compatible
+with versions 1.12 and 2.0.
 
 ### Building on Linux ###
 
@@ -98,7 +99,7 @@ To build the plugin on Debian/Ubuntu linux distributions:
 
 The following steps are required to compile the plugin as part of Wireshark:
 
-1) Download [Wireshark version 1.12 source](https://www.wireshark.org/download.html) [8]
+1) Download [Wireshark version 1.12 or 2.0 source](https://www.wireshark.org/download.html) [8]
    or checkout the code from the [source repository](https://code.wireshark.org/review/wireshark) [9].
 
 2) Decompress the package.
@@ -111,7 +112,9 @@ The following steps are required to compile the plugin as part of Wireshark:
 5) Configure the plugin to be included in the build process. This step can be
    performed using the patch file provided. At the root directory run:
 
-	git apply plugins/sap/wireshark.patch
+	git apply plugins/sap/wireshark-master-<version>.patch
+
+   Use the patch file according to the version being build.
 
 6) Perform a new build including the plugin. At the root directory run:
 
@@ -134,7 +137,9 @@ for building Wireshark on Windows [12].
 3) Configure the plugin to be included in the build process. This step can be
    performed using the patch file provided. At the root directory run:
 
-	git apply plugins/sap/wireshark.patch
+	git apply plugins/sap/wireshark-master-<version>.patch
+
+   Use the patch file according to the version being build.
 
 4) Perform a new build including the plugin. At the root directory run:
 
