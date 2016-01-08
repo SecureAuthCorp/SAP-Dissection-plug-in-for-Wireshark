@@ -1578,8 +1578,13 @@ add_item_value_stringz(tvbuff_t *tvb, proto_item *item, proto_tree *tree, int hf
 
 void
 add_item_value_hexstring(tvbuff_t *tvb, proto_item *item, proto_tree *tree, int hf, guint32 offset, guint32 length, const char *text){
+#if VERSION_MAJOR < 2
+	proto_tree_add_none_format(tree, hf, tvb, offset, length, "%s: %s", text, tvb_bytes_to_ep_str(tvb, offset, length));
+	proto_item_append_text(item, ", %s=%s", text, tvb_bytes_to_ep_str(tvb, offset, length));
+#else
 	proto_tree_add_none_format(tree, hf, tvb, offset, length, "%s: %s", text, tvb_bytes_to_str(wmem_packet_scope(), tvb, offset, length));
 	proto_item_append_text(item, ", %s=%s", text, tvb_bytes_to_str(wmem_packet_scope(), tvb, offset, length));
+#endif
 }
 
 
