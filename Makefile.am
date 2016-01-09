@@ -67,35 +67,23 @@ LIBS =
 # preceded only by "void " starting in column zero, and must not be
 # inside #if.
 #
-# DISSECTOR_SRC is assumed to have all the files that need to be scanned.
+# REGISTER_SRC_FILES is assumed to have all the files that need to be scanned.
 #
 # For some unknown reason, having a big "for" loop in the Makefile
 # to scan all the files doesn't work with some "make"s; they seem to
 # pass only the first few names in the list to the shell, for some
 # reason.
 #
-# Therefore, we have a script to generate the plugin.c file.
-# The shell script runs slowly, as multiple greps and seds are run
-# for each input file; this is especially slow on Windows.  Therefore,
-# if Python is present (as indicated by PYTHON being defined), we run
-# a faster Python script to do that work instead.
-#
+# Therefore, we use a script to generate the register.c file.
 # The first argument is the directory in which the source files live.
 # The second argument is "plugin", to indicate that we should build
 # a plugin.c file for a plugin.
 # All subsequent arguments are the files to scan.
 #
-plugin.c: $(DISSECTOR_SRC) $(top_srcdir)/tools/make-dissector-reg \
-    $(top_srcdir)/tools/make-dissector-reg.py
-	@if test -n "$(PYTHON)"; then \
-		echo Making plugin.c with python ; \
-		$(PYTHON) $(top_srcdir)/tools/make-dissector-reg.py $(srcdir) \
-		    plugin $(DISSECTOR_SRC) ; \
-	else \
-		echo Making plugin.c with shell script ; \
-		$(top_srcdir)/tools/make-dissector-reg $(srcdir) \
-		    $(plugin_src) plugin $(DISSECTOR_SRC) ; \
-	fi
+plugin.c: $(REGISTER_SRC_FILES) Makefile.common $(top_srcdir)/tools/make-dissector-reg.py
+	@echo Making plugin.c
+	@$(PYTHON) $(top_srcdir)/tools/make-dissector-reg.py $(srcdir) \
+		plugin $(REGISTER_SRC_FILES)
 
 #
 # Currently plugin.c can be included in the distribution because
@@ -131,4 +119,6 @@ EXTRA_DIST = \
 	CMakeLists.txt
 
 checkapi:
-	$(PERL) $(top_srcdir)/tools/checkAPIs.pl -g abort -g termoutput $(DISSECTOR_SRC) $(DISSECTOR_INCLUDES)
+	$(PERL) $(top_srcdir)/tools/checkAPIs.pl -g abort -g termoutput -build \
+	-sourcedir=$(srcdir) \
+	$(CLEAN_SRC_FILES) $(CLEAN_HEADER_FILES)
