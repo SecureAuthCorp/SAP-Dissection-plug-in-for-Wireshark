@@ -3,9 +3,9 @@ SAP Dissector Plugin for Wireshark
 
 [![Build Status](https://travis-ci.org/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark.svg?branch=master)](https://travis-ci.org/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark)
 
-Copyright (C) 2015 by Martin Gallo, Core Security
+Copyright (C) 2012-2016 by Martin Gallo, Core Security
 
-Version 0.2.4.dev (XXX 2015)
+Version 0.2.4.dev (XXX 2016)
 
 
 Overview
