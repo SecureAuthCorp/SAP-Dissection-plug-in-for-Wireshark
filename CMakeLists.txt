@@ -21,7 +21,7 @@ project(sap-wireshark-plugin C CXX)
 
 cmake_minimum_required(VERSION 2.6)
 set(CMAKE_BACKWARDS_COMPATIBILITY 2.6)
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake) 
 
 IF ( NOT CMAKE_INSTALL_LIBDIR )
   set(CMAKE_INSTALL_LIBDIR ~/.wireshark/plugins)
