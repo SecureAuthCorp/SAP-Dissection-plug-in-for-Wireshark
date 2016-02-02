@@ -41,6 +41,8 @@ include_directories (${WIRESHARK_INCLUDE_DIRS})
 set(LINK_MODE_LIB SHARED)
 set(LINK_MODE_MODULE MODULE)
 
+include(WiresharkPlugin)
+set_module_info(sap 0 2 3 0)
 
 set(DISSECTOR_SRC
 	src/packet-sapdiag.c
@@ -83,11 +85,13 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 register_dissector_files(plugin.c
 	plugin
 	${DISSECTOR_SRC}
+        ${DISSECTOR_SUPPORT_SRC}
 )
 
 add_library(sap ${LINK_MODE_MODULE}
 	${PLUGIN_FILES}
 )
+
 set_target_properties(sap PROPERTIES PREFIX "")
 set_target_properties(sap PROPERTIES LINK_FLAGS "${WS_LINK_FLAGS}")
 
