@@ -43,6 +43,7 @@ install:
         ./autogen.sh && ./configure --disable-wireshark --disable-editcap --disable-captype -disable-capinfos --disable-mergecap --disable-dumpcap --disable-reordercap --disable-text2pcap --disable-randpkt --disable-dftest --disable-rawshark && make;
       else
         mkdir build && cd build && cmake .. && make plugins tshark sap;
+        export PATH=${PATH}:${HOME}/wireshark-$WIRESHARK_BRANCH
       fi
     fi
 
