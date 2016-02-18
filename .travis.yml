@@ -42,7 +42,7 @@ install:
       if [ ${CMAKE} == "no" ]; then
         ./autogen.sh && ./configure --disable-wireshark --disable-editcap --disable-captype -disable-capinfos --disable-mergecap --disable-dumpcap --disable-reordercap --disable-text2pcap --disable-randpkt --disable-dftest --disable-rawshark && make;
       else
-        mkdir build && cd build && cmake .. && make plugins tshark sap && make install;
+        mkdir build && cd build && cmake .. && make plugins tshark sap;
       fi
     fi
 
