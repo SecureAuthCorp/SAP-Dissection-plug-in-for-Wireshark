@@ -35,7 +35,7 @@ before_install:
     fi
 
   - sudo apt-get install libxml2-dev libxslt-dev python-dev -qq
-  - sudo -H pip install pysap pyshark
+  - sudo -H sh -c "CXX=g++ CC=gcc pip install pysap pyshark"
 
 install:
   - if [ ${BUILD_STANDALONE} == "no" ]; then
