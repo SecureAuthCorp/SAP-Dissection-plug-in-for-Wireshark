@@ -23,18 +23,16 @@ cmake_minimum_required(VERSION 2.6)
 set(CMAKE_BACKWARDS_COMPATIBILITY 2.6)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake) 
 
-find_package(WiresharkPlugin QUIET)
+find_package(Wireshark)
 
-if(WIRESHARKPLUGIN_FOUND)
-  include(WiresharkPlugin)
-  set_module_info(sap 0 2 3 0)
+if(WIRESHARK_FOUND)
 
-else(WIRESHARKPLUGIN_FOUND)
+  MESSAGE(STATUS "Wireshark libraries found, performing a stand-alone plug-in build.") 
 
   if(NOT CMAKE_INSTALL_LIBDIR )
     set(CMAKE_INSTALL_LIBDIR ~/.wireshark/plugins)
   endif(NOT CMAKE_INSTALL_LIBDIR )
-  MESSAGE(STATUS "Plugin will be installed in: ${CMAKE_INSTALL_LIBDIR}")
+  MESSAGE(STATUS "Plug-in will be installed in: ${CMAKE_INSTALL_LIBDIR}")
 
   INCLUDE(UseMakeDissectorReg)
 
@@ -43,14 +41,19 @@ else(WIRESHARKPLUGIN_FOUND)
   find_package(GLIB2)
   include_directories (${GLIB2_INCLUDE_DIRS})
 
-  find_package(Wireshark)
   include_directories (${WIRESHARK_INCLUDE_DIRS})
 
   set(LINK_MODE_LIB SHARED)
   set(LINK_MODE_MODULE MODULE)
 
+else(WIRESHARK_FOUND)
 
-endif(WIRESHARKPLUGIN_FOUND)
+  MESSAGE(STATUS "Wireshark libraries not found, performing a Wireshark plug-in build.") 
+
+  include(WiresharkPlugin)
+  set_module_info(sap 0 2 3 0)
+
+endif(WIRESHARK_FOUND)
 
 set(DISSECTOR_SRC
 	src/packet-sapdiag.c
@@ -96,17 +99,7 @@ register_dissector_files(plugin.c
         ${DISSECTOR_SUPPORT_SRC}
 )
 
-if(WIRESHARKPLUGIN_FOUND)
-
-  add_plugin_library(sap)
-
-  install(TARGETS sap
-          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/${CPACK_PACKAGE_NAME}/plugins/${CPACK_PACKAGE_VERSION} NAMELINK_SKIP
-          RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}/${CPACK_PACKAGE_NAME}/plugins/${CPACK_PACKAGE_VERSION}
-          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/${CPACK_PACKAGE_NAME}/plugins/${CPACK_PACKAGE_VERSION}
-  )
-
-else(WIRESHARKPLUGIN_FOUND)
+if(WIRESHARK_FOUND)
 
   add_library(sap ${LINK_MODE_MODULE}
                   ${PLUGIN_FILES}
@@ -123,5 +116,15 @@ else(WIRESHARKPLUGIN_FOUND)
           ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   )
 
-endif(WIRESHARKPLUGIN_FOUND)
+else(WIRESHARK_FOUND)
+
+  add_plugin_library(sap)
+
+  install(TARGETS sap
+          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/${CPACK_PACKAGE_NAME}/plugins/${CPACK_PACKAGE_VERSION} NAMELINK_SKIP
+          RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}/${CPACK_PACKAGE_NAME}/plugins/${CPACK_PACKAGE_VERSION}
+          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/${CPACK_PACKAGE_NAME}/plugins/${CPACK_PACKAGE_VERSION}
+  )
+
+endif(WIRESHARK_FOUND)
 
