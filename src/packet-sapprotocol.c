@@ -74,11 +74,7 @@ void proto_reg_handoff_sap_protocol(void);
  * Get the SAPNI pdu length
  */
 static guint
-#if VERSION_MAJOR < 2
-get_sap_protocol_pdu_len(packet_info *pinfo _U_, tvbuff_t *tvb, int offset _U_)
-#else
 get_sap_protocol_pdu_len(packet_info *pinfo _U_, tvbuff_t *tvb, int offset _U_, void *dissector_data _U_)
-#endif
 {
 	return ((guint)tvb_get_ntohl(tvb, 0) + 4);
 }
@@ -271,11 +267,7 @@ proto_register_sap_protocol(void)
 
 	/* Sub dissector code */
 	sub_dissectors_table = register_dissector_table("sapni.port", "SAP Protocol Port", FT_UINT16, BASE_DEC);
-#if VERSION_MAJOR < 2
-	register_heur_dissector_list("sapni", &heur_subdissector_list);
-#else
 	heur_subdissector_list = register_heur_dissector_list("sapni");
-#endif
 
 	/* Register the preferences */
 	sap_protocol_module = prefs_register_protocol(proto_sap_protocol, proto_reg_handoff_sap_protocol);

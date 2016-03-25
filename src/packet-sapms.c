@@ -755,11 +755,7 @@ dissect_sapms_client(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
 	/* Add the IPv6 address (only for version 3/4) */
 	if (opcode_version >= 0x03){
 		tvb_get_ipv6(tvb, offset, &address_ipv6);
-#if VERSION_MAJOR < 2
-		proto_tree_add_ipv6(client_tree, hf_sapms_server_lst_hostaddr, tvb, offset, 16, (guint8 *)&address_ipv6); offset+=16;
-#else
 		proto_tree_add_ipv6(client_tree, hf_sapms_server_lst_hostaddr, tvb, offset, 16, &address_ipv6); offset+=16;
-#endif
 	}
 
 	/* Add the IPv4 address */
@@ -874,11 +870,7 @@ dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
             proto_tree_add_item(tree, hf_sapms_security_port, tvb, offset, 2, FALSE); offset+=2; length-=2;
             proto_tree_add_item(tree, hf_sapms_security_key, tvb, offset, 256, FALSE); offset+=256; length-=256;
             tvb_get_ipv6(tvb, offset, &address_ipv6);
-#if VERSION_MAJOR < 2
-            proto_tree_add_ipv6(tree, hf_sapms_security_address6, tvb, offset, 16, (guint8 *)&address_ipv6); offset+=16; length-=16;
-#else
             proto_tree_add_ipv6(tree, hf_sapms_security_address6, tvb, offset, 16, &address_ipv6); offset+=16; length-=16;
-#endif
             break;
         }
         case 0x0a:{         /* MS_GET_HWID */
@@ -996,11 +988,7 @@ dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
             proto_tree_add_item(tree, hf_sapms_logon_address6_length, tvb, offset, 2, FALSE); offset+=2; length-=2;
             if (address6_length==16 && length >= address6_length){
                 tvb_get_ipv6(tvb, offset, &address_ipv6);
-#if VERSION_MAJOR < 2
-                proto_tree_add_ipv6(tree, hf_sapms_logon_address6, tvb, offset, 16, (guint8 *)&address_ipv6); offset+=16; length-=16;
-#else
                 proto_tree_add_ipv6(tree, hf_sapms_logon_address6, tvb, offset, 16, &address_ipv6); offset+=16; length-=16;
-#endif
             } else { /* Add expert info if wrong IPv6 address length */
             	expert_add_info_format(pinfo, tree, &ei_sapms_ip_invalid_length, "Invalid IPv6 address length (%d) or data", address6_length);
             }
@@ -1038,11 +1026,7 @@ dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
         	} else if (opcode_version == 0x02){
         		struct e_in6_addr address_ipv6;
         		tvb_get_ipv6(tvb, offset, &address_ipv6);
-#if VERSION_MAJOR < 2
-                proto_tree_add_ipv6(tree, hf_sapms_ip_to_name_address6, tvb, offset, 16, (guint8 *)&address_ipv6); offset+=16; length-=16;
-#else
                 proto_tree_add_ipv6(tree, hf_sapms_ip_to_name_address6, tvb, offset, 16, &address_ipv6); offset+=16; length-=16;
-#endif
         	}
 
         	proto_tree_add_item(tree, hf_sapms_ip_to_name_port, tvb, offset, 2, FALSE); offset+=2; length-=2;

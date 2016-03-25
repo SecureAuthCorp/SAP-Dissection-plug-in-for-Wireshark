@@ -567,9 +567,5 @@ proto_reg_handoff_sapenqueue(void)
     /* Register the heuristic dissector. We need to use a heuristic dissector
      * here as the Enqueue Server uses the same port number that the Dispatcher
      * Service (32NN/tcp). */
-#if VERSION_MAJOR < 2
-	heur_dissector_add("sapni", dissect_sapenqueue_heur, proto_sapenqueue);
-#else
 	heur_dissector_add("sapni", dissect_sapenqueue_heur, "SAP Enqueue Protocol", "sapenqueue", proto_sapenqueue, HEURISTIC_ENABLE);
-#endif
 }
