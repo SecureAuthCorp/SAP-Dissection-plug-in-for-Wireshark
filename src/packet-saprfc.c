@@ -690,7 +690,7 @@ dissect_saprfc_rfcheader(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
 		header_unicode = proto_tree_add_item(tree, hf_saprfc_ucheader, tvb, offset, 11, FALSE);
 		header_unicode_tree = proto_item_add_subtree(header_unicode, ett_saprfc);
 
-		proto_tree_add_none_format(header_unicode_tree, hf_saprfc_ucheader_codepage, tvb, offset, 4, "Code Page: %s", tvb_bytes_to_ep_str(tvb, offset, 4)); offset+=4;
+		proto_tree_add_none_format(header_unicode_tree, hf_saprfc_ucheader_codepage, tvb, offset, 4, "Code Page: %s", tvb_bytes_to_str(wmem_packet_scope(), tvb, offset, 4)); offset+=4;
 		proto_tree_add_item(header_unicode_tree, hf_saprfc_ucheader_ce, tvb, offset, 1, FALSE); offset+=1;
 		proto_tree_add_item(header_unicode_tree, hf_saprfc_ucheader_et, tvb, offset, 1, FALSE); offset+=1;
 		proto_tree_add_item(header_unicode_tree, hf_saprfc_ucheader_cs, tvb, offset, 1, FALSE); offset+=1;
