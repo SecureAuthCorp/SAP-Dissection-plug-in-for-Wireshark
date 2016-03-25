@@ -37,7 +37,7 @@ before_install:
 install:
   - if [ ${BUILD_STANDALONE} == "no" ]; then
       mkdir build && cd build && cmake .. && make plugins tshark sap;
-      export PATH=${PATH}:${HOME}/wireshark-$WIRESHARK_BRANCH;
+      export PATH=${PATH}:${HOME}/wireshark-$WIRESHARK_BRANCH/build;
     fi
 
   - if [ ${BUILD_STANDALONE} == "yes" ]; then
