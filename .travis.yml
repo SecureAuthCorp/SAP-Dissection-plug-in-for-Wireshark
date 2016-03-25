@@ -5,9 +5,8 @@ compiler:
   - gcc
 
 env:
-  - WIRESHARK_BRANCH=master-2.0 BUILD_STANDALONE=no CMAKE=no
-  - WIRESHARK_BRANCH=master-2.0 BUILD_STANDALONE=no CMAKE=yes
-  - WIRESHARK_BRANCH=master-2.0 BUILD_STANDALONE=yes CMAKE=yes
+  - WIRESHARK_BRANCH=master-2.0 BUILD_STANDALONE=no
+  - WIRESHARK_BRANCH=master-2.0 BUILD_STANDALONE=yes
 
 
 before_install:
@@ -37,12 +36,8 @@ before_install:
 
 install:
   - if [ ${BUILD_STANDALONE} == "no" ]; then
-      if [ ${CMAKE} == "no" ]; then
-        ./autogen.sh && ./configure --disable-wireshark --disable-editcap --disable-captype -disable-capinfos --disable-mergecap --disable-dumpcap --disable-reordercap --disable-text2pcap --disable-randpkt --disable-dftest --disable-rawshark && make;
-      else
-        mkdir build && cd build && cmake .. && make plugins tshark sap;
-        export PATH=${PATH}:${HOME}/wireshark-$WIRESHARK_BRANCH;
-      fi
+      mkdir build && cd build && cmake .. && make plugins tshark sap;
+      export PATH=${PATH}:${HOME}/wireshark-$WIRESHARK_BRANCH;
     fi
 
   - if [ ${BUILD_STANDALONE} == "yes" ]; then
@@ -56,4 +51,3 @@ script:
   - if [ ${BUILD_STANDALONE} == "yes" ]; then
       python ${TRAVIS_BUILD_DIR}/tests/__init__.py;
     fi
-
