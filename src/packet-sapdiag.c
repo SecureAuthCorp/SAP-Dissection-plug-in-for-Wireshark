@@ -1975,6 +1975,14 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
 		check_length(pinfo, item_value_tree, 4, item_length, "RFC Diag Block Size");
 		add_item_value_uint32(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 4, "RFC Diag Block Size"); offset+=4;
 
+	} else if (item_type==0x10 && item_id==0x06 && item_sid==0x18){		/* Info flags */
+		check_length(pinfo, item_value_tree, 2, item_length, "Info flags");
+		add_item_value_uint16(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 2, "Info flags"); offset+=2;
+        /* If the preference is set, report the item as partially dissected in the expert info */
+        if (global_sapdiag_highlight_items){
+            expert_add_info_format(pinfo, item, &ei_sapdiag_item_partial, "The Diag Item is dissected partially (0x%.2x, 0x%.2x, 0x%.2x)", item_type, item_id, item_sid);
+        }
+
 	} else if (item_type==0x10 && item_id==0x06 && item_sid==0x19){		/* User ID */
 		check_length(pinfo, item_value_tree, 2, item_length, "User ID");
 		add_item_value_uint16(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 2, "User ID"); offset+=2;
