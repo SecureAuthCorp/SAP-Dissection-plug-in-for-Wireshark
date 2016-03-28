@@ -399,11 +399,13 @@ static const value_string hf_sapdiag_item_type_vals[] = {
 	{ 0x07, "DiagMessage (old format)" },
 	{ 0x08, "OKC" },
 	{ 0x09, "CHL" },
-	{ 0x0b, "SBA/SFE/SLC" },
+	{ 0x0a, "SFE" },
+	{ 0x0b, "SBA" },
 	{ 0x0c, "EOM" },
 	{ 0x10,	"APPL" },
 	{ 0x11, "DIAG_XMLBLOB" },
 	{ 0x12, "APPL4" },
+	{ 0x13, "SLC" },
 	{ 0x15, "SBA2" },
 	/* NULL */
 	{ 0, 	NULL }
@@ -1873,6 +1875,21 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
 			expert_add_info_format(pinfo, item, &ei_sapdiag_item_partial, "The SES item is dissected partially (event array = 0x%.2x)", event_array);
 		}
 
+    } else if (item_type==0x0a) {                                       /* SFE */
+		check_length(pinfo, item_value_tree, 3, item_length, "SFE");
+		add_item_value_uint8(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 1, "Control format"); offset+=1;
+		add_item_value_uint8(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 1, "Control color"); offset+=1;
+		add_item_value_uint8(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 1, "Control extended"); offset+=1;
+
+    } else if (item_type==0x0b) {                                       /* SBA */
+		check_length(pinfo, item_value_tree, 2, item_length, "SBA");
+		add_item_value_uint8(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 1, "Control y-position"); offset+=1;
+		add_item_value_uint8(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 1, "Control x-position"); offset+=1;
+
+    } else if (item_type==0x13) {                                       /* SLC */
+		check_length(pinfo, item_value_tree, 2, item_length, "SLC");
+		add_item_value_uint16(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 2, "Field length in characters"); offset+=2;
+
 	} else if (item_type==0x10 && item_id==0x04 && item_sid==0x26){		/* Dialog Step Number */
 		check_length(pinfo, item_value_tree, 4, item_length, "Dialog Step Number");
 		add_item_value_uint32(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 4, "Dialog Step Number"); offset+=4;
@@ -2322,8 +2339,12 @@ dissect_sapdiag_payload(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, pro
 				item_value_length = 22;
 				break;
 			}
-			case 0x0B:{ /* SBA/SFE/SLC */
-				item_value_length = 9;
+			case 0x0a:{ /* SFE */
+			    item_value_length = 3;
+			    break;
+			}
+			case 0x0b:{ /* SBA */
+				item_value_length = 2;
 				break;
 			}
 			case 0x0C:{ /* EOM End of message */
@@ -2331,6 +2352,10 @@ dissect_sapdiag_payload(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, pro
 			}
 			case 0x11:{ /* Data Stream */
 				item_long = 4;
+				break;
+			}
+			case 0x13:{ /* SLC */
+				item_value_length = 2;
 				break;
 			}
 			case 0x15:{ /* SBA2 XXX: Find the actual length */
