@@ -2223,7 +2223,7 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
            (item_type==0x10 && item_id==0x09 && item_sid==0x12) ||      /* Control Focus */
 		   (item_type==0x10 && item_id==0x0c && item_sid==0x04) || 		/* OK Code */
 		   (item_type==0x10 && item_id==0x0c && item_sid==0x09) || 		/* Session title */
-		   (item_type==0x10 && item_id==0x0c && item_sid==0x0a)) 		/* Session icon */
+		   (item_type==0x10 && item_id==0x0c && item_sid==0x0a) || 		/* Session icon */
 		   (item_type==0x10 && item_id==0x0c && item_sid==0x0b)) 		/* List Cell text */
 	{
 		add_item_value_string(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, item_length, "Value", 1); offset+=item_length;
