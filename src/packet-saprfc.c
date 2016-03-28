@@ -565,8 +565,8 @@ dissect_saprfc_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_t
 
     } else if (item_id1==0x03 && item_id2==0x01 && item_id3==0x03 && item_id4==0x02){
         check_length(pinfo, item_value_tree, 8, item_length, "Table length");
-        add_item_value_uint32(tvb, item, item_value_tree, hf_saprfc_item_value, offset, 4, "Fill Length"); offset+=4;
-        add_item_value_uint32(tvb, item, item_value_tree, hf_saprfc_item_value, offset, 4, "Width Length"); offset+=4;
+        add_item_value_uint32(tvb, item, item_value_tree, hf_saprfc_item_value, offset, "Fill Length"); offset+=4;
+        add_item_value_uint32(tvb, item, item_value_tree, hf_saprfc_item_value, offset, "Width Length"); offset+=4;
 
     } else if (item_id1==0x03 && item_id2==0x02 && item_id3==0x03 && item_id4==0x05){
     	offset += 4;  /* Skip the first 4 bytes */
@@ -586,10 +586,10 @@ dissect_saprfc_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_t
         add_item_value_string(tvb, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Tables Name", 1); offset+=item_length;
 
     } else if (item_id1==0x05 && item_id2==0x01 && item_id3==0x01 && item_id4==0x36){
-		add_item_value_uint8(tvb, item, item_value_tree, hf_saprfc_item_value, offset, 1, "#"); offset+=1;
+		add_item_value_uint8(tvb, item, item_value_tree, hf_saprfc_item_value, offset, "#"); offset+=1;
         add_item_value_hexstring(tvb, item, item_value_tree, hf_saprfc_item_value, offset, 16, "Root-id"); offset+=16;
         add_item_value_hexstring(tvb, item, item_value_tree, hf_saprfc_item_value, offset, 16, "Conn-id"); offset+=16;
-		add_item_value_uint32(tvb, item, item_value_tree, hf_saprfc_item_value, offset, 4, "#"); offset+=4;
+		add_item_value_uint32(tvb, item, item_value_tree, hf_saprfc_item_value, offset, "#"); offset+=4;
 
     } else {
         /* If the preference is set, report the item as unknown in the expert info */
