@@ -1886,10 +1886,6 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
 		add_item_value_uint8(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 1, "Control y-position"); offset+=1;
 		add_item_value_uint8(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 1, "Control x-position"); offset+=1;
 
-    } else if (item_type==0x13) {                                       /* SLC */
-		check_length(pinfo, item_value_tree, 2, item_length, "SLC");
-		add_item_value_uint16(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 2, "Field length in characters"); offset+=2;
-
 	} else if (item_type==0x10 && item_id==0x04 && item_sid==0x26){		/* Dialog Step Number */
 		check_length(pinfo, item_value_tree, 4, item_length, "Dialog Step Number");
 		add_item_value_uint32(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 4, "Dialog Step Number"); offset+=4;
@@ -2182,6 +2178,10 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
             expert_add_info_format(pinfo, item, &ei_sapdiag_item_partial, "The Diag Item is dissected partially (0x%.2x, 0x%.2x, 0x%.2x)", item_type, item_id, item_sid);
         }
 
+    /* UI event source */
+    } else if (item_type==0x10 && item_id==0x0f && item_sid==0x01){     /* UI Event Source */
+        dissect_sapdiag_uievent(tvb, pinfo, item_value_tree, offset, item_length); offset+=item_length;
+
     /* GUI Packet state */
     } else if (item_type==0x10 && item_id==0x14 && item_sid==0x01){     /* GUI Packet state */
 		add_item_value_uint8(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 1, "Flags"); offset+=1; /* XXX: Add flag values */
@@ -2189,22 +2189,10 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
         add_item_value_uint32(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 4, "Bytes Send"); offset+=4;
         add_item_value_uint32(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 4, "Bytes Received"); offset+=4;
 
-    /* UI event source */
-    } else if (item_type==0x10 && item_id==0x0f && item_sid==0x01){     /* UI Event Source */
-        dissect_sapdiag_uievent(tvb, pinfo, item_value_tree, offset, item_length); offset+=item_length;
-
     /* Dynt items */
 	} else if ((item_type==0x12 && item_id==0x09 && item_sid==0x02) ||	/* Dynt Atom */
                (item_type==0x10 && item_id==0x09 && item_sid==0x02)) {
         dissect_sapdiag_dyntatom(tvb, pinfo, item_value_tree, offset, item_length); offset+=item_length;
-
-    /* Tab Strip Controls */
-    } else if ((item_type==0x12 && item_id==0x09 && item_sid==0x10)) {
-        dissect_sapdiag_dyntatom(tvb, pinfo, item_value_tree, offset, item_length); offset+=item_length;
-
-    /* Menu Entries items */
-    } else if ((item_type==0x12 && item_id==0x0b)) {
-        dissect_sapdiag_menu(tvb, item_value_tree, offset, item_length); offset+=item_length;
 
 	/* String items */
 	} else if ((item_type==0x10 && item_id==0x04 && item_sid==0x09) || 	/* Gui Version */
@@ -2234,13 +2222,25 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
 	{
 		add_item_value_string(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, item_length, "Value", 1); offset+=item_length;
 
+    /* RFC Embedded calls */
+	} else if (item_type==0x10 && item_id==0x08){                       /* RFC_TR */
+        dissect_sapdiag_rfc_call(tvb, pinfo, parent_tree, offset, item_length);
+
 	/* String items (long text) */
 	} else if (item_type==0x11){										/* Data Stream */
 		add_item_value_string(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, item_length, "Value", 0); offset+=item_length;
 
-    /* RFC Embedded calls */
-	} else if (item_type==0x10 && item_id==0x08){                       /* RFC_TR */
-        dissect_sapdiag_rfc_call(tvb, pinfo, parent_tree, offset, item_length);
+    /* Tab Strip Controls */
+    } else if ((item_type==0x12 && item_id==0x09 && item_sid==0x10)) {
+        dissect_sapdiag_dyntatom(tvb, pinfo, item_value_tree, offset, item_length); offset+=item_length;
+
+    /* Menu Entries items */
+    } else if ((item_type==0x12 && item_id==0x0b)) {
+        dissect_sapdiag_menu(tvb, item_value_tree, offset, item_length); offset+=item_length;
+
+    } else if (item_type==0x13) {                                       /* SLC */
+		check_length(pinfo, item_value_tree, 2, item_length, "SLC");
+		add_item_value_uint16(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 2, "Field length in characters"); offset+=2;
 
     /* Another unknown item */
     } else {
