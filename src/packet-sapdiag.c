@@ -2148,6 +2148,12 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
 		check_length(pinfo, item_value_tree, 2, item_length, "Container Loop");
 		add_item_value_uint16(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 2, "Lines Per Loop Row"); offset+=2;
 
+	} else if (item_type==0x10 && item_id==0x0c && item_sid==0x0d){		/* List focus */
+		check_length(pinfo, item_value_tree, 5, item_length, "List focus");
+		add_item_value_uint8(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 1, "List focus version"); offset+=1;
+		add_item_value_uint16(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 2, "List focus Row"); offset+=2;
+		add_item_value_uint16(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 2, "List focus Column"); offset+=2;
+
 	} else if (item_type==0x10 && item_id==0x0c && item_sid==0x0e){		/* Main Area Pixel Size */
 		check_length(pinfo, item_value_tree, 16, item_length, "Main Area Pixel Size");
 		add_item_value_uint32(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, 4, "Window Height"); offset+=4;
