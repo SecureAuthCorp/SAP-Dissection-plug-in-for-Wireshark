@@ -44,7 +44,7 @@
 #define SAPDIAG_COM_FLAG_TERM_INI   0x10
 #define SAPDIAG_COM_FLAG_TERM_CAS   0x20
 #define SAPDIAG_COM_FLAG_TERM_NNM   0x40
-#define SAPDIAG_COM_FLAG_TERM_GRA   0x80 
+#define SAPDIAG_COM_FLAG_TERM_GRA   0x80
 
 /* SAP Diag Header Compression field values */
 static const value_string hf_sapdiag_compress_vals[] = {
@@ -431,7 +431,7 @@ static const value_string hf_sapdiag_item_id_vals[] = {
 	{ 0x13, "RCUI" },
 	{ 0x14, "GUI_PACKET" },
 	{ 0x00, NULL }
-};	
+};
 
 /* SAP Diag Item APPL/APPL4 SCRIPT SID values */
 static const value_string hf_sapdiag_item_appl_script_vals[] = {
@@ -1228,7 +1228,7 @@ dissect_sapdiag_dp(tvbuff_t *tvb, proto_tree *tree, guint32 offset){
 	dp = proto_tree_add_item(tree, hf_sapdiag_dp, tvb, offset, 200, FALSE);
 	dp_tree = proto_item_add_subtree(dp, ett_sapdiag);
 
-	proto_tree_add_item(dp_tree, hf_sapdiag_dp_request_id, tvb, offset, 4, FALSE); offset+=4; 		/* 0x00 */ 
+	proto_tree_add_item(dp_tree, hf_sapdiag_dp_request_id, tvb, offset, 4, FALSE); offset+=4; 		/* 0x00 */
 	proto_tree_add_item(dp_tree, hf_sapdiag_dp_retcode, tvb, offset, 1, FALSE); offset++;			/* 0x04 */
 	proto_tree_add_item(dp_tree, hf_sapdiag_dp_sender_id, tvb, offset, 1, FALSE); offset++;			/* 0x05 */
 	proto_tree_add_item(dp_tree, hf_sapdiag_dp_action_type, tvb, offset, 1, FALSE); offset++; 		/* 0x06 */
@@ -1613,7 +1613,7 @@ dissect_sapdiag_dyntatom(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
         }
 
         /* Add the item atom subtree */
-        atom_item = proto_tree_add_item(atom_tree, hf_sapdiag_item_dynt_atom_item, tvb, offset, tvb_get_ntohs(tvb, offset), FALSE); 
+        atom_item = proto_tree_add_item(atom_tree, hf_sapdiag_item_dynt_atom_item, tvb, offset, tvb_get_ntohs(tvb, offset), FALSE);
         atom_item_tree = proto_item_add_subtree(atom_item, ett_sapdiag);
 
         /* Get the atom item length */
@@ -1759,7 +1759,7 @@ dissect_sapdiag_menu(tvbuff_t *tvb, proto_tree *tree, guint32 offset, guint32 le
     while (offset < final){
 
         /* Add the menu entry subtree */
-        menu = proto_tree_add_item(tree, hf_sapdiag_item_menu_entry, tvb, offset, tvb_get_ntohs(tvb, offset), FALSE); 
+        menu = proto_tree_add_item(tree, hf_sapdiag_item_menu_entry, tvb, offset, tvb_get_ntohs(tvb, offset), FALSE);
         menu_tree = proto_item_add_subtree(menu, ett_sapdiag);
 
         add_item_value_uint16(tvb, menu, menu_tree, hf_sapdiag_item_value, offset, "Length"); offset+=2;
@@ -1831,7 +1831,7 @@ dissect_sapdiag_uievent(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gui
     /* These items are ignored if the flag SAPDIAG_UI_EVENT_VALID_FLAG_CONTROL_POS is not set. We dissect them always. */
     proto_tree_add_item(tree, ht_sapdiag_item_ui_event_control_row, tvb, offset, 2, FALSE); offset+=2;length-=2;
     proto_tree_add_item(tree, ht_sapdiag_item_ui_event_control_col, tvb, offset, 2, FALSE); offset+=2;length-=2;
- 
+
     i = container_nrs = tvb_get_ntohs(tvb, offset);
     proto_tree_add_item(tree, ht_sapdiag_item_ui_event_container_nrs, tvb, offset, 2, FALSE); offset+=2;length-=2;
 
@@ -2256,7 +2256,7 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
 const char *
 get_appl_string(guint8 item_id, guint8 item_sid){
 	const char *item_name_string = NULL;
-	
+
 	switch (item_id){
 		case 0x01:{   /* SCRIPT */
 			item_name_string = val_to_str(item_sid, hf_sapdiag_item_appl_script_vals, "Unknown"); break;
@@ -2421,7 +2421,7 @@ dissect_sapdiag_payload(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, pro
 				expert_add_info(pinfo, il, &ei_sapdiag_item_length_invalid);
 				item_value_length = (guint32)item_value_remaining_length;
 			}
-			item_value = proto_tree_add_item(item_tree, hf_sapdiag_item_value, tvb, offset, item_value_length, FALSE); 
+			item_value = proto_tree_add_item(item_tree, hf_sapdiag_item_value, tvb, offset, item_value_length, FALSE);
 			item_value_tree = proto_item_add_subtree(item_value, ett_sapdiag);
 			dissect_sapdiag_item(tvb, pinfo, item, item_value_tree, parent_tree, offset, item_type, item_id, item_sid, item_value_length);
 			offset+= item_value_length;
@@ -2530,7 +2530,7 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
             col_append_fstr(pinfo->cinfo, COL_INFO, " Uncompressed Length=%u ", reported_length);
 
 			/* Add the algorithm */
-			proto_tree_add_item(compression_header_tree, hf_sapdiag_algorithm, tvb, offset, 1, FALSE); offset++; 
+			proto_tree_add_item(compression_header_tree, hf_sapdiag_algorithm, tvb, offset, 1, FALSE); offset++;
 			/* Add the magic bytes */
 			proto_tree_add_item(compression_header_tree, hf_sapdiag_magic, tvb, offset, 2, FALSE); offset+=2;
 			/* Add the max bits */
@@ -2581,7 +2581,6 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 					/* Dissect the new uncompressed payload */
 					dissect_sapdiag_payload(next_tvb, pinfo, payload_tree, tree, 0);
 				} else {
-					
 				}
 			} else {
 				/* Add the payload subtree */
@@ -2779,7 +2778,7 @@ proto_register_sapdiag(void)
 			{ "Request ID", "sapdiag.dp.rqid", FT_INT16, BASE_DEC, NULL, 0x0, "SAP Diag DP Request ID", HFILL }},
 		{ &hf_sapdiag_dp_terminal,
 			{ "Terminal", "sapdiag.dp.terminal", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Diag DP Terminal", HFILL }},
-			
+
 		/* SAP Diag Support Bits */
 		{ &hf_SAPDIAG_SUPPORT_BIT_PROGRESS_INDICATOR,
 			{ "Support Bit PROGRESS_INDICATOR", "sapdiag.diag.supportbits.PROGRESS_INDICATOR", FT_BOOLEAN, 8, NULL, SAPDIAG_SUPPORT_BIT_PROGRESS_INDICATOR, "SAP Diag Support Bit PROGRESS_INDICATOR",
@@ -3535,7 +3534,7 @@ proto_register_sapdiag(void)
     prefs_register_bool_preference(sapdiag_module, "snc_dissection", "Dissect SAP SNC frames", "Whether the SAP Diag Protocol dissector should call the SAP SNC dissector for SNC frames", &global_sapdiag_snc_dissection);
 
     prefs_register_bool_preference(sapdiag_module, "highlight_unknown_items", "Highlight unknown SAP Diag Items", "Whether the SAP Diag Protocol dissector should highlight unknown SAP Diag item (migth be noise and generate a lot of expert warnings)", &global_sapdiag_highlight_items);
-    
+
 }
 
 /**
