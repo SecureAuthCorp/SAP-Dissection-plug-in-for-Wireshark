@@ -421,7 +421,7 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
     col_clear(pinfo->cinfo,COL_INFO);
 
     /* Add the main SAP Router subtree */
-    if (tree) { 
+    if (tree) {
         ti = proto_tree_add_item(tree, proto_saprouter, tvb, offset, -1, FALSE);
         saprouter_tree = proto_item_add_subtree(ti, ett_saprouter);
     }
@@ -432,10 +432,10 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
     /* Admin Message Type */
     if (tvb_strneql(tvb, offset, SAPROUTER_TYPE_ADMIN_STRING, eyecatcher_length) == 0){
         col_set_str(pinfo->cinfo, COL_INFO, "Admin Message");
-    
+
         proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, offset, eyecatcher_length, FALSE); offset += eyecatcher_length;
         proto_item_append_text(ti, ", Admin Message");
-        
+
         proto_tree_add_item(saprouter_tree, hf_saprouter_ni_version, tvb, offset, 1, FALSE); offset++;
 
         opcode = tvb_get_guint8(tvb, offset);
