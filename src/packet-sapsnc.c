@@ -106,16 +106,12 @@ proto_register_sapsnc(void)
 	};
 
 	/* Register the protocol */
-	proto_sapsnc = proto_register_protocol (
-		"SAP SNC Protocol",	/* name       */
-		"SAPSNC",	/* short name */
-		"sapsnc"	/* abbrev     */
-	);
+	proto_sapsnc = proto_register_protocol("SAP SNC Protocol", "SAPSNC", "sapsnc");
 
 	proto_register_field_array(proto_sapsnc, hf, array_length(hf));
 	proto_register_subtree_array(ett, array_length(ett));
 
-    register_dissector("sapsnc", dissect_sapsnc, proto_sapsnc);
+	register_dissector("sapsnc", dissect_sapsnc, proto_sapsnc);
 
 }
 
