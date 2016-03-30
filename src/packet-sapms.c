@@ -35,7 +35,7 @@ static const value_string hf_sapms_flag_vals[] = {
 	{  3, "MS_REPLY" },
 	{  4, "MS_ADMIN" },
 	{  0, NULL }
-};	
+};
 
 /* MS IFlag values */
 static const value_string hf_sapms_iflag_vals[] = {
@@ -109,7 +109,7 @@ static const value_string hf_sapms_adm_msgtype_vals[] = {
 
 /* MS Adm Record Opcode values */
 static const value_string hf_sapms_adm_record_opcode_vals[] = {
-    { 0x00, "AD_GENERAL" }, 
+    { 0x00, "AD_GENERAL" },
     { 0x01, "AD_PROFILE" },
     { 0x02, "AD_WPSTAT" },
     { 0x03, "AD_QUEUE" },
@@ -276,7 +276,7 @@ static const value_string hf_sapms_opcode_vals[] = {
 	{ 75, "MS_J2EE_RECONNECT_P1" },
 	{ 76, "MS_J2EE_RECONNECT_P2" },
 	{  0, NULL },
-};	
+};
 
 /* MS OP Code Error values */
 static const value_string hf_sapms_opcode_error_vals[] = {
@@ -615,7 +615,7 @@ dissect_sapms_adm_record(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
     guint8 adm_opcode;
 
     while (length>=104){
-        
+
         record = proto_tree_add_item(tree, hf_sapms_adm_record, tvb, offset, 104, FALSE);
         record_tree = proto_item_add_subtree(record, ett_sapms);
 
@@ -844,7 +844,7 @@ dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
 				while (tvb_captured_length_remaining(tvb, offset) > 0){
 					client_length = dissect_sapms_client(tvb, pinfo, tree, offset, opcode_version); offset += client_length;
 				}
-            }            
+            }
             break;
         }
         case 0x06:{			 /* MS_CHANGE_IP */
@@ -927,7 +927,7 @@ dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
             if (text_length != length ){
             	expert_add_info_format(pinfo, tree, &ei_sapms_text_invalid_length, "Invalid text length (expected=%d, actual=%d)", text_length, length);
             }
-            proto_tree_add_item(tree, hf_sapms_text_value, tvb, offset, length, FALSE); offset+=length;        
+            proto_tree_add_item(tree, hf_sapms_text_value, tvb, offset, length, FALSE); offset+=length;
             break;
         }
         case 0x24:			/* MS_COUNTER_CREATE */
