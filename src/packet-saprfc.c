@@ -483,14 +483,14 @@ dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 		proto_tree_add_item(tree, hf_saprfc_table_content, tvb, offset, -1, FALSE);
 	}
 
-    /* TODO: Dissect saprfc_payload */
+	/* TODO: Dissect saprfc_payload */
 }
 
 static void
 dissect_saprfc_tables(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset, guint16 item_length){
 
-    guint8 *reassemble_buffer = NULL;
-    guint32 reassemble_length = 0, reassemble_offset = 0, next_item = 0, initial_offset = offset;
+	guint8 *reassemble_buffer = NULL;
+	guint32 reassemble_length = 0, reassemble_offset = 0, next_item = 0, initial_offset = offset;
 
 	proto_item *table = NULL;
 	proto_tree *table_tree = NULL;
@@ -498,9 +498,9 @@ dissect_saprfc_tables(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint
 
 	/* Get the reassemble length */
 	reassemble_length = tvb_get_ntohl(tvb, offset + 4);
-    if (item_length > (reassemble_length - reassemble_offset)){
-    	item_length = reassemble_length - reassemble_offset;
-    }
+	if (item_length > (reassemble_length - reassemble_offset)){
+		item_length = reassemble_length - reassemble_offset;
+	}
 
 	/* Allocate the buffer only in the scope of current packet */
 	reassemble_buffer = (guint8 *)wmem_alloc(wmem_packet_scope(), reassemble_length);
@@ -508,102 +508,102 @@ dissect_saprfc_tables(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint
 		return;
 	}
 
-    /* Perform the reassemble */
+	/* Perform the reassemble */
 	while (tvb_offset_exists(tvb, offset + item_length) && (reassemble_offset <= reassemble_length)){
-        tvb_memcpy(tvb, reassemble_buffer + reassemble_offset, offset, item_length);
-        offset += item_length; reassemble_offset += item_length;
+		tvb_memcpy(tvb, reassemble_buffer + reassemble_offset, offset, item_length);
+		offset += item_length; reassemble_offset += item_length;
 
-        /* If the table content continues, get the length and advance the offset */
-        next_item = tvb_get_ntohl(tvb, offset); offset+=4;
-        if (next_item == 0x03050305){
-            item_length = tvb_get_ntohs(tvb, offset); offset+=2;
+		/* If the table content continues, get the length and advance the offset */
+		next_item = tvb_get_ntohl(tvb, offset); offset+=4;
+		if (next_item == 0x03050305){
+			item_length = tvb_get_ntohs(tvb, offset); offset+=2;
 
-            if (item_length > (reassemble_length - reassemble_offset)){
-            	item_length = reassemble_length - reassemble_offset;
-            }
+			if (item_length > (reassemble_length - reassemble_offset)){
+				item_length = reassemble_length - reassemble_offset;
+			}
 
-        /* If the table content doesn't continue, we've completed */
-        } else {
-            break;
-        }
-    }
+		/* If the table content doesn't continue, we've completed */
+		} else {
+			break;
+		}
+	}
 
 	/* Now re-setup the tvb buffer to have the new data */
 	compressed_tvb = tvb_new_real_data(reassemble_buffer, reassemble_length, reassemble_offset);
 	tvb_set_child_real_data_tvbuff(tvb, compressed_tvb);
 	add_new_data_source(pinfo, compressed_tvb, "Compressed Table Data");
 
-    /* Add the Table subtree */
-    table = proto_tree_add_item(tree, hf_saprfc_table, tvb, initial_offset, offset - initial_offset, FALSE);
-    table_tree = proto_item_add_subtree(table, ett_saprfc);
+	/* Add the Table subtree */
+	table = proto_tree_add_item(tree, hf_saprfc_table, tvb, initial_offset, offset - initial_offset, FALSE);
+	table_tree = proto_item_add_subtree(table, ett_saprfc);
 
-    /* Now uncompress the table content */
-    dissect_saprfc_tables_compressed(compressed_tvb, pinfo, table_tree);
+	/* Now uncompress the table content */
+	dissect_saprfc_tables_compressed(compressed_tvb, pinfo, table_tree);
 
 }
 
 static void
 dissect_saprfc_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_tree *item_value_tree, guint32 offset, guint8 item_id1, guint8 item_id2, guint8 item_id3, guint8 item_id4, guint16 item_length){
 
-    if        (item_id1==0x00 && item_id2==0x0b && item_id3==0x01 && item_id4==0x02){
-        add_item_value_string(tvb, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Dispatch call to", 1); offset+=item_length;
+	if (item_id1==0x00 && item_id2==0x0b && item_id3==0x01 && item_id4==0x02){
+		add_item_value_string(tvb, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Dispatch call to", 1); offset+=item_length;
 
-    } else if (item_id1==0x02 && item_id2==0x03 && item_id3==0x02 && item_id4==0x01){
-        add_item_value_string(tvb, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Parameter Name", 1); offset+=item_length;
+	} else if (item_id1==0x02 && item_id2==0x03 && item_id3==0x02 && item_id4==0x01){
+		add_item_value_string(tvb, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Parameter Name", 1); offset+=item_length;
 
-    } else if (item_id1==0x02 && item_id2==0x05 && item_id3==0x02 && item_id4==0x05){
-        add_item_value_string(tvb, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Parameter Name", 1); offset+=item_length;
+	} else if (item_id1==0x02 && item_id2==0x05 && item_id3==0x02 && item_id4==0x05){
+		add_item_value_string(tvb, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Parameter Name", 1); offset+=item_length;
 
-    } else if (item_id1==0x02 && item_id2==0x05 && item_id3==0x02 && item_id4==0x01){
-        add_item_value_string(tvb, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Parameter Name", 1); offset+=item_length;
+	} else if (item_id1==0x02 && item_id2==0x05 && item_id3==0x02 && item_id4==0x01){
+		add_item_value_string(tvb, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Parameter Name", 1); offset+=item_length;
 
-    } else if (item_id1==0x02 && item_id2==0x03 && item_id3==0x03 && item_id4==0x01){
-        add_item_value_string(tvb, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Tables Name", 1); offset+=item_length;
+	} else if (item_id1==0x02 && item_id2==0x03 && item_id3==0x03 && item_id4==0x01){
+		add_item_value_string(tvb, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Tables Name", 1); offset+=item_length;
 
-    } else if (item_id1==0x02 && item_id2==0x13 && item_id3==0x03 && item_id4==0x01){
-        add_item_value_string(tvb, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Tables Name", 1); offset+=item_length;
+	} else if (item_id1==0x02 && item_id2==0x13 && item_id3==0x03 && item_id4==0x01){
+		add_item_value_string(tvb, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Tables Name", 1); offset+=item_length;
 
-    } else if (item_id1==0x03 && item_id2==0x01 && item_id3==0x03 && item_id4==0x02){
-        check_length(pinfo, item_value_tree, 8, item_length, "Table length");
-        add_item_value_uint32(tvb, item, item_value_tree, hf_saprfc_item_value, offset, "Fill Length"); offset+=4;
-        add_item_value_uint32(tvb, item, item_value_tree, hf_saprfc_item_value, offset, "Width Length"); offset+=4;
+	} else if (item_id1==0x03 && item_id2==0x01 && item_id3==0x03 && item_id4==0x02){
+		check_length(pinfo, item_value_tree, 8, item_length, "Table length");
+		add_item_value_uint32(tvb, item, item_value_tree, hf_saprfc_item_value, offset, "Fill Length"); offset+=4;
+		add_item_value_uint32(tvb, item, item_value_tree, hf_saprfc_item_value, offset, "Width Length"); offset+=4;
 
-    } else if (item_id1==0x03 && item_id2==0x02 && item_id3==0x03 && item_id4==0x05){
-    	offset += 4;  /* Skip the first 4 bytes */
-    	proto_tree_add_item(item_value_tree, hf_saprfc_table_length, tvb, offset, 4, FALSE); offset += 4;
-    	proto_tree_add_none_format(item_value_tree, hf_saprfc_item_value, tvb, offset, item_length, "Table Content (first)");
-    	proto_item_append_text(item, ", Table Content (first)"); offset+=item_length;
+	} else if (item_id1==0x03 && item_id2==0x02 && item_id3==0x03 && item_id4==0x05){
+		offset += 4;  /* Skip the first 4 bytes */
+		proto_tree_add_item(item_value_tree, hf_saprfc_table_length, tvb, offset, 4, FALSE); offset += 4;
+		proto_tree_add_none_format(item_value_tree, hf_saprfc_item_value, tvb, offset, item_length, "Table Content (first)");
+		proto_item_append_text(item, ", Table Content (first)"); offset+=item_length;
 
-    } else if (item_id1==0x03 && item_id2==0x05 && item_id3==0x03 && item_id4==0x05){
-    	proto_tree_add_none_format(item_value_tree, hf_saprfc_item_value, tvb, offset, item_length, "Table Content");
-    	proto_item_append_text(item, ", Table Content"); offset+=item_length;
+	} else if (item_id1==0x03 && item_id2==0x05 && item_id3==0x03 && item_id4==0x05){
+		proto_tree_add_none_format(item_value_tree, hf_saprfc_item_value, tvb, offset, item_length, "Table Content");
+		proto_item_append_text(item, ", Table Content"); offset+=item_length;
 
-    } else if (item_id1==0x03 && item_id2==0x05 && item_id3==0x03 && item_id4==0x06){
-    	proto_tree_add_none_format(item_value_tree, hf_saprfc_item_value, tvb, offset, item_length, "Table Content (last)");
-    	proto_item_append_text(item, ", Table Content (last)"); offset+=item_length;
+	} else if (item_id1==0x03 && item_id2==0x05 && item_id3==0x03 && item_id4==0x06){
+		proto_tree_add_none_format(item_value_tree, hf_saprfc_item_value, tvb, offset, item_length, "Table Content (last)");
+		proto_item_append_text(item, ", Table Content (last)"); offset+=item_length;
 
-    } else if (item_id1==0x03 && item_id2==0x06 && item_id3==0x03 && item_id4==0x01){
-        add_item_value_string(tvb, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Tables Name", 1); offset+=item_length;
+	} else if (item_id1==0x03 && item_id2==0x06 && item_id3==0x03 && item_id4==0x01){
+		add_item_value_string(tvb, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Tables Name", 1); offset+=item_length;
 
-    } else if (item_id1==0x05 && item_id2==0x01 && item_id3==0x01 && item_id4==0x36){
+	} else if (item_id1==0x05 && item_id2==0x01 && item_id3==0x01 && item_id4==0x36){
 		add_item_value_uint8(tvb, item, item_value_tree, hf_saprfc_item_value, offset, "#"); offset+=1;
-        add_item_value_hexstring(tvb, item, item_value_tree, hf_saprfc_item_value, offset, 16, "Root-id"); offset+=16;
-        add_item_value_hexstring(tvb, item, item_value_tree, hf_saprfc_item_value, offset, 16, "Conn-id"); offset+=16;
+		add_item_value_hexstring(tvb, item, item_value_tree, hf_saprfc_item_value, offset, 16, "Root-id"); offset+=16;
+		add_item_value_hexstring(tvb, item, item_value_tree, hf_saprfc_item_value, offset, 16, "Conn-id"); offset+=16;
 		add_item_value_uint32(tvb, item, item_value_tree, hf_saprfc_item_value, offset, "#"); offset+=4;
 
-    } else {
-        /* If the preference is set, report the item as unknown in the expert info */
-        if (global_saprfc_highlight_items){
-            expert_add_info_format(pinfo, item, &ei_saprfc_unknown_item, "The RFC item has a unknown type that is not dissected (%d %d %d %d)", item_id1, item_id2, item_id3, item_id4);
-        }
-    }
+	} else {
+		/* If the preference is set, report the item as unknown in the expert info */
+		if (global_saprfc_highlight_items){
+			expert_add_info_format(pinfo, item, &ei_saprfc_unknown_item, "The RFC item has a unknown type that is not dissected (%d %d %d %d)", item_id1, item_id2, item_id3, item_id4);
+		}
+	}
 }
 
 static void
 dissect_saprfc_payload(tvbuff_t *tvb, packet_info *info, proto_tree *tree, proto_tree *parent_tree, guint32 offset){
 
 	guint8 item_id1, item_id2, item_id3, item_id4;
-    guint16 item_length, item_value_length;
+	guint16 item_length, item_value_length;
 
 	proto_item *item = NULL, *item_value = NULL;
 	proto_tree *item_tree = NULL, *item_value_tree = NULL;
@@ -616,55 +616,55 @@ dissect_saprfc_payload(tvbuff_t *tvb, packet_info *info, proto_tree *tree, proto
 		item = proto_tree_add_item(tree, hf_saprfc_item, tvb, offset, 1, FALSE);
 		item_tree = proto_item_add_subtree(item, ett_saprfc);
 
-        /* Get the first identifier */
-        item_id1 = tvb_get_guint8(tvb, offset);
+		/* Get the first identifier */
+		item_id1 = tvb_get_guint8(tvb, offset);
 		proto_tree_add_item(item_tree, hf_saprfc_item_id1, tvb, offset, 1, FALSE); offset+=1; item_length+=1;
 		proto_item_append_text(item, ": (0x%.2x)", item_id1);
 
-        /* Check if it's an End of message */
-        if (item_id1==0x0c){
-            item_value_length = 0;
+		/* Check if it's an End of message */
+		if (item_id1==0x0c){
+			item_value_length = 0;
 
-        /* Otherwise follow dissection */
-        } else {
+		/* Otherwise follow dissection */
+		} else {
 
-            item_id2 = tvb_get_guint8(tvb, offset);
-		    proto_tree_add_item(item_tree, hf_saprfc_item_id2, tvb, offset, 1, FALSE); offset+=1; item_length+=1;
-    		proto_item_append_text(item, ", (0x%.2x)", item_id2);
+			item_id2 = tvb_get_guint8(tvb, offset);
+			proto_tree_add_item(item_tree, hf_saprfc_item_id2, tvb, offset, 1, FALSE); offset+=1; item_length+=1;
+			proto_item_append_text(item, ", (0x%.2x)", item_id2);
 
-            if ((item_id1!=0xff) && (item_id2!=0xff)) {
+			if ((item_id1!=0xff) && (item_id2!=0xff)) {
 
-                item_id3 = tvb_get_guint8(tvb, offset);
-	            proto_tree_add_item(item_tree, hf_saprfc_item_id3, tvb, offset, 1, FALSE); offset+=1; item_length+=1;
-        		proto_item_append_text(item, ", (0x%.2x)", item_id3);
+				item_id3 = tvb_get_guint8(tvb, offset);
+				proto_tree_add_item(item_tree, hf_saprfc_item_id3, tvb, offset, 1, FALSE); offset+=1; item_length+=1;
+				proto_item_append_text(item, ", (0x%.2x)", item_id3);
 
-                item_id4 = tvb_get_guint8(tvb, offset);
-		        proto_tree_add_item(item_tree, hf_saprfc_item_id4, tvb, offset, 1, FALSE); offset+=1; item_length+=1;
-        		proto_item_append_text(item, ", (0x%.2x)", item_id4);
+				item_id4 = tvb_get_guint8(tvb, offset);
+				proto_tree_add_item(item_tree, hf_saprfc_item_id4, tvb, offset, 1, FALSE); offset+=1; item_length+=1;
+				proto_item_append_text(item, ", (0x%.2x)", item_id4);
 
-		        item_value_length = tvb_get_ntohs(tvb, offset);
-                proto_tree_add_item(item_tree, hf_saprfc_item_length, tvb, offset, 2, FALSE); offset+=2; item_length+=2;
-        		proto_item_append_text(item, ", Length=%d", item_value_length);
-            }
-        }
+				item_value_length = tvb_get_ntohs(tvb, offset);
+				proto_tree_add_item(item_tree, hf_saprfc_item_length, tvb, offset, 2, FALSE); offset+=2; item_length+=2;
+				proto_item_append_text(item, ", Length=%d", item_value_length);
+			}
+		}
 
-        /* Now we have the real length of the item, set the proper size */
-        item_length += item_value_length;
-        proto_item_set_len(item, item_length);
+		/* Now we have the real length of the item, set the proper size */
+		item_length += item_value_length;
+		proto_item_set_len(item, item_length);
 
-        /* If the item has content dissect it */
-        if (item_value_length>0){
-            item_value = proto_tree_add_item(item_tree, hf_saprfc_item_value, tvb, offset, item_value_length, FALSE);
+		/* If the item has content dissect it */
+		if (item_value_length>0){
+			item_value = proto_tree_add_item(item_tree, hf_saprfc_item_value, tvb, offset, item_value_length, FALSE);
 			item_value_tree = proto_item_add_subtree(item_value, ett_saprfc);
-            dissect_saprfc_item(tvb, info, item, item_value_tree, offset, item_id1, item_id2, item_id3, item_id4, item_value_length);
-        }
+			dissect_saprfc_item(tvb, info, item, item_value_tree, offset, item_id1, item_id2, item_id3, item_id4, item_value_length);
+		}
 
-        /* Also send the tables items for reassembling */
-        if (global_saprfc_table_reassembly && item_id1==0x03 && item_id2==0x02 && item_id3==0x03 && item_id4==0x05){
-            dissect_saprfc_tables(tvb, info, parent_tree, offset, item_value_length);
-        }
+		/* Also send the tables items for reassembling */
+		if (global_saprfc_table_reassembly && item_id1==0x03 && item_id2==0x02 && item_id3==0x03 && item_id4==0x05){
+			dissect_saprfc_tables(tvb, info, parent_tree, offset, item_value_length);
+		}
 
-        offset+= item_value_length;
+		offset+= item_value_length;
 	}
 
 }
@@ -715,7 +715,7 @@ dissect_saprfc_monitor_cmd(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, 
 	guint8 opcode;
 
 	opcode = tvb_get_guint8(tvb, offset);
-    col_append_fstr(pinfo->cinfo, COL_INFO, ", Command=%s", val_to_str(opcode, hf_saprfc_monitor_cmd_values, "Unknown"));
+	col_append_fstr(pinfo->cinfo, COL_INFO, ", Command=%s", val_to_str(opcode, hf_saprfc_monitor_cmd_values, "Unknown"));
 
 	if (tree){
 		proto_tree_add_item(tree, hf_saprfc_monitor_cmd, tvb, offset, 1, FALSE); offset+=1;
@@ -738,7 +738,7 @@ dissect_saprfc_header(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint
 	version = tvb_get_guint8(tvb, offset);
 	reqtype = tvb_get_guint8(tvb, offset + 1);
 
-    col_append_fstr(pinfo->cinfo, COL_INFO, "APPC Version=%d, Request Type=%s", version, val_to_str(reqtype, hf_saprfc_header_reqtype_values, "Unknown"));
+	col_append_fstr(pinfo->cinfo, COL_INFO, "APPC Version=%d, Request Type=%s", version, val_to_str(reqtype, hf_saprfc_header_reqtype_values, "Unknown"));
 
 	if (tree){
 		/* Add the APPC header subtree */
@@ -894,16 +894,16 @@ dissect_saprfc(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 	 * state-less seems to be difficult to keep track of the requests/responses.
 	 */
 	if (version > 0x03){
-    	if (tree){
+		if (tree){
 			/* Add the main saprfc subtree */
 			saprfc = proto_tree_add_item(tree, proto_saprfc, tvb, 0, -1, FALSE);
 			saprfc_tree = proto_item_add_subtree(saprfc, ett_saprfc);
-    	}
-    	dissect_saprfc_header(tvb, pinfo, saprfc_tree, offset);
+		}
+		dissect_saprfc_header(tvb, pinfo, saprfc_tree, offset);
 		return;
-    }
+	}
 
-    col_append_fstr(pinfo->cinfo, COL_INFO, "Version=%d, Request Type=%s", version, val_to_str(req_type, hf_saprfc_reqtype_values, "Unknown"));
+	col_append_fstr(pinfo->cinfo, COL_INFO, "Version=%d, Request Type=%s", version, val_to_str(req_type, hf_saprfc_reqtype_values, "Unknown"));
 
 	if (tree) { /* we are being asked for details */
 
@@ -911,7 +911,7 @@ dissect_saprfc(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 		saprfc = proto_tree_add_item(tree, proto_saprfc, tvb, 0, -1, FALSE);
 		saprfc_tree = proto_item_add_subtree(saprfc, ett_saprfc);
 
-        /* Dissect common fields */
+		/* Dissect common fields */
 		proto_tree_add_item(saprfc_tree, hf_saprfc_version, tvb, offset, 1, FALSE); offset+=1;
 		proto_tree_add_item(saprfc_tree, hf_saprfc_reqtype, tvb, offset, 1, FALSE); offset+=1;
 		proto_item_append_text(saprfc_tree, ", Version=%d, Request Type=%s", version, val_to_str(req_type, hf_saprfc_reqtype_values, "Unknown"));
@@ -1150,11 +1150,11 @@ proto_register_saprfc(void)
 		{ &hf_saprfc_header_conn_idx,
 			{ "Conn Index", "saprfc.appcheader.conn_idx", FT_INT16, BASE_DEC, NULL, 0x0, "SAP RFC APPC Header Conn Index", HFILL }},
 
-        /* RFC Header */
+		/* RFC Header */
 		{ &hf_saprfc_rfcheader,
 			{ "RFC Header", "saprfc.rfcheader", FT_NONE, BASE_NONE, NULL, 0x0, "SAP RFC Header", HFILL }},
 
-        /* RFC Unicode Header */
+		/* RFC Unicode Header */
 		{ &hf_saprfc_ucheader,
 			{ "Unicode Header", "saprfc.ucheader", FT_NONE, BASE_NONE, NULL, 0x0, "SAP RFC Unicode Header", HFILL }},
 		{ &hf_saprfc_ucheader_codepage,
@@ -1168,12 +1168,12 @@ proto_register_saprfc(void)
 		{ &hf_saprfc_ucheader_returncode,
 			{ "Return Code", "saprfc.ucheader.returncode", FT_UINT32, BASE_HEX, NULL, 0x0, "SAP RFC Unicode Header Return Code", HFILL }},
 
-        /* Payload */
+		/* Payload */
 		{ &hf_saprfc_payload,
 			{ "Message", "saprfc.message", FT_NONE, BASE_NONE, NULL, 0x0, "SAP RFC Message", HFILL }},
 
-        /* Item fields */
-        { &hf_saprfc_item,
+		/* Item fields */
+		{ &hf_saprfc_item,
 			{ "Item", "saprfc.item", FT_NONE, BASE_NONE, NULL, 0x0, "SAP RFC Item", HFILL }},
 		{ &hf_saprfc_item_id1,
 			{ "ID1", "saprfc.item.id1", FT_UINT8, BASE_HEX, NULL, 0x0, "SAP RFC Item ID 1", HFILL }},
@@ -1188,12 +1188,12 @@ proto_register_saprfc(void)
 		{ &hf_saprfc_item_value,
 			{ "Value", "saprfc.item.value", FT_NONE, BASE_NONE, NULL, 0x0, "SAP RFC Item Value", HFILL }},
 
-        /* Table content */
-        { &hf_saprfc_table,
+		/* Table content */
+		{ &hf_saprfc_table,
 			{ "Table", "saprfc.table", FT_NONE, BASE_NONE, NULL, 0x0, "SAP RFC Table", HFILL }},
 		{ &hf_saprfc_table_length,
 			{ "Table Content Length", "saprfc.table.length", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP RFC Table Content Length", HFILL }},
-        { &hf_saprfc_table_compress_header,
+		{ &hf_saprfc_table_compress_header,
 			{ "Compression Header", "saprfc.table.compression", FT_NONE, BASE_NONE, NULL, 0x0, "SAP RFC Table Compression Header", HFILL }},
 		{ &hf_saprfc_table_uncomplength,
 			{ "Uncompressed Length", "saprfc.table.compression.uncomplength", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP RFC Table Uncompressed Length", HFILL }},
@@ -1205,7 +1205,7 @@ proto_register_saprfc(void)
 			{ "Special", "saprfc.table.compression.special", FT_UINT8, BASE_HEX, NULL, 0x0, "SAP RFC Table Special", HFILL }},
 		{ &hf_saprfc_table_return_code,
 			{ "Decompress Return Code", "saprfc.table.compression.returncode", FT_UINT8, BASE_DEC, hf_decompress_return_code_vals, 0x0, "SAP RFC Decompression routine return code", HFILL }},
-        { &hf_saprfc_table_content,
+		{ &hf_saprfc_table_content,
 			{ "Content", "saprfc.table.content", FT_NONE, BASE_NONE, NULL, 0x0, "SAP RFC Table Content", HFILL }},
 
 	};
@@ -1215,7 +1215,7 @@ proto_register_saprfc(void)
 		&ett_saprfc
 	};
 
-    /* Register the expert info */
+	/* Register the expert info */
 	static ei_register_info ei[] = {
 		{ &ei_saprfc_invalid_decompresssion, { "saprfc.table.compression.failed", PI_MALFORMED, PI_WARN, "Decompression of payload failed", EXPFILL }},
 		{ &ei_saprfc_invalid_decompress_length, { "saprfc.table.compression.uncomplength.invalid", PI_MALFORMED, PI_WARN, "The uncompressed payload length differs with the reported length", EXPFILL }},
@@ -1226,11 +1226,7 @@ proto_register_saprfc(void)
 	expert_module_t* saprfc_expert;
 
 	/* Register the protocol */
-	proto_saprfc = proto_register_protocol (
-		"SAP RFC Protocol",	/* name       */
-		"SAPRFC",		/* short name */
-		"saprfc"		/* abbrev     */
-	);
+	proto_saprfc = proto_register_protocol("SAP RFC Protocol", "SAPRFC", "saprfc");
 
 	proto_register_field_array(proto_saprfc, hf, array_length(hf));
 	proto_register_subtree_array(ett, array_length(ett));
@@ -1251,7 +1247,7 @@ proto_register_saprfc(void)
 
 	prefs_register_bool_preference(saprfc_module, "table_reassembly", "Reassemble SAP RFC table content", "Whether the SAP RFC Protocol dissector should reassemble table content included in payloads.", &global_saprfc_table_reassembly);
 
-    prefs_register_bool_preference(saprfc_module, "highlight_unknown_items", "Highlight unknown SAP RFC Items", "Whether the SAP RFC Protocol dissector should highlight unknown RFC items (migth be noise and generate a lot of expert warnings)", &global_saprfc_highlight_items);
+	prefs_register_bool_preference(saprfc_module, "highlight_unknown_items", "Highlight unknown SAP RFC Items", "Whether the SAP RFC Protocol dissector should highlight unknown RFC items (migth be noise and generate a lot of expert warnings)", &global_saprfc_highlight_items);
 }
 
 /**
