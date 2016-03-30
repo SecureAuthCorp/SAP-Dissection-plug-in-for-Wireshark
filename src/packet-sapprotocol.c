@@ -151,7 +151,7 @@ dissect_sap_protocol_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree
 	col_add_fstr(pinfo->cinfo, COL_INFO, "Length=%d ", length);
 
 	/* We are being asked for details */
-	if (tree) {  
+	if (tree) {
 		/* Add the main SAP Protocol subtree */
 		ti = proto_tree_add_item(tree, proto_sap_protocol, tvb, 0, -1, FALSE);
 		sap_protocol_tree = proto_item_add_subtree(ti, ett_sap_protocol);
