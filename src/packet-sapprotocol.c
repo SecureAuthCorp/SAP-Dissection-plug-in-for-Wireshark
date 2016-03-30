@@ -251,11 +251,7 @@ proto_register_sap_protocol(void)
 	expert_module_t* sap_protocol_expert;
 
 	/* Register the protocol */
-	proto_sap_protocol = proto_register_protocol (
-		"SAP NI Protocol",	/* name       */
-		"SAPNI",	/* short name */
-		"sapni"	/* abbrev     */
-	);
+	proto_sap_protocol = proto_register_protocol("SAP NI Protocol", "SAPNI", "sapni");
 
 	proto_register_field_array(proto_sap_protocol, hf, array_length(hf));
 	proto_register_subtree_array(ett, array_length(ett));
