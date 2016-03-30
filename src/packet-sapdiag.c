@@ -47,15 +47,16 @@
 #define SAPDIAG_COM_FLAG_TERM_GRA   0x80
 
 /* SAP Diag Header Compression field values */
-static const value_string hf_sapdiag_compress_vals[] = {
+static const value_string sapdiag_compress_vals[] = {
 	{ 0x0, "Compression switched off" },
 	{ 0x1, "Compression switched on" },
 	{ 0x2, "Data encrypted" },
-	{ 0x3, "????" }
+	{ 0x3, "????" },
+	{ 0, NULL }
 };
 
 /* SAP Diag Header Algorithm field values */
-static const value_string hf_sapdiag_algorithm_vals[] = {
+static const value_string sapdiag_algorithm_vals[] = {
 	{ 0x10, "LZC" },
 	{ 0x12, "LZH" },
 	/* NULL */
@@ -64,7 +65,7 @@ static const value_string hf_sapdiag_algorithm_vals[] = {
 
 
 /* SAP Diag DP Header Request ID values */
-static const value_string hf_sapdiag_dp_request_id_vals[] = {
+static const value_string sapdiag_dp_request_id_vals[] = {
 	{ 0x00000000, "NOWP" },
 	{ 0x00000001, "DIA" },
 	{ 0x00000002, "DUPD" },
@@ -77,7 +78,7 @@ static const value_string hf_sapdiag_dp_request_id_vals[] = {
 };
 
 /* SAP Diag DP Header Sender ID values */
-static const value_string hf_sapdiag_dp_sender_id_vals[] = {
+static const value_string sapdiag_dp_sender_id_vals[] = {
 	{ 0x01, "DISPATCHER" },
 	{ 0x02, "WORK_PROCESS" },
 	{ 0x04, "REMOTE_TERMINAL" },
@@ -91,7 +92,7 @@ static const value_string hf_sapdiag_dp_sender_id_vals[] = {
 };
 
 /* SAP Diag DP Header Action Type values */
-static const value_string hf_sapdiag_dp_action_type_vals[] = {
+static const value_string sapdiag_dp_action_type_vals[] = {
 	{ 0x01, "SEND_TO_DP" },
 	{ 0x02, "SEND_TO_WP" },
 	{ 0x03, "SEND_TO_TM" },
@@ -379,7 +380,7 @@ static const value_string hf_sapdiag_dp_action_type_vals[] = {
 
 
 /* SAP Diag DP Header New Status values */
-static const value_string hf_sapdiag_dp_new_stat_vals[] = {
+static const value_string sapdiag_dp_new_stat_vals[] = {
 	{ 0x00, "NO_CHANGE" },
 	{ 0x01, "WP_SLOT_FREE" },
 	{ 0x02, "WP_WAIT" },
@@ -388,11 +389,12 @@ static const value_string hf_sapdiag_dp_new_stat_vals[] = {
 	{ 0x10, "WP_KILLED" },
 	{ 0x20, "WP_SHUTDOWN" },
 	{ 0x40, "WP_RESTRICTED" },
-	{ 0x80, "WP_NEW" }
+	{ 0x80, "WP_NEW" },
+	{ 0, NULL }
 };
 
 /* SAP Diag Item Type values */
-static const value_string hf_sapdiag_item_type_vals[] = {
+static const value_string sapdiag_item_type_vals[] = {
 	{ 0x01,	"SES" },
 	{ 0x02, "ICO" },
 	{ 0x03, "TIT" },
@@ -412,7 +414,7 @@ static const value_string hf_sapdiag_item_type_vals[] = {
 };
 
 /* SAP Diag Item APPL/APPL4 ID values */
-static const value_string hf_sapdiag_item_id_vals[] = {
+static const value_string sapdiag_item_id_vals[] = {
 	{ 0x01, "SCRIPT" },
 	{ 0x02, "GRAPH" },
 	{ 0x03, "IXOS" },
@@ -434,7 +436,7 @@ static const value_string hf_sapdiag_item_id_vals[] = {
 };
 
 /* SAP Diag Item APPL/APPL4 SCRIPT SID values */
-static const value_string hf_sapdiag_item_appl_script_vals[] = {
+static const value_string sapdiag_item_appl_script_vals[] = {
 	/* SCRIPT */
 	{ 0x01, "SCRIPT_OTF" },
 	{ 0x02, "SCRIPT_SCREEN" },
@@ -444,7 +446,7 @@ static const value_string hf_sapdiag_item_appl_script_vals[] = {
 };
 
 /* SAP Diag Item APPL/APPL4 GRAPH SID values */
-static const value_string hf_sapdiag_item_appl_graph_vals[] = {
+static const value_string sapdiag_item_appl_graph_vals[] = {
 	/* GRAPH */
 	{ 0x03, "GRAPH RELEASE 3" },
 	{ 0x05, "GRAPH RELEASE 5" },
@@ -452,7 +454,7 @@ static const value_string hf_sapdiag_item_appl_graph_vals[] = {
 };
 
 /* SAP Diag Item APPL/APPL4 IXOS SID values */
-static const value_string hf_sapdiag_item_appl_ixos_vals[] = {
+static const value_string sapdiag_item_appl_ixos_vals[] = {
 	/* IXOS */
 	{ 0x01, "ABLAGE" },
 	{ 0x02, "ANZEIGE" },
@@ -461,7 +463,7 @@ static const value_string hf_sapdiag_item_appl_ixos_vals[] = {
 };
 
 /* SAP Diag Item APPL/APPL4 ST_USER SID values */
-static const value_string hf_sapdiag_item_appl_st_user_vals[] = {
+static const value_string sapdiag_item_appl_st_user_vals[] = {
 	/* ST_USER */
 	{ 0x01, "V1" },
 	{ 0x02, "CONNECT" },
@@ -504,7 +506,7 @@ static const value_string hf_sapdiag_item_appl_st_user_vals[] = {
 };
 
 /* SAP Diag Item APPL/APPL4 SYNN SID values */
-static const value_string hf_sapdiag_item_appl_dynn_vals[] = {
+static const value_string sapdiag_item_appl_dynn_vals[] = {
 	/* DYNN */
 	{ 0x01, "CHL" },
 	{ 0x03, "XMLPROP DYNPRO" },
@@ -512,7 +514,7 @@ static const value_string hf_sapdiag_item_appl_dynn_vals[] = {
 };
 
 /* SAP Diag Item APPL/APPL4 ST_R3INFO SID values */
-static const value_string hf_sapdiag_item_appl_st_r3info_vals[] = {
+static const value_string sapdiag_item_appl_st_r3info_vals[] = {
 	/* ST_R3INFO */
 	{ 0x01, "MODENUMBER" },
 	{ 0x02, "DBNAME" },
@@ -560,14 +562,14 @@ static const value_string hf_sapdiag_item_appl_st_r3info_vals[] = {
 };
 
 /* SAP Diag Item APPL/APPL4 POPU SID values */
-static const value_string hf_sapdiag_item_appl_popu_vals[] = {
+static const value_string sapdiag_item_appl_popu_vals[] = {
 	/* POPU */
 	{ 0x02, "DEST" },
 	{ 0x00, NULL }
 };
 
 /* SAP Diag Item APPL/APPL4 RFC_TR SID values */
-static const value_string hf_sapdiag_item_appl_rfc_tr_vals[] = {
+static const value_string sapdiag_item_appl_rfc_tr_vals[] = {
 	/* RFC_TR */
 	{ 0x00, "RFC_TR_REQ" },
 	{ 0x01, "RFC_TR_RET" },
@@ -585,7 +587,7 @@ static const value_string hf_sapdiag_item_appl_rfc_tr_vals[] = {
 };
 
 /* SAP Diag Item APPL/APPL4 DYNT SID values */
-static const value_string hf_sapdiag_item_appl_dynt_vals[] = {
+static const value_string sapdiag_item_appl_dynt_vals[] = {
 	/* DYNT */
 	{ 0x01, "DYNT_FOCUS" },
 	{ 0x02, "DYNT_ATOM" },
@@ -614,7 +616,7 @@ static const value_string hf_sapdiag_item_appl_dynt_vals[] = {
 };
 
 /* SAP Diag Item APPL/APPL4 CONTAINER SID values */
-static const value_string hf_sapdiag_item_appl_container_vals[] = {
+static const value_string sapdiag_item_appl_container_vals[] = {
 	/* CONTAINTER */
 	{ 0x01, "RESET" },
 	{ 0x02, "DEFAULT" },
@@ -632,7 +634,7 @@ static const value_string hf_sapdiag_item_appl_container_vals[] = {
 };
 
 /* SAP Diag Item APPL/APPL4 MNUENTRY SID values */
-static const value_string hf_sapdiag_item_appl_mnuentry_vals[] = {
+static const value_string sapdiag_item_appl_mnuentry_vals[] = {
 	/* MNUENTRY */
 	{ 0x01, "MENU_ACT" },
 	{ 0x02, "MENU_MNU" },
@@ -642,7 +644,7 @@ static const value_string hf_sapdiag_item_appl_mnuentry_vals[] = {
 };
 
 /* SAP Diag Item APPL/APPL4 VARINFO SID values */
-static const value_string hf_sapdiag_item_appl_varinfo_vals[] = {
+static const value_string sapdiag_item_appl_varinfo_vals[] = {
 	/* VARINFO */
 	{ 0x01, "MESTYPE" },
 	{ 0x02, "SCROLL_INFOS" },
@@ -663,21 +665,21 @@ static const value_string hf_sapdiag_item_appl_varinfo_vals[] = {
 };
 
 /* SAP Diag Item APPL/APPL4 CONTROl SID values */
-static const value_string hf_sapdiag_item_appl_control_vals[] = {
+static const value_string sapdiag_item_appl_control_vals[] = {
 	/* CONTROL */
 	{ 0x01, "CONTROL_PROPERTIES" },
 	{ 0x00, NULL }
 };
 
 /* SAP Diag Item APPL/APPL4 UI_EVENT SID values */
-static const value_string hf_sapdiag_item_appl_ui_event_vals[] = {
+static const value_string sapdiag_item_appl_ui_event_vals[] = {
 	/* UI_EVENT */
 	{ 0x01, "UI_EVENT_SOURCE" },
 	{ 0x00, NULL }
 };
 
 /* SAP Diag Item APPL/APPL4 ACC_LIST SID values */
-static const value_string hf_sapdiag_item_appl_acc_list_vals[] = {
+static const value_string sapdiag_item_appl_acc_list_vals[] = {
 	/* ACC_LIST */
 	{ 0x01, "ACC_LIST_INFO4FIELD" },
 	{ 0x02, "ACC_LIST_CONTAINER" },
@@ -685,7 +687,7 @@ static const value_string hf_sapdiag_item_appl_acc_list_vals[] = {
 };
 
 /* SAP Diag Item APPL/APPL4 RCUI SID values */
-static const value_string hf_sapdiag_item_appl_rcui_vals[] = {
+static const value_string sapdiag_item_appl_rcui_vals[] = {
 	/* RCUI */
 	{ 0x01, "RCUI_STREAM" },
 	{ 0x02, "RCUI_SYSTEM_ERROR" },
@@ -700,7 +702,7 @@ static const value_string hf_sapdiag_item_appl_rcui_vals[] = {
 };
 
 /* SAP Diag Item APPL/APPL4 GUI_PACKET SID values */
-static const value_string hf_sapdiag_item_appl_gui_packet_vals[] = {
+static const value_string sapdiag_item_appl_gui_packet_vals[] = {
 	/* GUI_PACKET */
 	{ 0x01, "GUI_PACKET_STATE" },
 	{ 0x02, "GUI_PACKET_DATA" },
@@ -708,7 +710,7 @@ static const value_string hf_sapdiag_item_appl_gui_packet_vals[] = {
 };
 
 /* SAP Diag Dynt Atom Etype values */
-static const value_string hf_sapdiag_item_dynt_atom_item_etype_vals[] = {
+static const value_string sapdiag_item_dynt_atom_item_etype_vals[] = {
 	{ 101, "DIAG_DGOTYP_EFIELD" },
 	{ 102, "DIAG_DGOTYP_OFIELD" },
 	{ 103, "DIAG_DGOTYP_KEYWORD" },
@@ -744,7 +746,7 @@ static const value_string hf_sapdiag_item_dynt_atom_item_etype_vals[] = {
 };
 
 /* SAP Diag UI Event Source Event Type Values */
-static const value_string ht_sapdiag_item_ui_event_event_type_vals[] = {
+static const value_string sapdiag_item_ui_event_event_type_vals[] = {
 	{ 0x01, "SELECT" },
 	{ 0x02, "HE" },
 	{ 0x03, "VALUEHELP" },
@@ -758,7 +760,7 @@ static const value_string ht_sapdiag_item_ui_event_event_type_vals[] = {
 	{ 0, NULL }
 };
 
-static const value_string ht_sapdiag_item_ui_event_control_type_vals[] = {
+static const value_string sapdiag_item_ui_event_control_type_vals[] = {
 	{ 0x00, "NONE" },
 	{ 0x01, "FIELD" },
 	{ 0x02, "RADIOBUTTON" },
@@ -779,10 +781,11 @@ static const value_string ht_sapdiag_item_ui_event_control_type_vals[] = {
 	{ 0x12, "SPLITTER" },
 	{ 0x13, "MESSAGE" },
 	{ 0x14, "OKCODE" },
-	{ 0x15, "ACC_CONTAINER" }
+	{ 0x15, "ACC_CONTAINER" },
+	{ 0, NULL }
 };
 
-static const value_string ht_sapdiag_item_ui_event_navigation_data_vals[] = {
+static const value_string sapdiag_item_ui_event_navigation_data_vals[] = {
 	{ 0x01, "TAB" },
 	{ 0x02, "TAB_BACK" },
 	{ 0x03, "JUMP_OVER" },
@@ -1602,7 +1605,7 @@ dissect_sapdiag_dyntatom(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
 			atom_length = 0;
 			atom = proto_tree_add_item(tree, hf_sapdiag_item_dynt_atom, tvb, offset, atom_length, FALSE);
 			atom_tree = proto_item_add_subtree(atom, ett_sapdiag);
-			proto_item_append_text(atom, ", Etype=%s", val_to_str(etype, hf_sapdiag_item_dynt_atom_item_etype_vals, "Unknown")); /* Add the Etype to the Atom tree also */
+			proto_item_append_text(atom, ", Etype=%s", val_to_str(etype, sapdiag_item_dynt_atom_item_etype_vals, "Unknown")); /* Add the Etype to the Atom tree also */
 		}
 
 		/* Check the atom_tree for NULL values. If the atom_tree wasn't created at this point, the atom
@@ -1811,10 +1814,10 @@ dissect_sapdiag_uievent(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gui
 	proto_tree_add_item(event_valid_tree, ht_sapdiag_item_ui_event_valid_FUNCTIONKEY_DATA, tvb, offset, 1, FALSE); offset+=1;length-=1;
 
 	proto_tree_add_item(tree, ht_sapdiag_item_ui_event_event_type, tvb, offset, 2, FALSE);
-	proto_item_append_text(tree, ", Event Type=%s", val_to_str(tvb_get_ntohs(tvb, offset), ht_sapdiag_item_ui_event_event_type_vals, "Unknown")); offset+=2;length-=2;
+	proto_item_append_text(tree, ", Event Type=%s", val_to_str(tvb_get_ntohs(tvb, offset), sapdiag_item_ui_event_event_type_vals, "Unknown")); offset+=2;length-=2;
 
 	proto_tree_add_item(tree, ht_sapdiag_item_ui_event_control_type, tvb, offset, 2, FALSE);
-	proto_item_append_text(tree, ", Control Type=%s", val_to_str(tvb_get_ntohs(tvb, offset), ht_sapdiag_item_ui_event_control_type_vals, "Unknown")); offset+=2;length-=2;
+	proto_item_append_text(tree, ", Control Type=%s", val_to_str(tvb_get_ntohs(tvb, offset), sapdiag_item_ui_event_control_type_vals, "Unknown")); offset+=2;length-=2;
 
 	/* The semantic of the event data changes depending of the event valid flag and are ignored if the
 	SAPDIAG_UI_EVENT_VALID_FLAG_NAVIGATION_DATA flag or the SAPDIAG_UI_EVENT_VALID_FLAG_FUNCTIONKEY_DATA
@@ -2259,39 +2262,39 @@ get_appl_string(guint8 item_id, guint8 item_sid){
 
 	switch (item_id){
 		case 0x01:{   /* SCRIPT */
-			item_name_string = val_to_str(item_sid, hf_sapdiag_item_appl_script_vals, "Unknown"); break;
+			item_name_string = val_to_str(item_sid, sapdiag_item_appl_script_vals, "Unknown"); break;
 		} case 0x02:{ /* GRAPH */
-			item_name_string = val_to_str(item_sid, hf_sapdiag_item_appl_graph_vals, "Unknown"); break;
+			item_name_string = val_to_str(item_sid, sapdiag_item_appl_graph_vals, "Unknown"); break;
 		} case 0x03:{ /* IXOS */
-			item_name_string = val_to_str(item_sid, hf_sapdiag_item_appl_ixos_vals, "Unknown"); break;
+			item_name_string = val_to_str(item_sid, sapdiag_item_appl_ixos_vals, "Unknown"); break;
 		} case 0x04:{ /* ST_USER */
-			item_name_string = val_to_str(item_sid, hf_sapdiag_item_appl_st_user_vals, "Unknown"); break;
+			item_name_string = val_to_str(item_sid, sapdiag_item_appl_st_user_vals, "Unknown"); break;
 		} case 0x05:{ /* DYNN */
-			item_name_string = val_to_str(item_sid, hf_sapdiag_item_appl_dynn_vals, "Unknown"); break;
+			item_name_string = val_to_str(item_sid, sapdiag_item_appl_dynn_vals, "Unknown"); break;
 		} case 0x06:{ /* ST_R3INFO */
-			item_name_string = val_to_str(item_sid, hf_sapdiag_item_appl_st_r3info_vals, "Unknown"); break;
+			item_name_string = val_to_str(item_sid, sapdiag_item_appl_st_r3info_vals, "Unknown"); break;
 		} case 0x07:{ /* POPU */
-			item_name_string = val_to_str(item_sid, hf_sapdiag_item_appl_popu_vals, "Unknown"); break;
+			item_name_string = val_to_str(item_sid, sapdiag_item_appl_popu_vals, "Unknown"); break;
 		} case 0x08:{ /* RFC_TR */
-			item_name_string = val_to_str(item_sid, hf_sapdiag_item_appl_rfc_tr_vals, "Unknown"); break;
+			item_name_string = val_to_str(item_sid, sapdiag_item_appl_rfc_tr_vals, "Unknown"); break;
 		} case 0x09:{ /* DYNT */
-			item_name_string = val_to_str(item_sid, hf_sapdiag_item_appl_dynt_vals, "Unknown"); break;
+			item_name_string = val_to_str(item_sid, sapdiag_item_appl_dynt_vals, "Unknown"); break;
 		} case 0x0a:{ /* CONTAINER */
-			item_name_string = val_to_str(item_sid, hf_sapdiag_item_appl_container_vals, "Unknown"); break;
+			item_name_string = val_to_str(item_sid, sapdiag_item_appl_container_vals, "Unknown"); break;
 		} case 0x0b:{ /* MNUENTRY */
-			item_name_string = val_to_str(item_sid, hf_sapdiag_item_appl_mnuentry_vals, "Unknown"); break;
+			item_name_string = val_to_str(item_sid, sapdiag_item_appl_mnuentry_vals, "Unknown"); break;
 		} case 0x0c:{ /* VARINFO */
-			item_name_string = val_to_str(item_sid, hf_sapdiag_item_appl_varinfo_vals, "Unknown"); break;
+			item_name_string = val_to_str(item_sid, sapdiag_item_appl_varinfo_vals, "Unknown"); break;
 		} case 0x0e:{ /* CONTROL */
-			item_name_string = val_to_str(item_sid, hf_sapdiag_item_appl_control_vals, "Unknown"); break;
+			item_name_string = val_to_str(item_sid, sapdiag_item_appl_control_vals, "Unknown"); break;
 		} case 0x0f:{ /* UI_EVENT */
-			item_name_string = val_to_str(item_sid, hf_sapdiag_item_appl_ui_event_vals, "Unknown"); break;
+			item_name_string = val_to_str(item_sid, sapdiag_item_appl_ui_event_vals, "Unknown"); break;
 		} case 0x12:{ /* ACC_LIST */
-			item_name_string = val_to_str(item_sid, hf_sapdiag_item_appl_acc_list_vals, "Unknown"); break;
+			item_name_string = val_to_str(item_sid, sapdiag_item_appl_acc_list_vals, "Unknown"); break;
 		} case 0x13:{ /* RCUI */
-			item_name_string = val_to_str(item_sid, hf_sapdiag_item_appl_rcui_vals, "Unknown"); break;
+			item_name_string = val_to_str(item_sid, sapdiag_item_appl_rcui_vals, "Unknown"); break;
 		} case 0x14:{ /* GUI_PACKET */
-			item_name_string = val_to_str(item_sid, hf_sapdiag_item_appl_gui_packet_vals, "Unknown"); break;
+			item_name_string = val_to_str(item_sid, sapdiag_item_appl_gui_packet_vals, "Unknown"); break;
 		}
 	}
 	return (item_name_string);
@@ -2317,7 +2320,7 @@ dissect_sapdiag_payload(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, pro
 		/* Get the item type */
 		item_type = tvb_get_guint8(tvb, offset);
 		proto_tree_add_item(item_tree, hf_sapdiag_item_type, tvb, offset, 1, FALSE); offset++; item_length++;
-		proto_item_append_text(item, ": %s", val_to_str(item_type, hf_sapdiag_item_type_vals, "Unknown"));
+		proto_item_append_text(item, ": %s", val_to_str(item_type, sapdiag_item_type_vals, "Unknown"));
 
 		switch (item_type){
 			case 0x01:{ /* SES */
@@ -2374,7 +2377,7 @@ dissect_sapdiag_payload(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, pro
 			case 0x12:{ /* APPL4 */
 				/* Get the APPL(4) ID */
 				item_id = tvb_get_guint8(tvb, offset);
-				proto_item_append_text(item, ", %s", val_to_str(item_id, hf_sapdiag_item_id_vals, "Unknown"));
+				proto_item_append_text(item, ", %s", val_to_str(item_id, sapdiag_item_id_vals, "Unknown"));
 				proto_tree_add_item(item_tree, hf_sapdiag_item_id, tvb, offset, 1, FALSE); offset++; item_length++;
 
 				/* Get the APPL item sid value and set the respective name string according to them XXX: Change this for a multi array */
@@ -2652,7 +2655,7 @@ proto_register_sapdiag(void)
 		{ &hf_sapdiag_msg_rc,
 			{ "Message Rc", "sapdiag.header.msgrc", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP Diag Message RC", HFILL }},
 		{ &hf_sapdiag_compress,
-			{ "Compress", "sapdiag.header.compress", FT_UINT8, BASE_HEX, hf_sapdiag_compress_vals, 0x0, "SAP Diag Compress", HFILL }},
+			{ "Compress", "sapdiag.header.compress", FT_UINT8, BASE_HEX, VALS(sapdiag_compress_vals), 0x0, "SAP Diag Compress", HFILL }},
 
 		/* Error Messages */
 		{ &hf_sapdiag_error_message,
@@ -2664,20 +2667,20 @@ proto_register_sapdiag(void)
 		{ &hf_sapdiag_uncomplength,
 			{ "Uncompressed Length", "sapdiag.header.compression.uncomplength", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP Diag Uncompressed Message Length", HFILL }},
 		{ &hf_sapdiag_algorithm,
-			{ "Compression Algorithm", "sapdiag.header.compression.algorithm", FT_UINT8, BASE_HEX, hf_sapdiag_algorithm_vals, 0x0, "SAP Diag Compression Algorithm", HFILL }},
+			{ "Compression Algorithm", "sapdiag.header.compression.algorithm", FT_UINT8, BASE_HEX, VALS(sapdiag_algorithm_vals), 0x0, "SAP Diag Compression Algorithm", HFILL }},
 		{ &hf_sapdiag_magic,
 			{ "Magic Bytes", "sapdiag.header.compression.magic", FT_UINT16, BASE_HEX, NULL, 0x0, "SAP Diag Compression Magic Bytes", HFILL }},
 		{ &hf_sapdiag_special,
 			{ "Special", "sapdiag.header.compression.special", FT_UINT8, BASE_HEX, NULL, 0x0, "SAP Diag Special", HFILL }},
 		{ &hf_sapdiag_decompress_return_code,
-			{ "Decompress Return Code", "sapdiag.header.compression.returncode", FT_INT8, BASE_DEC, hf_decompress_return_code_vals, 0x0, "SAP Diag Decompression routine return code", HFILL }},
+			{ "Decompress Return Code", "sapdiag.header.compression.returncode", FT_INT8, BASE_DEC, VALS(hf_decompress_return_code_vals), 0x0, "SAP Diag Decompression routine return code", HFILL }},
 		/* SAPDiag Messages */
 		{ &hf_sapdiag_item,
 			{ "Item", "sapdiag.item", FT_NONE, BASE_NONE, NULL, 0x0, "SAP Diag Item", HFILL }},
 		{ &hf_sapdiag_item_type,
-			{ "Type", "sapdiag.item.type", FT_UINT8, BASE_HEX, hf_sapdiag_item_type_vals, 0x0, "SAP Diag Item Type", HFILL }},
+			{ "Type", "sapdiag.item.type", FT_UINT8, BASE_HEX, VALS(sapdiag_item_type_vals), 0x0, "SAP Diag Item Type", HFILL }},
 		{ &hf_sapdiag_item_id,
-			{ "ID", "sapdiag.item.id", FT_UINT8, BASE_HEX, hf_sapdiag_item_id_vals, 0x0, "SAP Diag Item ID", HFILL }},
+			{ "ID", "sapdiag.item.id", FT_UINT8, BASE_HEX, VALS(sapdiag_item_id_vals), 0x0, "SAP Diag Item ID", HFILL }},
 		{ &hf_sapdiag_item_sid,
 			{ "SID", "sapdiag.item.sid", FT_UINT8, BASE_HEX, NULL, 0x0, "SAP Diag Item SID", HFILL }},
 		{ &hf_sapdiag_item_length,
@@ -2686,13 +2689,13 @@ proto_register_sapdiag(void)
 			{ "Value", "sapdiag.item.value", FT_NONE, BASE_NONE, NULL, 0x0, "SAP Diag Item Value", HFILL }},
 		/* SAPDiag DP Header */
 		{ &hf_sapdiag_dp_request_id,
-			{ "Request ID", "sapdiag.dp.reqid", FT_INT32, BASE_DEC, hf_sapdiag_dp_request_id_vals, 0x0, "SAP Diag DP Request ID", HFILL }},
+			{ "Request ID", "sapdiag.dp.reqid", FT_INT32, BASE_DEC, VALS(sapdiag_dp_request_id_vals), 0x0, "SAP Diag DP Request ID", HFILL }},
 		{ &hf_sapdiag_dp_retcode,
 			{ "Retcode", "sapdiag.dp.retcode", FT_UINT8, BASE_HEX, NULL, 0x0, "SAP Diag DP Retcode", HFILL }},
 		{ &hf_sapdiag_dp_sender_id,
-			{ "Sender ID", "sapdiag.dp.senderid", FT_UINT8, BASE_HEX, hf_sapdiag_dp_sender_id_vals, 0x0, "SAP Diag DP Sender ID", HFILL }},
+			{ "Sender ID", "sapdiag.dp.senderid", FT_UINT8, BASE_HEX, VALS(sapdiag_dp_sender_id_vals), 0x0, "SAP Diag DP Sender ID", HFILL }},
 		{ &hf_sapdiag_dp_action_type,
-			{ "Action type", "sapdiag.dp.actiontype", FT_UINT8, BASE_HEX, hf_sapdiag_dp_action_type_vals, 0x0, "SAP Diag DP Action Type", HFILL }},
+			{ "Action type", "sapdiag.dp.actiontype", FT_UINT8, BASE_HEX, VALS(sapdiag_dp_action_type_vals), 0x0, "SAP Diag DP Action Type", HFILL }},
 		{ &hf_sapdiag_dp_req_info,
 			{ "Request Info", "sapdiag.dp.reqinfo", FT_UINT8, BASE_HEX, NULL, 0x0, "SAP Diag DP Request Info", HFILL }},
 		/* Request Info Flag */
@@ -2773,7 +2776,7 @@ proto_register_sapdiag(void)
 		{ &hf_sapdiag_dp_len,
 			{ "Len", "sapdiag.dp.len", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP Diag DP Len", HFILL }},
 		{ &hf_sapdiag_dp_new_stat,
-			{ "New Stat", "sapdiag.dp.newstat", FT_UINT8, BASE_HEX, hf_sapdiag_dp_new_stat_vals, 0x0, "SAP Diag DP New Stat", HFILL }},
+			{ "New Stat", "sapdiag.dp.newstat", FT_UINT8, BASE_HEX, VALS(sapdiag_dp_new_stat_vals), 0x0, "SAP Diag DP New Stat", HFILL }},
 		{ &hf_sapdiag_dp_rq_id,
 			{ "Request ID", "sapdiag.dp.rqid", FT_INT16, BASE_DEC, NULL, 0x0, "SAP Diag DP Request ID", HFILL }},
 		{ &hf_sapdiag_dp_terminal,
@@ -3413,7 +3416,7 @@ proto_register_sapdiag(void)
 			{ "Dynt Atom Item", "sapdiag.item.value.dyntatom.item", FT_NONE, BASE_NONE, NULL, 0x0, "SAP Dynt Atom Item",
 			HFILL }},
 		{ &hf_sapdiag_item_dynt_atom_item_etype,
-			{ "Dynt Atom Item Type", "sapdiag.item.value.dyntatom.item.type", FT_UINT8, BASE_DEC, hf_sapdiag_item_dynt_atom_item_etype_vals, 0x0, "SAP Dynt Atom Item Type",
+			{ "Dynt Atom Item Type", "sapdiag.item.value.dyntatom.item.type", FT_UINT8, BASE_DEC, VALS(sapdiag_item_dynt_atom_item_etype_vals), 0x0, "SAP Dynt Atom Item Type",
 			HFILL }},
 
 		/* Dynt Atom Attribute Flags */
@@ -3447,9 +3450,9 @@ proto_register_sapdiag(void)
 
 		/* UI Event Source fields */
 		{ &ht_sapdiag_item_ui_event_event_type,
-			{ "UI Event Source Type", "sapdiag.item.value.uievent.type", FT_UINT16, BASE_DEC, ht_sapdiag_item_ui_event_event_type_vals, 0x0, "SAP UI Event Source Type", HFILL }},
+			{ "UI Event Source Type", "sapdiag.item.value.uievent.type", FT_UINT16, BASE_DEC, VALS(sapdiag_item_ui_event_event_type_vals), 0x0, "SAP UI Event Source Type", HFILL }},
 		{ &ht_sapdiag_item_ui_event_control_type,
-			{ "UI Event Control Type", "sapdiag.item.value.uievent.control", FT_UINT16, BASE_DEC, ht_sapdiag_item_ui_event_control_type_vals, 0x0, "SAP UI Event Source Control Type", HFILL }},
+			{ "UI Event Control Type", "sapdiag.item.value.uievent.control", FT_UINT16, BASE_DEC, VALS(sapdiag_item_ui_event_control_type_vals), 0x0, "SAP UI Event Source Control Type", HFILL }},
 
 		{ &ht_sapdiag_item_ui_event_valid,
 			{ "UI Event Valid", "sapdiag.item.value.uievent.valid", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP UI Event Source Valid", HFILL }},
@@ -3467,7 +3470,7 @@ proto_register_sapdiag(void)
 		{ &ht_sapdiag_item_ui_event_control_col,
 			{ "UI Event Source Control Column", "sapdiag.item.value.uievent.controlcol", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP UI Event Source Control Column", HFILL }},
 		{ &ht_sapdiag_item_ui_event_navigation_data,
-			{ "UI Event Source Navigation Data", "sapdiag.item.value.uievent.navigationdata", FT_UINT32, BASE_DEC, ht_sapdiag_item_ui_event_navigation_data_vals, 0x0, "SAP UI Event Source Navigation Data", HFILL }},
+			{ "UI Event Source Navigation Data", "sapdiag.item.value.uievent.navigationdata", FT_UINT32, BASE_DEC, VALS(sapdiag_item_ui_event_navigation_data_vals), 0x0, "SAP UI Event Source Navigation Data", HFILL }},
 		{ &ht_sapdiag_item_ui_event_data,
 			{ "UI Event Source Data", "sapdiag.item.value.uievent.data", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP UI Event Source Data", HFILL }},
 		{ &ht_sapdiag_item_ui_event_container_nrs,
