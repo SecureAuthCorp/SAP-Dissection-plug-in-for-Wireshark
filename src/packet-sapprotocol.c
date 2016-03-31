@@ -151,7 +151,7 @@ dissect_sap_protocol_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree
 	col_add_fstr(pinfo->cinfo, COL_INFO, "Length=%d ", length);
 
 	/* We are being asked for details */
-	if (tree) {  
+	if (tree) {
 		/* Add the main SAP Protocol subtree */
 		ti = proto_tree_add_item(tree, proto_sap_protocol, tvb, 0, -1, FALSE);
 		sap_protocol_tree = proto_item_add_subtree(ti, ett_sap_protocol);
@@ -251,11 +251,7 @@ proto_register_sap_protocol(void)
 	expert_module_t* sap_protocol_expert;
 
 	/* Register the protocol */
-	proto_sap_protocol = proto_register_protocol (
-		"SAP NI Protocol",	/* name       */
-		"SAPNI",	/* short name */
-		"sapni"	/* abbrev     */
-	);
+	proto_sap_protocol = proto_register_protocol("SAP NI Protocol", "SAPNI", "sapni");
 
 	proto_register_field_array(proto_sap_protocol, hf, array_length(hf));
 	proto_register_subtree_array(ett, array_length(ett));
@@ -311,3 +307,16 @@ proto_reg_handoff_sap_protocol(void)
 	sap_protocol_port_range = range_copy(global_sap_protocol_port_range);
 	range_foreach(sap_protocol_port_range, range_add_callback);
 }
+
+/*
+ * Editor modelines  -  https://www.wireshark.org/tools/modelines.html
+ *
+ * Local variables:
+ * c-basic-offset: 8
+ * tab-width: 8
+ * indent-tabs-mode: t
+ * End:
+ *
+ * vi: set shiftwidth=8 tabstop=8 noexpandtab:
+ * :indentSize=8:tabSize=8:noTabs=false:
+ */
