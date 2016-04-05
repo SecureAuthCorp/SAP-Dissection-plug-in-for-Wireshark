@@ -32,7 +32,7 @@ extern "C" {
 #define CS_E_MEMORY_ERROR -99
 
 /* SAP Decompression routine return codes */
-static const value_string hf_decompress_return_code_vals[] = {
+static const value_string decompress_return_code_vals[] = {
 	{ 3, "CS_END_INBUFFER (End of input buffer)" },
 	{ 2, "CS_END_OUTBUFFER (End of output buffer)" },
 	{ 1, "CS_END_OF_STREAM (End of data)" },

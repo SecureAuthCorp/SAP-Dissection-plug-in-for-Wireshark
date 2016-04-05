@@ -2559,7 +2559,7 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 				/* Check the return code and add a expert info warning if an error occurred. The dissector continues trying to add
 				adding the payload, however the returned size should be 0.  */
 				if (rt < 0){
-					expert_add_info_format(pinfo, compression_header, &ei_sapdiag_invalid_decompresssion, "Decompression of payload failed with return code %d (%s)", rt, val_to_str(rt, hf_decompress_return_code_vals, "Unknown"));
+					expert_add_info_format(pinfo, compression_header, &ei_sapdiag_invalid_decompresssion, "Decompression of payload failed with return code %d (%s)", rt, val_to_str(rt, decompress_return_code_vals, "Unknown"));
 				}
 
 				/* Check the length returned for the compression routine. If differs with the reported, use the actual one and add
@@ -2673,7 +2673,7 @@ proto_register_sapdiag(void)
 		{ &hf_sapdiag_special,
 			{ "Special", "sapdiag.header.compression.special", FT_UINT8, BASE_HEX, NULL, 0x0, "SAP Diag Special", HFILL }},
 		{ &hf_sapdiag_decompress_return_code,
-			{ "Decompress Return Code", "sapdiag.header.compression.returncode", FT_INT8, BASE_DEC, VALS(hf_decompress_return_code_vals), 0x0, "SAP Diag Decompression routine return code", HFILL }},
+			{ "Decompress Return Code", "sapdiag.header.compression.returncode", FT_INT8, BASE_DEC, VALS(decompress_return_code_vals), 0x0, "SAP Diag Decompression routine return code", HFILL }},
 		/* SAPDiag Messages */
 		{ &hf_sapdiag_item,
 			{ "Item", "sapdiag.item", FT_NONE, BASE_NONE, NULL, 0x0, "SAP Diag Item", HFILL }},
