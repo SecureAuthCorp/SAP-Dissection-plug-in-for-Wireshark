@@ -28,15 +28,16 @@
 
 
 /* Enqueue Server Type values */
-static const value_string hf_sapenqueue_type_vals[] = {
+static const value_string sapenqueue_type_vals[] = {
 	{  0, "SYNC_REQUEST" },
 	{  1, "ASYNC_REQUEST" },
 	{  2, "RESPONSE" },
+	{  0, NULL }
 };
 
 
 /* Enqueue Server Destination values */
-static const value_string hf_sapenqueue_dest_vals[] = {
+static const value_string sapenqueue_dest_vals[] = {
 	{  1, "SYNC_ENQUEUE" },
 	{  2, "ASYNC_ENQUEUE" },
 	{  3, "SERVER_ADMIN" },
@@ -49,7 +50,7 @@ static const value_string hf_sapenqueue_dest_vals[] = {
 
 
 /* Enqueue Server Admin Opcode values */
-static const value_string hf_sapenqueue_server_admin_opcode_vals[] = {
+static const value_string sapenqueue_server_admin_opcode_vals[] = {
 	{  1, "EnAdmDummyRequest" },
 	{  2, "EnAdmShutdownRequest" },
 	{  4, "EnAdmGetReplInfoRequest" },
@@ -58,25 +59,27 @@ static const value_string hf_sapenqueue_server_admin_opcode_vals[] = {
 };
 
 /* Enqueue Server Connection Admin Trace Action values */
-static const value_string hf_sapenqueue_server_admin_trace_action_vals[] = {
+static const value_string sapenqueue_server_admin_trace_action_vals[] = {
 	{  1, "Raise level" },
 	{  2, "Lower level" },
 	{  3, "Get trace state" },
 	{  4, "Set trace status" },
 	{  5, "Reset trace files" },
+	{  0, NULL }
 };
 
 /* Enqueue Server Connection Admin Trace Limit values */
-static const value_string hf_sapenqueue_server_admin_trace_limit_vals[] = {
+static const value_string sapenqueue_server_admin_trace_limit_vals[] = {
 	{  0, "Globally" },
 	{  1, "Only in enserver" },
 	{  2, "Only in repserver" },
 	{  3, "Only in threads of type" },
 	{  4, "Only in one thread of type" },
+	{  0, NULL }
 };
 
 /* Enqueue Server Connection Admin Trace Thread values */
-static const value_string hf_sapenqueue_server_admin_trace_thread_vals[] = {
+static const value_string sapenqueue_server_admin_trace_thread_vals[] = {
 	{  0, "All threads" },
 	{  1, "All I/O threads" },
 	{  2, "Enqueue Worker thread" },
@@ -84,10 +87,11 @@ static const value_string hf_sapenqueue_server_admin_trace_thread_vals[] = {
 	{  4, "ADM thread" },
 	{  5, "Signal thread" },
 	{  6, "Listener thread" },
+	{  0, NULL }
 };
 
 /* Enqueue Server Connection Admin Opcode values */
-static const value_string hf_sapenqueue_conn_admin_opcode_vals[] = {
+static const value_string sapenqueue_conn_admin_opcode_vals[] = {
 	{  0, "Loopback packet" },
 	{  1, "Parameter Request" },
 	{  2, "Parameter Response" },
@@ -95,10 +99,11 @@ static const value_string hf_sapenqueue_conn_admin_opcode_vals[] = {
 	{  4, "Shutdown Write" },
 	{  5, "Shutdown Both" },
 	{  6, "Keepalive" },
+	{  0, NULL }
 };
 
 /* Enqueue Server Connection Admin Parameter values */
-static const value_string hf_sapenqueue_conn_admin_param_vals[] = {
+static const value_string sapenqueue_conn_admin_param_vals[] = {
 	{  0, "ENCPARAM_RECV_LEN" },
 	{  1, "ENCPARAM_SEND_LEN" },
 	{  2, "ENCPARAM_MSG_TYPE" },
@@ -106,6 +111,7 @@ static const value_string hf_sapenqueue_conn_admin_param_vals[] = {
 	{  4, "ENCPARAM_SET_NOSUPP" },
 	{  5, "ENCPARAM_SET_VERSION" },
 	{  6, "ENCPARAM_SET_UCSUPPORT" },
+	{  0, NULL }
 };
 
 static int proto_sapenqueue = -1;
@@ -367,14 +373,14 @@ dissect_sapenqueue(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 	col_clear(pinfo->cinfo,COL_INFO);
 
 	dest = tvb_get_guint8(tvb, offset + 16);
-	col_append_fstr(pinfo->cinfo, COL_INFO, "Dest=%s", val_to_str(dest, hf_sapenqueue_dest_vals, "Unknown"));
+	col_append_fstr(pinfo->cinfo, COL_INFO, "Dest=%s", val_to_str(dest, sapenqueue_dest_vals, "Unknown"));
 
 	opcode = tvb_get_guint8(tvb, offset + 17);
 	type = tvb_get_guint8(tvb, offset + 19);
-	col_append_fstr(pinfo->cinfo, COL_INFO, ",Type=%s", val_to_str(type, hf_sapenqueue_type_vals, "Unknown"));
+	col_append_fstr(pinfo->cinfo, COL_INFO, ",Type=%s", val_to_str(type, sapenqueue_type_vals, "Unknown"));
 
 	if (dest == 0x06){
-		col_append_fstr(pinfo->cinfo, COL_INFO, ",Opcode=%s", val_to_str(opcode, hf_sapenqueue_conn_admin_opcode_vals, "Unknown"));
+		col_append_fstr(pinfo->cinfo, COL_INFO, ",Opcode=%s", val_to_str(opcode, sapenqueue_conn_admin_opcode_vals, "Unknown"));
 	}
 
 
@@ -447,13 +453,13 @@ proto_register_sapenqueue(void)
 		{ &hf_sapenqueue_length_frag,
 			{ "Fragment Length", "sapenque.fragment_length", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP Enqueue Fragment Length", HFILL }},
 		{ &hf_sapenqueue_dest,
-			{ "Destination", "sapenque.destination", FT_UINT8, BASE_DEC, hf_sapenqueue_dest_vals, 0x0, "SAP Enqueue Destination", HFILL }},
+			{ "Destination", "sapenque.destination", FT_UINT8, BASE_DEC, VALS(sapenqueue_dest_vals), 0x0, "SAP Enqueue Destination", HFILL }},
 		{ &hf_sapenqueue_conn_admin_opcode,
-			{ "Opcode", "sapenque.opcode", FT_UINT8, BASE_DEC, hf_sapenqueue_conn_admin_opcode_vals, 0x0, "SAP Enqueue Opcode", HFILL }},
+			{ "Opcode", "sapenque.opcode", FT_UINT8, BASE_DEC, VALS(sapenqueue_conn_admin_opcode_vals), 0x0, "SAP Enqueue Opcode", HFILL }},
 		{ &hf_sapenqueue_more_frags,
 			{ "More Fragments", "sapenque.more_frags", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP Enqueue More Fragments", HFILL }},
 		{ &hf_sapenqueue_type,
-			{ "Type", "sapenque.type", FT_UINT8, BASE_DEC, hf_sapenqueue_type_vals, 0x0, "SAP Enqueue Type", HFILL }},
+			{ "Type", "sapenque.type", FT_UINT8, BASE_DEC, VALS(sapenqueue_type_vals), 0x0, "SAP Enqueue Type", HFILL }},
 
 		/* Server Admin fields */
 		{ &hf_sapenqueue_server_admin,
@@ -467,7 +473,7 @@ proto_register_sapenqueue(void)
 		{ &hf_sapenqueue_server_admin_length,
 			{ "Length", "sapenque.server_admin.length", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP Enqueue Server Admin Length", HFILL }},
 		{ &hf_sapenqueue_server_admin_opcode,
-			{ "Opcode", "sapenque.server_admin.opcode", FT_UINT8, BASE_DEC, hf_sapenqueue_server_admin_opcode_vals, 0x0, "SAP Enqueue Server Admin Opcode", HFILL }},
+			{ "Opcode", "sapenque.server_admin.opcode", FT_UINT8, BASE_DEC, VALS(sapenqueue_server_admin_opcode_vals), 0x0, "SAP Enqueue Server Admin Opcode", HFILL }},
 		{ &hf_sapenqueue_server_admin_flags,
 			{ "Flags", "sapenque.server_admin.flags", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP Enqueue Server Admin Flags", HFILL }},
 		{ &hf_sapenqueue_server_admin_rc,
@@ -481,11 +487,11 @@ proto_register_sapenqueue(void)
 		{ &hf_sapenqueue_server_admin_trace_protocol_version,
 			{ "Trace Protocol Version", "sapenque.server_admin.trace.protocol", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP Enqueue Server Admin Trace Request Protocol Version", HFILL }},
 		{ &hf_sapenqueue_server_admin_trace_action,
-			{ "Trace Action", "sapenque.server_admin.trace.action", FT_UINT8, BASE_DEC, hf_sapenqueue_server_admin_trace_action_vals, 0x0, "SAP Enqueue Server Admin Trace Request Action", HFILL }},
+			{ "Trace Action", "sapenque.server_admin.trace.action", FT_UINT8, BASE_DEC, VALS(sapenqueue_server_admin_trace_action_vals), 0x0, "SAP Enqueue Server Admin Trace Request Action", HFILL }},
 		{ &hf_sapenqueue_server_admin_trace_limit,
-			{ "Trace Limit", "sapenque.server_admin.trace.limit", FT_UINT8, BASE_DEC, hf_sapenqueue_server_admin_trace_limit_vals, 0x0, "SAP Enqueue Server Admin Trace Request Limit", HFILL }},
+			{ "Trace Limit", "sapenque.server_admin.trace.limit", FT_UINT8, BASE_DEC, VALS(sapenqueue_server_admin_trace_limit_vals), 0x0, "SAP Enqueue Server Admin Trace Request Limit", HFILL }},
 		{ &hf_sapenqueue_server_admin_trace_thread,
-			{ "Trace Thread", "sapenque.server_admin.trace.thread", FT_UINT8, BASE_DEC, hf_sapenqueue_server_admin_trace_thread_vals, 0x0, "SAP Enqueue Server Admin Trace Request Thread", HFILL }},
+			{ "Trace Thread", "sapenque.server_admin.trace.thread", FT_UINT8, BASE_DEC, VALS(sapenqueue_server_admin_trace_thread_vals), 0x0, "SAP Enqueue Server Admin Trace Request Thread", HFILL }},
 		{ &hf_sapenqueue_server_admin_trace_level,
 			{ "Trace Level", "sapenque.server_admin.trace.level", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP Enqueue Server Admin Trace Request Level", HFILL }},
 		{ &hf_sapenqueue_server_admin_trace_logging,
@@ -517,7 +523,7 @@ proto_register_sapenqueue(void)
 		{ &hf_sapenqueue_conn_admin_param,
 			{ "Parameter", "sapenque.conn_admin.params.param", FT_NONE, BASE_NONE, NULL, 0x0, "SAP Enqueue Connection Admin Parameter", HFILL }},
 		{ &hf_sapenqueue_conn_admin_param_id,
-			{ "Parameter ID", "sapenque.conn_admin.params.param.id", FT_UINT32, BASE_DEC, hf_sapenqueue_conn_admin_param_vals, 0x0, "SAP Enqueue Connection Admin Parameter ID", HFILL }},
+			{ "Parameter ID", "sapenque.conn_admin.params.param.id", FT_UINT32, BASE_DEC, VALS(sapenqueue_conn_admin_param_vals), 0x0, "SAP Enqueue Connection Admin Parameter ID", HFILL }},
 		{ &hf_sapenqueue_conn_admin_param_len,
 			{ "Parameter Length", "sapenque.conn_admin.params.param.length", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP Enqueue Connection Admin Parameter Length", HFILL }},
 		{ &hf_sapenqueue_conn_admin_param_value,
