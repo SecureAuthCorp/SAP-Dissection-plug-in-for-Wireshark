@@ -3480,7 +3480,7 @@ proto_register_sapdiag(void)
 
 		/* Menu Entries */
 		{ &hf_sapdiag_item_menu_entry,
-			{ "Menu Entry", "sapdiag.item.value.menu", FT_NONE, BASE_NONE, NULL, 0x0, "Menu Entry",
+			{ "Menu Entry", "sapdiag.item.value.menu", FT_NONE, BASE_NONE, NULL, 0x0, NULL,
 			HFILL }},
 
 	};
