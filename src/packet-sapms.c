@@ -29,7 +29,7 @@
 #define SAPMS_PORT_RANGE "3600-3699,3900-3999"
 
 /* MS Flag values */
-static const value_string hf_sapms_flag_vals[] = {
+static const value_string sapms_flag_vals[] = {
 	{  1, "MS_ONE_WAY" },
 	{  2, "MS_REQUEST" },
 	{  3, "MS_REPLY" },
@@ -38,7 +38,7 @@ static const value_string hf_sapms_flag_vals[] = {
 };
 
 /* MS IFlag values */
-static const value_string hf_sapms_iflag_vals[] = {
+static const value_string sapms_iflag_vals[] = {
 	{  1, "MS_SEND_NAME" },
 	{  2, "MS_SEND_TYPE" },
 	{  3, "MS_LOGIN" },
@@ -60,7 +60,7 @@ static const value_string hf_sapms_iflag_vals[] = {
 };
 
 /* MS Error number values */
-static const value_string hf_sapms_errorno_vals[] = {
+static const value_string sapms_errorno_vals[] = {
 	{ 0, "MSERECONNECTION" },
 	{ 1, "MSENISELWRITE" },
 	{ 2, "MSENISELREAD" },
@@ -98,17 +98,18 @@ static const value_string hf_sapms_errorno_vals[] = {
 	{ 101, "MSEINVAL" },
 	{ 102, "MSENOMSG" },
 	{ 103, "MSEINTERN" },
+	{   0, NULL }
 };
 
 /* MS Adm Message Types values */
-static const value_string hf_sapms_adm_msgtype_vals[] = {
+static const value_string sapms_adm_msgtype_vals[] = {
 	{  1, "ADM_REQUEST" },
 	{  2, "ADM_REPLY" },
 	{  0, NULL }
 };
 
 /* MS Adm Record Opcode values */
-static const value_string hf_sapms_adm_record_opcode_vals[] = {
+static const value_string sapms_adm_record_opcode_vals[] = {
 	{ 0x00, "AD_GENERAL" },
 	{ 0x01, "AD_PROFILE" },
 	{ 0x02, "AD_WPSTAT" },
@@ -174,7 +175,7 @@ static const value_string hf_sapms_adm_record_opcode_vals[] = {
 };
 
 /* MS Adm AD_RZL_STRG Type values */
-static const value_string hf_sapms_adm_rzl_strg_type_vals[] = {
+static const value_string sapms_adm_rzl_strg_type_vals[] = {
 	{ 10, "STRG_TYPE_READALL" },
 	{ 11, "STRG_TYPE_READALL_I" },
 	{ 12, "STRG_TYPE_READALL_C" },
@@ -196,10 +197,11 @@ static const value_string hf_sapms_adm_rzl_strg_type_vals[] = {
 	{ 52, "STRG_TYPE_CREATE_C" },
 	{ 53, "STRG_TYPE_CREATE_LC" },
 	{ 90, "STRG_TYPE_DUMP" },
+	{ 0, NULL }
 };
 
 /* MS OP Code values */
-static const value_string hf_sapms_opcode_vals[] = {
+static const value_string sapms_opcode_vals[] = {
 	{  1, "MS_SERVER_CHG" },
 	{  2, "MS_SERVER_ADD" },
 	{  3, "MS_SERVER_SUB" },
@@ -279,7 +281,7 @@ static const value_string hf_sapms_opcode_vals[] = {
 };
 
 /* MS OP Code Error values */
-static const value_string hf_sapms_opcode_error_vals[] = {
+static const value_string sapms_opcode_error_vals[] = {
 	{  0, "MSOP_OK" },
 	{  1, "MSOP_UNKNOWN_OPCODE" },
 	{  2, "MSOP_NOMEM" },
@@ -312,10 +314,11 @@ static const value_string hf_sapms_opcode_error_vals[] = {
 	{ 29, "MSOP_KERNEL_INCOMPATIBLE" },
 	{ 30, "MSOP_NIACLCREATE_FAILED" },
 	{ 31, "MSOP_NIACLSYNTAX_ERROR" },
+	{  0, NULL },
 };
 
 /* MS Set/Get Property ID values */
-static const value_string hf_sapms_property_id_vals[] = {
+static const value_string sapms_property_id_vals[] = {
 	{  1, "MS_PROPERTY_TEXT" },
 	{  2, "MS_PROPERTY_VHOST" },
 	{  3, "MS_PROPERTY_IPADR" },
@@ -327,7 +330,7 @@ static const value_string hf_sapms_property_id_vals[] = {
 };
 
 /* MS Dump Info Dump values */
-static const value_string hf_sapms_dump_command_vals[] = {
+static const value_string sapms_dump_command_vals[] = {
 	{  1, "MS_DUMP_MSADM" },
 	{  2, "MS_DUMP_CON" },
 	{  3, "MS_DUMP_PARAMS" },
@@ -359,7 +362,7 @@ static const value_string hf_sapms_dump_command_vals[] = {
 };
 
 /* MS Reload file values */
-static const value_string hf_sapms_file_reload_vals[] = {
+static const value_string sapms_file_reload_vals[] = {
 	{ 1, "MS_RELOAD_CLIENT_TAB" },
 	{ 2, "MS_RELOAD_SERVER_TAB" },
 	{ 3, "MS_RELOAD_DOMAIN_TAB" },
@@ -379,7 +382,7 @@ static const value_string hf_sapms_file_reload_vals[] = {
 
 
 /* MS Logon Type values */
-static const value_string hf_sapms_logon_type_vals[] = {
+static const value_string sapms_logon_type_vals[] = {
 	{ 0, "MS_LOGON_DIAG_LB" },
 	{ 1, "MS_LOGON_DIAG_LBS" },
 	{ 2, "MS_LOGON_DIAG" },
@@ -418,11 +421,12 @@ static const value_string hf_sapms_logon_type_vals[] = {
 	{ 35, "MS_LOGON_J2EERI" },
 	{ 36, "MS_LOGON_J2EESRI" },
 	{ 37, "MS_LOGON_TRXNS" },
+	{ 0, NULL }
 };
 
 
 /* MS Client Status values */
-static const value_string hf_sapms_server_lst_status_vals[] = {
+static const value_string sapms_server_lst_status_vals[] = {
 	{ 0, "MS_STATE_UNKNOWN" },
 	{ 1, "ACTIVE" },
 	{ 2, "INACTIVE" },
@@ -430,6 +434,7 @@ static const value_string hf_sapms_server_lst_status_vals[] = {
 	{ 4, "MS_STATE_STOP" },
 	{ 5, "MS_STATE_STARTING" },
 	{ 6, "MS_STATE_INIT" },
+	{ 0, NULL }
 };
 
 
@@ -621,7 +626,7 @@ dissect_sapms_adm_record(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
 
 		adm_opcode = tvb_get_guint8(tvb, offset);
 		proto_tree_add_item(record_tree, hf_sapms_adm_record_opcode, tvb, offset, 1, FALSE);
-		proto_item_append_text(record_tree, ", Adm Opcode=%s", val_to_str(adm_opcode, hf_sapms_adm_record_opcode_vals, "Unknown")); offset+=1; length-=1;
+		proto_item_append_text(record_tree, ", Adm Opcode=%s", val_to_str(adm_opcode, sapms_adm_record_opcode_vals, "Unknown")); offset+=1; length-=1;
 
 		proto_tree_add_item(record_tree, hf_sapms_adm_record_serial_number, tvb, offset, 1, FALSE); offset+=1; length-=1;
 		proto_tree_add_item(record_tree, hf_sapms_adm_record_executed, tvb, offset, 1, FALSE); offset+=1; length-=1;
@@ -1102,13 +1107,13 @@ dissect_sapms(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 
 			flag = tvb_get_guint8(tvb, offset);
 			proto_tree_add_item(sapms_tree, hf_sapms_flag, tvb, offset, 1, FALSE); offset+=1;
-			proto_item_append_text(sapms_tree, ", Flag=%s", val_to_str(flag, hf_sapms_flag_vals, "Unknown"));
+			proto_item_append_text(sapms_tree, ", Flag=%s", val_to_str(flag, sapms_flag_vals, "Unknown"));
 
 			iflag = tvb_get_guint8(tvb, offset);
 			proto_tree_add_item(sapms_tree, hf_sapms_iflag, tvb, offset, 1, FALSE); offset+=1;
-			proto_item_append_text(sapms_tree, ", IFlag=%s", val_to_str(iflag, hf_sapms_iflag_vals, "Unknown"));
+			proto_item_append_text(sapms_tree, ", IFlag=%s", val_to_str(iflag, sapms_iflag_vals, "Unknown"));
 
-			col_append_fstr(pinfo->cinfo, COL_INFO, "Flag=%s,IFlag=%s", val_to_str(flag, hf_sapms_flag_vals, "Unknown"), val_to_str(iflag, hf_sapms_iflag_vals, "Unknown"));
+			col_append_fstr(pinfo->cinfo, COL_INFO, "Flag=%s,IFlag=%s", val_to_str(flag, sapms_flag_vals, "Unknown"), val_to_str(iflag, sapms_iflag_vals, "Unknown"));
 
 			proto_tree_add_item(sapms_tree, hf_sapms_fromname, tvb, offset, 40, FALSE); offset+=40;
 
@@ -1131,8 +1136,8 @@ dissect_sapms(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 					proto_tree_add_item(sapms_tree, hf_sapms_opcode_version, tvb, offset, 1, FALSE); offset+=1;
 					proto_tree_add_item(sapms_tree, hf_sapms_opcode_charset, tvb, offset, 1, FALSE); offset+=1;
 
-					proto_item_append_text(sapms_tree, ", Opcode=%s", val_to_str(opcode, hf_sapms_opcode_vals, "Unknown"));
-					col_append_fstr(pinfo->cinfo, COL_INFO, ", Opcode=%s", val_to_str(opcode, hf_sapms_opcode_vals, "Unknown"));
+					proto_item_append_text(sapms_tree, ", Opcode=%s", val_to_str(opcode, sapms_opcode_vals, "Unknown"));
+					col_append_fstr(pinfo->cinfo, COL_INFO, ", Opcode=%s", val_to_str(opcode, sapms_opcode_vals, "Unknown"));
 
 					/* Add the opcode value subtree */
 					remaining_length = tvb_captured_length_remaining(tvb, offset);
@@ -1175,7 +1180,7 @@ proto_register_sapms(void)
 		{ &hf_sapms_version,
 			{ "Version", "sapms.version", FT_UINT8, BASE_HEX, NULL, 0x0, "SAP MS Version", HFILL }},
 		{ &hf_sapms_errorno,
-			{ "Error Number", "sapms.errorno", FT_UINT8, BASE_HEX, hf_sapms_errorno_vals, 0x0, "SAP MS Error Number", HFILL }},
+			{ "Error Number", "sapms.errorno", FT_UINT8, BASE_HEX, VALS(sapms_errorno_vals), 0x0, "SAP MS Error Number", HFILL }},
 		{ &hf_sapms_toname,
 			{ "To Name", "sapms.toname", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS To Name", HFILL }},
 		{ &hf_sapms_msgtypes,
@@ -1209,9 +1214,9 @@ proto_register_sapms(void)
 		{ &hf_sapms_key,
 			{ "Key", "sapms.key", FT_NONE, BASE_NONE, NULL, 0x0, "SAP MS Key", HFILL }},
 		{ &hf_sapms_flag,
-			{ "Flag", "sapms.flag", FT_UINT8, BASE_HEX, hf_sapms_flag_vals, 0x0, "SAP MS Flag", HFILL }},
+			{ "Flag", "sapms.flag", FT_UINT8, BASE_HEX, VALS(sapms_flag_vals), 0x0, "SAP MS Flag", HFILL }},
 		{ &hf_sapms_iflag,
-			{ "IFlag", "sapms.iflag", FT_UINT8, BASE_HEX, hf_sapms_iflag_vals, 0x0, "SAP MS IFlag", HFILL }},
+			{ "IFlag", "sapms.iflag", FT_UINT8, BASE_HEX, VALS(sapms_iflag_vals), 0x0, "SAP MS IFlag", HFILL }},
 		{ &hf_sapms_fromname,
 			{ "From Name", "sapms.fromname", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS From Name", HFILL }},
 		{ &hf_sapms_fromhost,
@@ -1227,7 +1232,7 @@ proto_register_sapms(void)
 		{ &hf_sapms_adm_version,
 			{ "Adm Version", "sapms.adm.version", FT_UINT8, BASE_HEX, NULL, 0x0, "SAP MS Adm Version", HFILL }},
 		{ &hf_sapms_adm_msgtype,
-			{ "Adm Message Type", "sapms.adm.msgtype", FT_UINT8, BASE_HEX, hf_sapms_adm_msgtype_vals, 0x0, "SAP MS Adm Message Type", HFILL }},
+			{ "Adm Message Type", "sapms.adm.msgtype", FT_UINT8, BASE_HEX, VALS(sapms_adm_msgtype_vals), 0x0, "SAP MS Adm Message Type", HFILL }},
 		{ &hf_sapms_adm_recsize,
 			{ "Adm Record Size", "sapms.adm.recsize", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS Adm Record Size", HFILL }},
 		{ &hf_sapms_adm_recno,
@@ -1238,7 +1243,7 @@ proto_register_sapms(void)
 		{ &hf_sapms_adm_record,
 			{ "Adm Record", "sapms.adm.records", FT_NONE, BASE_NONE, NULL, 0x0, "SAP MS Adm Record", HFILL }},
 		{ &hf_sapms_adm_record_opcode,
-			{ "Adm Record Opcode", "sapms.adm.record.opcode", FT_UINT8, BASE_HEX, hf_sapms_adm_record_opcode_vals, 0x0, "SAP MS Adm Record Opcode", HFILL }},
+			{ "Adm Record Opcode", "sapms.adm.record.opcode", FT_UINT8, BASE_HEX, VALS(sapms_adm_record_opcode_vals), 0x0, "SAP MS Adm Record Opcode", HFILL }},
 		{ &hf_sapms_adm_record_serial_number,
 			{ "Adm Record Serial Number", "sapms.adm.record.serial_number", FT_UINT8, BASE_HEX, NULL, 0x0, "SAP MS Adm Record Serial Number", HFILL }},
 		{ &hf_sapms_adm_record_executed,
@@ -1252,7 +1257,7 @@ proto_register_sapms(void)
 			{ "Adm Profile Parameter", "sapms.adm.parameter", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS Adm Profile Parameter", HFILL }},
 
 		{ &hf_sapms_adm_rzl_strg_type,
-			{ "Adm RZL String Type", "sapms.adm.rzl_strg.type", FT_UINT8, BASE_HEX, hf_sapms_adm_rzl_strg_type_vals, 0x0, "SAP MS Adm RZL String Type", HFILL }},
+			{ "Adm RZL String Type", "sapms.adm.rzl_strg.type", FT_UINT8, BASE_HEX, VALS(sapms_adm_rzl_strg_type_vals), 0x0, "SAP MS Adm RZL String Type", HFILL }},
 		{ &hf_sapms_adm_rzl_strg_name,
 			{ "Adm RZL String Name", "sapms.adm.rzl_strg.name", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS Adm RZL String Name", HFILL }},
 		{ &hf_sapms_adm_rzl_strg_value,
@@ -1262,9 +1267,9 @@ proto_register_sapms(void)
 
 		/* OPCODE fields */
 		{ &hf_sapms_opcode,
-			{ "Opcode", "sapms.opcode", FT_UINT8, BASE_HEX, hf_sapms_opcode_vals, 0x0, "SAP MS Opcode", HFILL }},
+			{ "Opcode", "sapms.opcode", FT_UINT8, BASE_HEX, VALS(sapms_opcode_vals), 0x0, "SAP MS Opcode", HFILL }},
 		{ &hf_sapms_opcode_error,
-			{ "Opcode Error", "sapms.opcode.error", FT_UINT8, BASE_HEX, hf_sapms_opcode_error_vals, 0x0, "SAP MS Opcode Error", HFILL }},
+			{ "Opcode Error", "sapms.opcode.error", FT_UINT8, BASE_HEX, VALS(sapms_opcode_error_vals), 0x0, "SAP MS Opcode Error", HFILL }},
 		{ &hf_sapms_opcode_version,
 			{ "Opcode Version", "sapms.opcode.version", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP MS Opcode Version", HFILL }},
 		{ &hf_sapms_opcode_charset,
@@ -1276,7 +1281,7 @@ proto_register_sapms(void)
 		{ &hf_sapms_property_client,
 			{ "Property Client", "sapms.property.client", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS Property Client", HFILL }},
 		{ &hf_sapms_property_id,
-			{ "Property ID", "sapms.property.id", FT_UINT32, BASE_HEX, hf_sapms_property_id_vals, 0x0, "SAP MS Property ID", HFILL }},
+			{ "Property ID", "sapms.property.id", FT_UINT32, BASE_HEX, VALS(sapms_property_id_vals), 0x0, "SAP MS Property ID", HFILL }},
 		{ &hf_sapms_property_length,
 			{ "Property Length", "sapms.property.length", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP MS Property Length", HFILL }},
 		{ &hf_sapms_property_value,
@@ -1308,7 +1313,7 @@ proto_register_sapms(void)
 		{ &hf_sapms_dump_index,
 			{ "Dump Index", "sapms.dump.index", FT_UINT16, BASE_HEX, NULL, 0x0, "SAP MS Dump Index", HFILL }},
 		{ &hf_sapms_dump_command,
-			{ "Dump Command", "sapms.dump.command", FT_UINT16, BASE_HEX, hf_sapms_dump_command_vals, 0x0, "SAP MS Dump Command", HFILL }},
+			{ "Dump Command", "sapms.dump.command", FT_UINT16, BASE_HEX, VALS(sapms_dump_command_vals), 0x0, "SAP MS Dump Command", HFILL }},
 		{ &hf_sapms_dump_name,
 			{ "Dump Name", "sapms.dump.name", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS Dump Name", HFILL }},
 
@@ -1354,7 +1359,7 @@ proto_register_sapms(void)
 		{ &hf_sapms_server_lst_servno,
 			{ "Service Number", "sapms.serverlst.servno", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP MS Service Number", HFILL }},
 		{ &hf_sapms_server_lst_status,
-			{ "Status", "sapms.serverlst.status", FT_UINT8, BASE_HEX, hf_sapms_server_lst_status_vals, 0x0, "SAP MS Status", HFILL }},
+			{ "Status", "sapms.serverlst.status", FT_UINT8, BASE_HEX, VALS(sapms_server_lst_status_vals), 0x0, "SAP MS Status", HFILL }},
 		{ &hf_sapms_server_lst_nitrc,
 			{ "NI Trace", "sapms.serverlst.nitrc", FT_UINT8, BASE_HEX, NULL, 0x0, "SAP MS NI Trace", HFILL }},
 		{ &hf_sapms_server_lst_sys_service,
@@ -1396,13 +1401,13 @@ proto_register_sapms(void)
 
 		/* FILE RELOAD fields */
 		{ &hf_sapms_file_reload,
-			{ "File Reload Name", "sapms.filereload.name", FT_UINT8, BASE_HEX, hf_sapms_file_reload_vals, 0x0, "SAP MS File Reload Name", HFILL }},
+			{ "File Reload Name", "sapms.filereload.name", FT_UINT8, BASE_HEX, VALS(sapms_file_reload_vals), 0x0, "SAP MS File Reload Name", HFILL }},
 		{ &hf_sapms_file_filler,
 			{ "File Reload Filler", "sapms.filereload.filler", FT_NONE, BASE_NONE, NULL, 0x0, "SAP MS File Reload Filler", HFILL }},
 
 		/* MS_GET_LOGON, MS_SET_LOGON and MS_DEL_LOGON fields */
 		{ &hf_sapms_logon_type,
-			{ "Logon Type", "sapms.logon.type", FT_UINT16, BASE_HEX, hf_sapms_logon_type_vals, 0x0, "SAP MS Logon Type", HFILL }},
+			{ "Logon Type", "sapms.logon.type", FT_UINT16, BASE_HEX, VALS(sapms_logon_type_vals), 0x0, "SAP MS Logon Type", HFILL }},
 		{ &hf_sapms_logon_port,
 			{ "Logon Port", "sapms.logon.port", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP MS Logon Port", HFILL }},
 		{ &hf_sapms_logon_address,
