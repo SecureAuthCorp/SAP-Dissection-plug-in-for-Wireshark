@@ -831,7 +831,7 @@ static int hf_sapdiag_com_flag_TERM_NNM = -1;
 static int hf_sapdiag_com_flag_TERM_GRA = -1;
 
 static int hf_sapdiag_mode_stat = -1;
-static int hf_sapdiag_err_flag = -1;
+static int hf_sapdiag_err_no = -1;
 static int hf_sapdiag_msg_type = -1;
 static int hf_sapdiag_msg_info = -1;
 static int hf_sapdiag_msg_rc = -1;
@@ -2450,7 +2450,7 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 
 	if (tree) { /* we are being asked for details */
 
-		guint8 compress = 0, error_flag = 0;
+		guint8 compress = 0, error_no = 0;
 		guint32 offset = 0;
 		proto_item *sapdiag = NULL, *header = NULL, *com_flag = NULL, *compression_header = NULL, *payload = NULL, *rl = NULL;
 		proto_tree *sapdiag_tree = NULL, *header_tree = NULL, *com_flag_tree = NULL, *compression_header_tree = NULL, *payload_tree = NULL;
@@ -2494,8 +2494,8 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 
 		proto_tree_add_item(header_tree, hf_sapdiag_mode_stat, tvb, offset, 1, FALSE); offset++;
 
-		error_flag = tvb_get_guint8(tvb, offset);
-		proto_tree_add_item(header_tree, hf_sapdiag_err_flag, tvb, offset, 1, FALSE); offset++;
+		error_no = tvb_get_guint8(tvb, offset);
+		proto_tree_add_item(header_tree, hf_sapdiag_err_no, tvb, offset, 1, FALSE); offset++;
 		proto_tree_add_item(header_tree, hf_sapdiag_msg_type, tvb, offset, 1, FALSE); offset++;
 		proto_tree_add_item(header_tree, hf_sapdiag_msg_info, tvb, offset, 1, FALSE); offset++;
 		proto_tree_add_item(header_tree, hf_sapdiag_msg_rc, tvb, offset, 1, FALSE); offset++;
@@ -2504,7 +2504,7 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 		proto_tree_add_item(header_tree, hf_sapdiag_compress, tvb, offset, 1, FALSE); offset++;
 
 		/* Check for error messages */
-		if ((error_flag != 0x00) && (tvb_captured_length_remaining(tvb, offset) > 0)){
+		if ((error_no != 0x00) && (tvb_captured_length_remaining(tvb, offset) > 0)){
 			gchar  *error_message = NULL;
 			guint32 error_message_length = 0;
 
@@ -2643,8 +2643,8 @@ proto_register_sapdiag(void)
 
 		{ &hf_sapdiag_mode_stat,
 			{ "Mode Stat", "sapdiag.header.modestat", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP Diag Mode Stat", HFILL }},
-		{ &hf_sapdiag_err_flag,
-			{ "Error Flag", "sapdiag.header.errorflag", FT_BOOLEAN, BASE_NONE, NULL, 0x0, "SAP Diag Error Flag", HFILL }},
+		{ &hf_sapdiag_err_no,
+			{ "Error Number", "sapdiag.header.errorno", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP Diag Error Number", HFILL }},
 		{ &hf_sapdiag_msg_type,
 			{ "Message Type", "sapdiag.header.msgtype", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP Diag Message Type", HFILL }},
 		{ &hf_sapdiag_msg_info,
