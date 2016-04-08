@@ -665,7 +665,7 @@ proto_register_saprouter(void)
 		{ &hf_saprouter_route_string_hostname,
 			{ "Hostname", "saprouter.routestring.hostname", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Route Hop Hostname", HFILL }},
 		{ &hf_saprouter_route_string_service,
-			{ "Service", "saprouter.routestring.service", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Route Hop Service ", HFILL }},
+			{ "Service", "saprouter.routestring.service", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Route Hop Service", HFILL }},
 		{ &hf_saprouter_route_string_password,
 			{ "Password", "saprouter.routestring.password", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Route Hop Password", HFILL }},
 
