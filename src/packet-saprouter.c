@@ -53,14 +53,15 @@
 #define SAPROUTER_TYPE_ADMIN_STRING	"ROUTER_ADM"
 
 /* SAP Router Talk Modes */
-static const value_string hf_saprouter_talk_mode_vals[] = {
+static const value_string saprouter_talk_mode_vals[] = {
 	{ 0, "NI_MSG_IO" },
 	{ 1, "NI_RAW_IO" },
-	{ 2, "NI_ROUT_IO" }
+	{ 2, "NI_ROUT_IO" },
+	{ 0, NULL},
 };
 
 /* SAP Router Operation values */
-static const value_string hf_saprouter_opcode_vals[] = {
+static const value_string saprouter_opcode_vals[] = {
 	{ 0, "Error information" },
 	{ 1, "Version Request" },
 	{ 2, "Version Response" },
@@ -69,10 +70,11 @@ static const value_string hf_saprouter_opcode_vals[] = {
 	{ 8, "Send Handle (8)" },		/* TODO: Check this opcodes */
 	{ 70, "SNC request" },			/* TODO: Check this opcodes NiSncOpcode: NISNC_REQ */
 	{ 71, "SNC handshake complete" },	/* TODO: Check this opcodes NiSncOpcode: NISNC_ACK */
+	{ 0, NULL}
 };
 
 /* SAP Router Return Code values (as per SAP Note 63342 http://service.sap.com/sap/support/notes/63342) */
-static const value_string hf_saprouter_return_code_vals[] = {
+static const value_string saprouter_return_code_vals[] = {
 	{ -1, "NI-internal error (NIEINTERN)" },
 	{ -2, "Host name unknown (NIEHOST_UNKNOWN)" },
 	{ -3, "Service unknown (NIESERV_UNKNOWN)" },
@@ -108,11 +110,12 @@ static const value_string hf_saprouter_return_code_vals[] = {
 	{-102, "Client not available (NIEROUT_NOCLIENT)" },
 	{-103, "Error in external library (NIEROUT_EXTERN)" },
 	{-104, "Error in the SNC shift (NIEROUT_SNC_FAILURE)" },
+	{ 0, NULL}
 };
 
 
 /* SAP Router Admin Command values */
-static const value_string hf_saprouter_admin_command_vals[] = {
+static const value_string saprouter_admin_command_vals[] = {
 	{ 2, "Information Request" },
 	{ 3, "New Route Table Request" },
 	{ 4, "Toggle Trace Request" },
@@ -126,6 +129,7 @@ static const value_string hf_saprouter_admin_command_vals[] = {
 	{ 12, "Trace Connection" },
 	{ 13, "Trace Connection" },
 	{ 14, "Hide Error Information Request" },
+	{ 0, NULL}
 };
 
 
@@ -647,7 +651,7 @@ proto_register_saprouter(void)
 		{ &hf_saprouter_entries,
 			{ "Entries", "saprouter.entries", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP Router Total number of entries", HFILL }},
 		{ &hf_saprouter_talk_mode,
-			{ "Talk Mode", "saprouter.talkmode", FT_UINT8, BASE_DEC, hf_saprouter_talk_mode_vals, 0x0, "SAP Router Talk Mode", HFILL }},
+			{ "Talk Mode", "saprouter.talkmode", FT_UINT8, BASE_DEC, VALS(saprouter_talk_mode_vals), 0x0, "SAP Router Talk Mode", HFILL }},
 		{ &hf_saprouter_rest_nodes,
 			{ "Remaining Hops", "saprouter.restnodes", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP Router Remaining Hops", HFILL }},
 		{ &hf_saprouter_route_length,
@@ -667,9 +671,9 @@ proto_register_saprouter(void)
 
 		/* NI error information / Control messages */
 		{ &hf_saprouter_opcode,
-			{ "Operation Code", "saprouter.opcode", FT_UINT8, BASE_DEC, hf_saprouter_opcode_vals, 0x0, "SAP Router Operation Code", HFILL }},
+			{ "Operation Code", "saprouter.opcode", FT_UINT8, BASE_DEC, VALS(saprouter_opcode_vals), 0x0, "SAP Router Operation Code", HFILL }},
 		{ &hf_saprouter_return_code,
-			{ "Return Code", "saprouter.returncode", FT_INT32, BASE_DEC, hf_saprouter_return_code_vals, 0x0, "SAP Router Return Code", HFILL }},
+			{ "Return Code", "saprouter.returncode", FT_INT32, BASE_DEC, VALS(saprouter_return_code_vals), 0x0, "SAP Router Return Code", HFILL }},
 		{ &hf_saprouter_unknown,
 			{ "Unknown field", "saprouter.unknown", FT_INT32, BASE_DEC, NULL, 0x0, "SAP Router Unknown field", HFILL }},
 
@@ -721,7 +725,7 @@ proto_register_saprouter(void)
 
 		/* Router Admin messages */
 		{ &hf_saprouter_admin_command,
-			{ "Admin Command", "saprouter.command", FT_UINT8, BASE_DEC, hf_saprouter_admin_command_vals, 0x0, "SAP Router Admin Command", HFILL }},
+			{ "Admin Command", "saprouter.command", FT_UINT8, BASE_DEC, VALS(saprouter_admin_command_vals), 0x0, "SAP Router Admin Command", HFILL }},
 		{ &hf_saprouter_admin_password,
 			{ "Admin Command Info Password", "saprouter.password", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Admin Info Password", HFILL }},
 		{ &hf_saprouter_admin_client_count_short,
