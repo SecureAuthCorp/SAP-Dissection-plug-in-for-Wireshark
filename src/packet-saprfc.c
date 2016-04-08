@@ -37,7 +37,7 @@
 
 
 /* SAP RFC Request Types field values */
-static const value_string hf_saprfc_reqtype_values[] = {
+static const value_string saprfc_reqtype_values[] = {
 	{ 0x00, "GW_UNDEF_TYPE" },
 	{ 0x01, "GW_CHECK_GATEWAY" },
 	{ 0x02, "GW_CONNECT_GWWP" },
@@ -57,10 +57,11 @@ static const value_string hf_saprfc_reqtype_values[] = {
 	{ 0x10, "GW_CANCEL_REGISTER_TP" },
 	{ 0x11, "REMOTE_GATEWAY" },
 	{ 0x12, "GW_CONTAINER_RECEIVED" },
+	{ 0x00, NULL }
 };
 
 /* SAP RFC Monitor Command field values */
-static const value_string hf_saprfc_monitor_cmd_values[] = {
+static const value_string saprfc_monitor_cmd_values[] = {
 	{ 0x01, "NOOP" },
 	{ 0x02, "DELETE_CONN" },
 	{ 0x03, "CANCEL_CONN" },
@@ -114,7 +115,7 @@ static const value_string hf_saprfc_monitor_cmd_values[] = {
 };
 
 /* SAP RFC APPC Header Request Type field values */
-static const value_string hf_saprfc_header_reqtype_values[] = {
+static const value_string saprfc_header_reqtype_values[] = {
 	{ 0x00, "F_NO_REQUEST" },
 	{ 0x01, "F_INITIALIZE_CONVERSATION" },
 	{ 0x03, "F_ACCEPT_CONVERSATION" },
@@ -146,11 +147,12 @@ static const value_string hf_saprfc_header_reqtype_values[] = {
 	{ 0xd4, "F_SAP_SET_UID" },
 	{ 0xd5, "F_SAP_CANCEL" },
 	{ 0xd6, "F_SAP_CANCELED" },
+	{ 0x00, NULL }
 };
 
 
 /* SAP RFC APPC Header Protocol field values */
-static const value_string hf_saprfc_header_protocol_values[] = {
+static const value_string saprfc_header_protocol_values[] = {
 	{ 0x00, "R2PR" },
 	{ 0x01, "INT" },
 	{ 0x02, "EXT" },
@@ -162,10 +164,11 @@ static const value_string hf_saprfc_header_protocol_values[] = {
 	{ 0x45, "NE" },
 	{ 0x48, "INT" },
 	{ 0x61, "REG" },
+	{ 0x00, NULL }
 };
 
 /* SAP RFC APPC Header APPC Return Code field values */
-static const value_string hf_saprfc_header_appc_rc_values[] = {
+static const value_string saprfc_header_appc_rc_values[] = {
 	{ 0x00, "CM_OK" },
 	{ 0x01, "CM_ALLOCATE_FAILURE_NO_RETRY" },
 	{ 0x02, "CM_ALLOCATE_FAILURE_RETRY" },
@@ -191,13 +194,15 @@ static const value_string hf_saprfc_header_appc_rc_values[] = {
 	{ 0x24, "CM_SYSTEM_EVENT" },
 	{ 0x2711, "CM_SAP_TIMEOUT_RETRY" },
 	{ 0x2712, "CM_CANCEL_REQUEST" },
+	{ 0x00, NULL }
 };
 
 /* SAP RFC APPC Header MCPIC Parameters Client Info values */
-static const value_string hf_saprfc_header_ncpic_parameters_client_info_values[] = {
+static const value_string saprfc_header_ncpic_parameters_client_info_values[] = {
 	{ 0x00, "GW_NO_CLIENT_INFO" },
 	{ 0x01, "GW_EXTERNAL_CLIENT" },
 	{ 0x02, "GW_R3_CLIENT" },
+	{ 0x00, NULL }
 };
 
 
@@ -715,11 +720,11 @@ dissect_saprfc_monitor_cmd(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, 
 	guint8 opcode;
 
 	opcode = tvb_get_guint8(tvb, offset);
-	col_append_fstr(pinfo->cinfo, COL_INFO, ", Command=%s", val_to_str(opcode, hf_saprfc_monitor_cmd_values, "Unknown"));
+	col_append_fstr(pinfo->cinfo, COL_INFO, ", Command=%s", val_to_str(opcode, saprfc_monitor_cmd_values, "Unknown"));
 
 	if (tree){
 		proto_tree_add_item(tree, hf_saprfc_monitor_cmd, tvb, offset, 1, FALSE); offset+=1;
-		proto_item_append_text(tree, ", Command=%s", val_to_str(opcode, hf_saprfc_monitor_cmd_values, "Unknown"));
+		proto_item_append_text(tree, ", Command=%s", val_to_str(opcode, saprfc_monitor_cmd_values, "Unknown"));
 	}
 
 	switch (opcode){
@@ -738,14 +743,14 @@ dissect_saprfc_header(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint
 	version = tvb_get_guint8(tvb, offset);
 	reqtype = tvb_get_guint8(tvb, offset + 1);
 
-	col_append_fstr(pinfo->cinfo, COL_INFO, "APPC Version=%d, Request Type=%s", version, val_to_str(reqtype, hf_saprfc_header_reqtype_values, "Unknown"));
+	col_append_fstr(pinfo->cinfo, COL_INFO, "APPC Version=%d, Request Type=%s", version, val_to_str(reqtype, saprfc_header_reqtype_values, "Unknown"));
 
 	if (tree){
 		/* Add the APPC header subtree */
 		header = proto_tree_add_item(tree, hf_saprfc_header, tvb, offset, 28, FALSE);
 		header_tree = proto_item_add_subtree(header, ett_saprfc);
 
-		proto_item_append_text(header, ", Version=%d, Request Type=%s", version, val_to_str(reqtype, hf_saprfc_header_reqtype_values, "Unknown"));
+		proto_item_append_text(header, ", Version=%d, Request Type=%s", version, val_to_str(reqtype, saprfc_header_reqtype_values, "Unknown"));
 
 		proto_tree_add_item(header_tree, hf_saprfc_header_version, tvb, offset, 1, FALSE); offset+=1;
 		proto_tree_add_item(header_tree, hf_saprfc_header_reqtype, tvb, offset, 1, FALSE); offset+=1;
@@ -903,7 +908,7 @@ dissect_saprfc(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 		return;
 	}
 
-	col_append_fstr(pinfo->cinfo, COL_INFO, "Version=%d, Request Type=%s", version, val_to_str(req_type, hf_saprfc_reqtype_values, "Unknown"));
+	col_append_fstr(pinfo->cinfo, COL_INFO, "Version=%d, Request Type=%s", version, val_to_str(req_type, saprfc_reqtype_values, "Unknown"));
 
 	if (tree) { /* we are being asked for details */
 
@@ -914,7 +919,7 @@ dissect_saprfc(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 		/* Dissect common fields */
 		proto_tree_add_item(saprfc_tree, hf_saprfc_version, tvb, offset, 1, FALSE); offset+=1;
 		proto_tree_add_item(saprfc_tree, hf_saprfc_reqtype, tvb, offset, 1, FALSE); offset+=1;
-		proto_item_append_text(saprfc_tree, ", Version=%d, Request Type=%s", version, val_to_str(req_type, hf_saprfc_reqtype_values, "Unknown"));
+		proto_item_append_text(saprfc_tree, ", Version=%d, Request Type=%s", version, val_to_str(req_type, saprfc_reqtype_values, "Unknown"));
 
 	}
 
@@ -971,7 +976,7 @@ proto_register_saprfc(void)
 		{ &hf_saprfc_version,
 			{ "Version", "saprfc.version", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP RFC Version", HFILL }},
 		{ &hf_saprfc_reqtype,
-			{ "Request Type", "saprfc.reqtype", FT_UINT8, BASE_HEX, hf_saprfc_reqtype_values, 0x0, "SAP RFC Request Type", HFILL }},
+			{ "Request Type", "saprfc.reqtype", FT_UINT8, BASE_HEX, VALS(saprfc_reqtype_values), 0x0, "SAP RFC Request Type", HFILL }},
 		{ &hf_saprfc_address,
 			{ "IPv4 Address", "saprfc.addres", FT_IPv4, BASE_NONE, NULL, 0x0, "SAP RFC IPv4 Address", HFILL }},
 		{ &hf_saprfc_service,
@@ -1017,7 +1022,7 @@ proto_register_saprfc(void)
 
 		/* Monitor Commands*/
 		{ &hf_saprfc_monitor_cmd,
-			{ "Command", "saprfc.monitor_cmd", FT_UINT8, BASE_DEC, hf_saprfc_monitor_cmd_values, 0x0, "SAP RFC Monitor Command", HFILL }},
+			{ "Command", "saprfc.monitor_cmd", FT_UINT8, BASE_DEC, VALS(saprfc_monitor_cmd_values), 0x0, "SAP RFC Monitor Command", HFILL }},
 
 		/* APPC Header */
 		{ &hf_saprfc_header,
@@ -1025,9 +1030,9 @@ proto_register_saprfc(void)
 		{ &hf_saprfc_header_version,
 			{ "Version", "saprfc.appcheader.version", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP RFC APPC Header Version", HFILL }},
 		{ &hf_saprfc_header_reqtype,
-			{ "Request Type", "saprfc.appcheader.reqtype", FT_UINT8, BASE_HEX, hf_saprfc_header_reqtype_values, 0x0, "SAP RFC APPC Header Request Type", HFILL }},
+			{ "Request Type", "saprfc.appcheader.reqtype", FT_UINT8, BASE_HEX, VALS(saprfc_header_reqtype_values), 0x0, "SAP RFC APPC Header Request Type", HFILL }},
 		{ &hf_saprfc_header_protocol,
-			{ "Protocol", "saprfc.appcheader.protocol", FT_UINT8, BASE_HEX, hf_saprfc_header_protocol_values, 0x0, "SAP RFC APPC Header Protocol", HFILL }},
+			{ "Protocol", "saprfc.appcheader.protocol", FT_UINT8, BASE_HEX, VALS(saprfc_header_protocol_values), 0x0, "SAP RFC APPC Header Protocol", HFILL }},
 		{ &hf_saprfc_header_mode,
 			{ "Mode", "saprfc.appcheader.mode", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP RFC APPC Header Mode", HFILL }},
 		{ &hf_saprfc_header_uid,
@@ -1117,7 +1122,7 @@ proto_register_saprfc(void)
 		{ &hf_saprfc_header_reqtype2_F_V_FLUSH,
 			{ "Request Type 2 Flag F_V_FLUSH", "saprfc.appcheader.reqtype2.F_V_FLUSH", FT_BOOLEAN, 8, NULL, SAPRFC_APPCHDR_REQTYPE2_F_V_FLUSH, "SAP RFC Request Type 2 Flag F_V_FLUSH", HFILL }},
 		{ &hf_saprfc_header_appc_rc,
-			{ "APPC Return Code", "saprfc.appcheader.appc_rc", FT_INT32, BASE_DEC, hf_saprfc_header_appc_rc_values, 0x0, "SAP RFC APPC Header APPC Return Code", HFILL }},
+			{ "APPC Return Code", "saprfc.appcheader.appc_rc", FT_INT32, BASE_DEC, VALS(saprfc_header_appc_rc_values), 0x0, "SAP RFC APPC Header APPC Return Code", HFILL }},
 		{ &hf_saprfc_header_sap_rc,
 			{ "SAP Return Code", "saprfc.appcheader.sap_rc", FT_INT32, BASE_DEC, NULL, 0x0, "SAP RFC APPC Header SAP Return Code", HFILL }},
 		{ &hf_saprfc_header_conversation_id,
@@ -1133,7 +1138,7 @@ proto_register_saprfc(void)
 		{ &hf_saprfc_header_ncpic_parameters_ctype,
 			{ "CType", "saprfc.appcheader.ncpic_parameters.ctype", FT_STRING, BASE_NONE, NULL, 0x0, "SAP RFC APPC Header NCPIC Parameters CType", HFILL }},
 		{ &hf_saprfc_header_ncpic_parameters_client_info,
-			{ "Client Info", "saprfc.appcheader.ncpic_parameters.client_info", FT_UINT8, BASE_HEX, hf_saprfc_header_ncpic_parameters_client_info_values, 0x0, "SAP RFC APPC Header NCPIC Parameters Client Info", HFILL }},
+			{ "Client Info", "saprfc.appcheader.ncpic_parameters.client_info", FT_UINT8, BASE_HEX, VALS(saprfc_header_ncpic_parameters_client_info_values), 0x0, "SAP RFC APPC Header NCPIC Parameters Client Info", HFILL }},
 		{ &hf_saprfc_header_ncpic_parameters_lu_name,
 			{ "LU Name", "saprfc.appcheader.ncpic_parameters.lu_name", FT_STRING, BASE_NONE, NULL, 0x0, "SAP RFC APPC Header NCPIC Parameters LU Name", HFILL }},
 		{ &hf_saprfc_header_ncpic_parameters_lu_name_length,
@@ -1204,7 +1209,7 @@ proto_register_saprfc(void)
 		{ &hf_saprfc_table_special,
 			{ "Special", "saprfc.table.compression.special", FT_UINT8, BASE_HEX, NULL, 0x0, "SAP RFC Table Special", HFILL }},
 		{ &hf_saprfc_table_return_code,
-			{ "Decompress Return Code", "saprfc.table.compression.returncode", FT_UINT8, BASE_DEC, decompress_return_code_vals, 0x0, "SAP RFC Decompression routine return code", HFILL }},
+			{ "Decompress Return Code", "saprfc.table.compression.returncode", FT_UINT8, BASE_DEC, VALS(decompress_return_code_vals), 0x0, "SAP RFC Decompression routine return code", HFILL }},
 		{ &hf_saprfc_table_content,
 			{ "Content", "saprfc.table.content", FT_NONE, BASE_NONE, NULL, 0x0, "SAP RFC Table Content", HFILL }},
 
