@@ -183,20 +183,20 @@ dissect_sapenqueue_server_admin(tvbuff_t *tvb, packet_info *pinfo, proto_tree *t
 	proto_item *server_admin = NULL;
 	proto_tree *server_admin_tree = NULL;
 
-	server_admin = proto_tree_add_item(tree, hf_sapenqueue_server_admin, tvb, offset, -1, FALSE);
+	server_admin = proto_tree_add_item(tree, hf_sapenqueue_server_admin, tvb, offset, -1, ENC_NA);
 	server_admin_tree = proto_item_add_subtree(server_admin, ett_sapenqueue);
 
-	proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_eyecatcher, tvb, offset, 4, FALSE); offset += 4;
-	proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_version, tvb, offset, 1, FALSE); offset += 1;
+	proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_eyecatcher, tvb, offset, 4, ENC_ASCII|ENC_NA); offset += 4;
+	proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset += 1;
 	offset += 3;  /* Unknown bytes */
-	proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_eyecatcher, tvb, offset, 4, FALSE); offset += 4;
-	proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_flag, tvb, offset, 1, FALSE); offset += 1;
-	proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_length, tvb, offset, 4, FALSE); offset += 4;
+	proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_eyecatcher, tvb, offset, 4, ENC_ASCII|ENC_NA); offset += 4;
+	proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_flag, tvb, offset, 1, ENC_BIG_ENDIAN); offset += 1;
+	proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_length, tvb, offset, 4, ENC_BIG_ENDIAN); offset += 4;
 	opcode = tvb_get_guint8(tvb, offset);
-	proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_opcode, tvb, offset, 1, FALSE); offset += 1;
-	proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_flags, tvb, offset, 1, FALSE); offset += 1;
-	proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_rc, tvb, offset, 4, FALSE); offset += 4;
-	proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_eyecatcher, tvb, offset, 4, FALSE); offset += 4;
+	proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_opcode, tvb, offset, 1, ENC_BIG_ENDIAN); offset += 1;
+	proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_flags, tvb, offset, 1, ENC_BIG_ENDIAN); offset += 1;
+	proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_rc, tvb, offset, 4, ENC_BIG_ENDIAN); offset += 4;
+	proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_eyecatcher, tvb, offset, 4, ENC_ASCII|ENC_NA); offset += 4;
 
 	if (tvb_captured_length_remaining(tvb, offset) > 0){
 		switch(opcode){
@@ -206,43 +206,43 @@ dissect_sapenqueue_server_admin(tvbuff_t *tvb, packet_info *pinfo, proto_tree *t
 				proto_item *trace_request = NULL, *trace_request_patterns = NULL, *trace_request_pattern = NULL;
 				proto_tree *trace_request_tree = NULL, *trace_request_patterns_tree = NULL, *trace_request_pattern_tree = NULL;
 
-				trace_request = proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_trace_request, tvb, offset, -1, FALSE);
+				trace_request = proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_trace_request, tvb, offset, -1, ENC_NA);
 				trace_request_tree = proto_item_add_subtree(trace_request, ett_sapenqueue);
 
-				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_protocol_version, tvb, offset, 1, FALSE); offset += 1;
-				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_action, tvb, offset, 1, FALSE); offset += 1;
-				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_limit, tvb, offset, 1, FALSE); offset += 1;
-				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_thread, tvb, offset, 1, FALSE); offset += 1;
+				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_protocol_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset += 1;
+				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_action, tvb, offset, 1, ENC_BIG_ENDIAN); offset += 1;
+				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_limit, tvb, offset, 1, ENC_BIG_ENDIAN); offset += 1;
+				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_thread, tvb, offset, 1, ENC_BIG_ENDIAN); offset += 1;
 				offset += 4;  /* TODO: Unknown field here */
-				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_level, tvb, offset, 4, FALSE); offset += 4;
-				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_level, tvb, offset, 4, FALSE); offset += 4;
-				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_logging, tvb, offset, 1, FALSE); offset += 1;
-				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_max_file_size, tvb, offset, 4, FALSE); offset += 4;
+				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_level, tvb, offset, 4, ENC_BIG_ENDIAN); offset += 4;
+				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_level, tvb, offset, 4, ENC_BIG_ENDIAN); offset += 4;
+				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_logging, tvb, offset, 1, ENC_BIG_ENDIAN); offset += 1;
+				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_max_file_size, tvb, offset, 4, ENC_BIG_ENDIAN); offset += 4;
 
 				nopatterns = tvb_get_ntohl(tvb, offset);
-				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_nopatterns, tvb, offset, 4, FALSE); offset += 4;
-				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_nopatterns, tvb, offset, 4, FALSE); offset += 4;
+				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_nopatterns, tvb, offset, 4, ENC_BIG_ENDIAN); offset += 4;
+				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_nopatterns, tvb, offset, 4, ENC_BIG_ENDIAN); offset += 4;
 				offset += 4;  /* TODO: Unknown field here */
-				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_eyecatcher, tvb, offset, 4, FALSE); offset += 4;
+				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_eyecatcher, tvb, offset, 4, ENC_ASCII|ENC_NA); offset += 4;
 
 				/* As we don't have the right size yet, start with 1 byte */
-				trace_request_patterns = proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_patterns, tvb, offset, 1, FALSE);
+				trace_request_patterns = proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_patterns, tvb, offset, 1, ENC_NA);
 				trace_request_patterns_tree = proto_item_add_subtree(trace_request_patterns, ett_sapenqueue);
 
 				while (nopatterns > 0 && tvb_offset_exists(tvb, offset)){
 					/* As we don't have the right size yet, start with 1 byte */
-					trace_request_pattern = proto_tree_add_item(trace_request_patterns_tree, hf_sapenqueue_server_admin_trace_pattern, tvb, offset, 1, FALSE);
+					trace_request_pattern = proto_tree_add_item(trace_request_patterns_tree, hf_sapenqueue_server_admin_trace_pattern, tvb, offset, 1, ENC_NA);
 					trace_request_pattern_tree = proto_item_add_subtree(trace_request_pattern, ett_sapenqueue);
 
 					pattern_length = tvb_get_guint8(tvb, offset) + 1; /* Pattern string is null terminated */
-					proto_tree_add_item(trace_request_pattern_tree, hf_sapenqueue_server_admin_trace_pattern_len, tvb, offset, 1, FALSE); offset += 1;
+					proto_tree_add_item(trace_request_pattern_tree, hf_sapenqueue_server_admin_trace_pattern_len, tvb, offset, 1, ENC_BIG_ENDIAN); offset += 1;
 
 					/* Set the max length to the remaining of the packet, just in case a malformed packet arrives */
 					if (!tvb_offset_exists(tvb, offset + pattern_length)) {
 						pattern_length = (guint8)tvb_captured_length_remaining(tvb, offset);
 						expert_add_info(pinfo, trace_request_pattern, &ei_sapenqueue_pattern_invalid_length);
 					}
-					proto_tree_add_item(trace_request_pattern_tree, hf_sapenqueue_server_admin_trace_pattern_value, tvb, offset, pattern_length, FALSE); offset += pattern_length;
+					proto_tree_add_item(trace_request_pattern_tree, hf_sapenqueue_server_admin_trace_pattern_value, tvb, offset, pattern_length, ENC_ASCII|ENC_NA); offset += pattern_length;
 
 					/* Set the right size for the pattern tree */
 					pattern_length += 1; /* Add also the length field */
@@ -253,12 +253,12 @@ dissect_sapenqueue_server_admin(tvbuff_t *tvb, packet_info *pinfo, proto_tree *t
 				}
 				proto_item_set_len(trace_request_patterns, total_length);
 
-				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_eyecatcher, tvb, offset, 4, FALSE); offset += 4;
+				proto_tree_add_item(trace_request_tree, hf_sapenqueue_server_admin_trace_eyecatcher, tvb, offset, 4, ENC_ASCII|ENC_NA); offset += 4;
 
 				break;
 			}
 			default:{
-				proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_value, tvb, offset, -1, FALSE);
+				proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_value, tvb, offset, -1, ENC_NA);
 				break;
 			}
 		}
@@ -272,7 +272,7 @@ dissect_sapenqueue_conn_admin(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tre
 	proto_item *conn_admin = NULL;
 	proto_tree *conn_admin_tree = NULL;
 
-	conn_admin = proto_tree_add_item(tree, hf_sapenqueue_conn_admin, tvb, offset, -1, FALSE);
+	conn_admin = proto_tree_add_item(tree, hf_sapenqueue_conn_admin, tvb, offset, -1, ENC_NA);
 	conn_admin_tree = proto_item_add_subtree(conn_admin, ett_sapenqueue);
 
 	switch (opcode){
@@ -285,37 +285,37 @@ dissect_sapenqueue_conn_admin(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tre
 			proto_tree *params_tree = NULL, *param_tree = NULL;
 
 			count = tvb_get_ntohl(tvb, offset);
-			proto_tree_add_item(conn_admin_tree, hf_sapenqueue_conn_admin_params_count, tvb, offset, 4, FALSE); offset += 4;
+			proto_tree_add_item(conn_admin_tree, hf_sapenqueue_conn_admin_params_count, tvb, offset, 4, ENC_BIG_ENDIAN); offset += 4;
 
-			params = proto_tree_add_item(conn_admin_tree, hf_sapenqueue_conn_admin_params, tvb, offset, 1, FALSE);
+			params = proto_tree_add_item(conn_admin_tree, hf_sapenqueue_conn_admin_params, tvb, offset, 1, ENC_NA);
 			params_tree = proto_item_add_subtree(params, ett_sapenqueue);
 
 			while (count > 0 && tvb_offset_exists(tvb, offset)){
 				/* As we don't have the right size yet, start with 1 byte */
-				param = proto_tree_add_item(params_tree, hf_sapenqueue_conn_admin_param, tvb, offset, 1, FALSE);
+				param = proto_tree_add_item(params_tree, hf_sapenqueue_conn_admin_param, tvb, offset, 1, ENC_NA);
 				param_tree = proto_item_add_subtree(param, ett_sapenqueue);
 
 				id = tvb_get_ntohl(tvb, offset);
-				proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_id, tvb, offset, 4, FALSE); offset += 4;
+				proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_id, tvb, offset, 4, ENC_BIG_ENDIAN); offset += 4;
 				length = 4;
 
 				if (id == 0x03){	/* Set Name parameter */
 					name_length = tvb_strsize(tvb, offset);
 					if (name_length > 0) {
-						proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_name, tvb, offset, name_length, FALSE); offset += name_length;
+						proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_name, tvb, offset, name_length, ENC_ASCII|ENC_NA); offset += name_length;
 						length += name_length;
 					}
 
 				} else if (id == 0x04) {  /* No support parameter */
 					/* This parameter appears to have more fields only for responses */
 					if (opcode == 0x02) {
-						proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_value, tvb, offset, 4, FALSE); offset += 4;
+						proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_value, tvb, offset, 4, ENC_BIG_ENDIAN); offset += 4;
 						length += 4;
 					}
 
 				} else if (id == 0x06){  /* Set Unicode Support Parameter */
 					name_length = tvb_get_ntohl(tvb, offset);
-					proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_len, tvb, offset, 4, FALSE); offset += 4;
+					proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_len, tvb, offset, 4, ENC_BIG_ENDIAN); offset += 4;
 
 					/* If the reported length is not correct, use the remaining of the packet as length */
 					name_length_remaining = tvb_captured_length_remaining(tvb, offset);
@@ -328,11 +328,11 @@ dissect_sapenqueue_conn_admin(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tre
 						expert_add_info(pinfo, param, &ei_sapenqueue_support_invalid_length);
 					}
 
-					proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_value, tvb, offset, name_length, FALSE); offset += name_length;
+					proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_value, tvb, offset, name_length, ENC_BIG_ENDIAN); offset += name_length;
 					length += 4 + name_length;
 				} else {
 					/* The rest of the parameters have an integer value field */
-					proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_value, tvb, offset, 4, FALSE); offset += 4;
+					proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_value, tvb, offset, 4, ENC_BIG_ENDIAN); offset += 4;
 					length += 4;
 				}
 
@@ -387,20 +387,20 @@ dissect_sapenqueue(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 	if (tree){ /* we are being asked for details */
 
 		/* Add the main sapenqueue subtree */
-		ti = proto_tree_add_item(tree, proto_sapenqueue, tvb, 0, -1, FALSE);
+		ti = proto_tree_add_item(tree, proto_sapenqueue, tvb, 0, -1, ENC_NA);
 		sapenqueue_tree = proto_item_add_subtree(ti, ett_sapenqueue);
 
-		proto_tree_add_item(sapenqueue_tree, hf_sapenqueue_magic, tvb, offset, 4, FALSE); offset += 4;
-		proto_tree_add_item(sapenqueue_tree, hf_sapenqueue_id, tvb, offset, 4, FALSE); offset += 4;
-		proto_tree_add_item(sapenqueue_tree, hf_sapenqueue_length, tvb, offset, 4, FALSE); offset += 4;
-		proto_tree_add_item(sapenqueue_tree, hf_sapenqueue_length_frag, tvb, offset, 4, FALSE); offset += 4;
-		proto_tree_add_item(sapenqueue_tree, hf_sapenqueue_dest, tvb, offset, 1, FALSE); offset += 1;
+		proto_tree_add_item(sapenqueue_tree, hf_sapenqueue_magic, tvb, offset, 4, ENC_NA); offset += 4;
+		proto_tree_add_item(sapenqueue_tree, hf_sapenqueue_id, tvb, offset, 4, ENC_BIG_ENDIAN); offset += 4;
+		proto_tree_add_item(sapenqueue_tree, hf_sapenqueue_length, tvb, offset, 4, ENC_BIG_ENDIAN); offset += 4;
+		proto_tree_add_item(sapenqueue_tree, hf_sapenqueue_length_frag, tvb, offset, 4, ENC_BIG_ENDIAN); offset += 4;
+		proto_tree_add_item(sapenqueue_tree, hf_sapenqueue_dest, tvb, offset, 1, ENC_BIG_ENDIAN); offset += 1;
 		if (dest == 0x06){  /* This field is only relevant if the destination is Connection Admin */
-			proto_tree_add_item(sapenqueue_tree, hf_sapenqueue_conn_admin_opcode, tvb, offset, 1, FALSE);
+			proto_tree_add_item(sapenqueue_tree, hf_sapenqueue_conn_admin_opcode, tvb, offset, 1, ENC_BIG_ENDIAN);
 		}
 		offset += 1;
-		proto_tree_add_item(sapenqueue_tree, hf_sapenqueue_more_frags, tvb, offset, 1, FALSE); offset += 1;
-		proto_tree_add_item(sapenqueue_tree, hf_sapenqueue_type, tvb, offset, 1, FALSE); offset += 1;
+		proto_tree_add_item(sapenqueue_tree, hf_sapenqueue_more_frags, tvb, offset, 1, ENC_BIG_ENDIAN); offset += 1;
+		proto_tree_add_item(sapenqueue_tree, hf_sapenqueue_type, tvb, offset, 1, ENC_BIG_ENDIAN); offset += 1;
 
 		switch (dest){
 			case 0x03:{		/* Server Admin */

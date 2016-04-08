@@ -59,20 +59,20 @@ dissect_sapsnc(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 		proto_tree *sapsnc_tree = NULL, *sapsnc_frame_tree = NULL;
 
 		/* Add the main SNC subtree */
-		sapsnc = proto_tree_add_item(tree, proto_sapsnc, tvb, offset, -1, FALSE);
+		sapsnc = proto_tree_add_item(tree, proto_sapsnc, tvb, offset, -1, ENC_NA);
 		sapsnc_tree = proto_item_add_subtree(sapsnc, ett_sapsnc);
 
 		/* Add the SNC Frame subtree */
-		sapsnc_frame = proto_tree_add_item(sapsnc_tree, hf_sapsnc_frame, tvb, offset, -1, FALSE);
+		sapsnc_frame = proto_tree_add_item(sapsnc_tree, hf_sapsnc_frame, tvb, offset, -1, ENC_NA);
 		sapsnc_frame_tree = proto_item_add_subtree(sapsnc_frame, ett_sapsnc);
 
-		proto_tree_add_item(sapsnc_frame_tree, hf_sapsnc_eye_catcher, tvb, offset, 8, FALSE); offset+=8;
+		proto_tree_add_item(sapsnc_frame_tree, hf_sapsnc_eye_catcher, tvb, offset, 8, ENC_ASCII|ENC_NA); offset+=8;
 		offset+=4; /* First 4 bytes (Flags ?) */
-		proto_tree_add_item(sapsnc_frame_tree, hf_sapsnc_token_length, tvb, offset, 4, FALSE); offset+=4;
-		proto_tree_add_item(sapsnc_frame_tree, hf_sapsnc_data_length, tvb, offset, 4, FALSE); offset+=4;
+		proto_tree_add_item(sapsnc_frame_tree, hf_sapsnc_token_length, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
+		proto_tree_add_item(sapsnc_frame_tree, hf_sapsnc_data_length, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 		offset+=2; /* 2 Bytes */
-		proto_tree_add_item(sapsnc_frame_tree, hf_sapsnc_flags, tvb, offset, 2, FALSE); offset+=2;
-		proto_tree_add_item(sapsnc_frame_tree, hf_sapsnc_extflags, tvb, offset, 4, FALSE); offset+=4;
+		proto_tree_add_item(sapsnc_frame_tree, hf_sapsnc_flags, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2;
+		proto_tree_add_item(sapsnc_frame_tree, hf_sapsnc_extflags, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 
 	}
 }
