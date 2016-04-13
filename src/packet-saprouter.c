@@ -53,14 +53,15 @@
 #define SAPROUTER_TYPE_ADMIN_STRING	"ROUTER_ADM"
 
 /* SAP Router Talk Modes */
-static const value_string hf_saprouter_talk_mode_vals[] = {
+static const value_string saprouter_talk_mode_vals[] = {
 	{ 0, "NI_MSG_IO" },
 	{ 1, "NI_RAW_IO" },
-	{ 2, "NI_ROUT_IO" }
+	{ 2, "NI_ROUT_IO" },
+	{ 0, NULL},
 };
 
 /* SAP Router Operation values */
-static const value_string hf_saprouter_opcode_vals[] = {
+static const value_string saprouter_opcode_vals[] = {
 	{ 0, "Error information" },
 	{ 1, "Version Request" },
 	{ 2, "Version Response" },
@@ -69,10 +70,11 @@ static const value_string hf_saprouter_opcode_vals[] = {
 	{ 8, "Send Handle (8)" },		/* TODO: Check this opcodes */
 	{ 70, "SNC request" },			/* TODO: Check this opcodes NiSncOpcode: NISNC_REQ */
 	{ 71, "SNC handshake complete" },	/* TODO: Check this opcodes NiSncOpcode: NISNC_ACK */
+	{ 0, NULL}
 };
 
 /* SAP Router Return Code values (as per SAP Note 63342 http://service.sap.com/sap/support/notes/63342) */
-static const value_string hf_saprouter_return_code_vals[] = {
+static const value_string saprouter_return_code_vals[] = {
 	{ -1, "NI-internal error (NIEINTERN)" },
 	{ -2, "Host name unknown (NIEHOST_UNKNOWN)" },
 	{ -3, "Service unknown (NIESERV_UNKNOWN)" },
@@ -108,11 +110,12 @@ static const value_string hf_saprouter_return_code_vals[] = {
 	{-102, "Client not available (NIEROUT_NOCLIENT)" },
 	{-103, "Error in external library (NIEROUT_EXTERN)" },
 	{-104, "Error in the SNC shift (NIEROUT_SNC_FAILURE)" },
+	{ 0, NULL}
 };
 
 
 /* SAP Router Admin Command values */
-static const value_string hf_saprouter_admin_command_vals[] = {
+static const value_string saprouter_admin_command_vals[] = {
 	{ 2, "Information Request" },
 	{ 3, "New Route Table Request" },
 	{ 4, "Toggle Trace Request" },
@@ -126,6 +129,7 @@ static const value_string hf_saprouter_admin_command_vals[] = {
 	{ 12, "Trace Connection" },
 	{ 13, "Trace Connection" },
 	{ 14, "Hide Error Information Request" },
+	{ 0, NULL}
 };
 
 
@@ -254,7 +258,7 @@ dissect_routestring(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32
 
 		/* Create the subtree for this route hop */
 		if (tree){
-			route_hop = proto_tree_add_item(tree, hf_saprouter_route_string, tvb, offset, 0, FALSE);
+			route_hop = proto_tree_add_item(tree, hf_saprouter_route_string, tvb, offset, 0, ENC_NA);
 			route_hop_tree = proto_item_add_subtree(route_hop, ett_saprouter);
 			proto_item_append_text(route_hop, ", nro %d", hop);
 		}
@@ -263,7 +267,7 @@ dissect_routestring(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32
 		len = tvb_strsize(tvb, offset);
 		hostname = tvb_get_string_enc(wmem_file_scope(), tvb, offset, len - 1, ENC_ASCII);
 		if (tree){
-			proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_hostname, tvb, offset, len, FALSE);
+			proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_hostname, tvb, offset, len, ENC_ASCII|ENC_NA);
 		}
 		offset += len;
 
@@ -271,7 +275,7 @@ dissect_routestring(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32
 		len = tvb_strsize(tvb, offset);
 		port = tvb_get_string_enc(wmem_packet_scope(), tvb, offset, len - 1, ENC_ASCII);
 		if (tree){
-			proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_service, tvb, offset, len, FALSE);
+			proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_service, tvb, offset, len, ENC_ASCII|ENC_NA);
 		}
 		offset += len;
 
@@ -279,7 +283,7 @@ dissect_routestring(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32
 		len = tvb_strsize(tvb, offset);
 		password = tvb_get_string_enc(wmem_file_scope(), tvb, offset, len - 1, ENC_ASCII);
 		if (tree){
-			route_password = proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_password, tvb, offset, len, FALSE);
+			route_password = proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_password, tvb, offset, len, ENC_ASCII|ENC_NA);
 
 			/* If a password was found, add a expert warning in the security category */
 			if (len > 1){
@@ -324,49 +328,49 @@ dissect_errorstring(tvbuff_t *tvb, proto_tree *tree, guint32 offset)
 	guint32 len;
 
 	len = tvb_strsize(tvb, offset);
-	proto_tree_add_item(tree, hf_saprouter_error_eyecatcher, tvb, offset, len, FALSE); offset += len;
+	proto_tree_add_item(tree, hf_saprouter_error_eyecatcher, tvb, offset, len, ENC_ASCII|ENC_NA); offset += len;
 	len = tvb_strsize(tvb, offset);
-	proto_tree_add_item(tree, hf_saprouter_error_counter, tvb, offset, len, FALSE); offset += len;
+	proto_tree_add_item(tree, hf_saprouter_error_counter, tvb, offset, len, ENC_ASCII|ENC_NA); offset += len;
 	len = tvb_strsize(tvb, offset);
-	proto_tree_add_item(tree, hf_saprouter_error_error, tvb, offset, len, FALSE); offset += len;
+	proto_tree_add_item(tree, hf_saprouter_error_error, tvb, offset, len, ENC_ASCII|ENC_NA); offset += len;
 	len = tvb_strsize(tvb, offset);
-	proto_tree_add_item(tree, hf_saprouter_error_return_code, tvb, offset, len, FALSE); offset += len;
+	proto_tree_add_item(tree, hf_saprouter_error_return_code, tvb, offset, len, ENC_ASCII|ENC_NA); offset += len;
 	len = tvb_strsize(tvb, offset);
-	proto_tree_add_item(tree, hf_saprouter_error_component, tvb, offset, len, FALSE); offset += len;
+	proto_tree_add_item(tree, hf_saprouter_error_component, tvb, offset, len, ENC_ASCII|ENC_NA); offset += len;
 	len = tvb_strsize(tvb, offset);
-	proto_tree_add_item(tree, hf_saprouter_error_release, tvb, offset, len, FALSE); offset += len;
+	proto_tree_add_item(tree, hf_saprouter_error_release, tvb, offset, len, ENC_ASCII|ENC_NA); offset += len;
 	len = tvb_strsize(tvb, offset);
-	proto_tree_add_item(tree, hf_saprouter_error_version, tvb, offset, len, FALSE); offset += len;
+	proto_tree_add_item(tree, hf_saprouter_error_version, tvb, offset, len, ENC_ASCII|ENC_NA); offset += len;
 	len = tvb_strsize(tvb, offset);
-	proto_tree_add_item(tree, hf_saprouter_error_module, tvb, offset, len, FALSE); offset += len;
+	proto_tree_add_item(tree, hf_saprouter_error_module, tvb, offset, len, ENC_ASCII|ENC_NA); offset += len;
 	len = tvb_strsize(tvb, offset);
-	proto_tree_add_item(tree, hf_saprouter_error_line, tvb, offset, len, FALSE); offset += len;
+	proto_tree_add_item(tree, hf_saprouter_error_line, tvb, offset, len, ENC_ASCII|ENC_NA); offset += len;
 	len = tvb_strsize(tvb, offset);
-	proto_tree_add_item(tree, hf_saprouter_error_detail, tvb, offset, len, FALSE); offset += len;
+	proto_tree_add_item(tree, hf_saprouter_error_detail, tvb, offset, len, ENC_ASCII|ENC_NA); offset += len;
 	len = tvb_strsize(tvb, offset);
-	proto_tree_add_item(tree, hf_saprouter_error_time, tvb, offset, len, FALSE); offset += len;
+	proto_tree_add_item(tree, hf_saprouter_error_time, tvb, offset, len, ENC_ASCII|ENC_NA); offset += len;
 	len = tvb_strsize(tvb, offset);
-	proto_tree_add_item(tree, hf_saprouter_error_system_call, tvb, offset, len, FALSE); offset += len;
+	proto_tree_add_item(tree, hf_saprouter_error_system_call, tvb, offset, len, ENC_ASCII|ENC_NA); offset += len;
 	len = tvb_strsize(tvb, offset);
-	proto_tree_add_item(tree, hf_saprouter_error_errorno, tvb, offset, len, FALSE); offset += len;
+	proto_tree_add_item(tree, hf_saprouter_error_errorno, tvb, offset, len, ENC_ASCII|ENC_NA); offset += len;
 	len = tvb_strsize(tvb, offset);
-	proto_tree_add_item(tree, hf_saprouter_error_errorno_text, tvb, offset, len, FALSE); offset += len;
+	proto_tree_add_item(tree, hf_saprouter_error_errorno_text, tvb, offset, len, ENC_ASCII|ENC_NA); offset += len;
 	len = tvb_strsize(tvb, offset);
-	proto_tree_add_item(tree, hf_saprouter_error_error_count, tvb, offset, len, FALSE); offset += len;
+	proto_tree_add_item(tree, hf_saprouter_error_error_count, tvb, offset, len, ENC_ASCII|ENC_NA); offset += len;
 	len = tvb_strsize(tvb, offset);
-	proto_tree_add_item(tree, hf_saprouter_error_location, tvb, offset, len, FALSE); offset += len;
+	proto_tree_add_item(tree, hf_saprouter_error_location, tvb, offset, len, ENC_ASCII|ENC_NA); offset += len;
 
 	len = tvb_strsize(tvb, offset);
-	proto_tree_add_item(tree, hf_saprouter_error_unknown, tvb, offset, len, FALSE); offset += len;
+	proto_tree_add_item(tree, hf_saprouter_error_unknown, tvb, offset, len, ENC_ASCII|ENC_NA); offset += len;
 	len = tvb_strsize(tvb, offset);
-	proto_tree_add_item(tree, hf_saprouter_error_unknown, tvb, offset, len, FALSE); offset += len;
+	proto_tree_add_item(tree, hf_saprouter_error_unknown, tvb, offset, len, ENC_ASCII|ENC_NA); offset += len;
 	len = tvb_strsize(tvb, offset);
-	proto_tree_add_item(tree, hf_saprouter_error_unknown, tvb, offset, len, FALSE); offset += len;
+	proto_tree_add_item(tree, hf_saprouter_error_unknown, tvb, offset, len, ENC_ASCII|ENC_NA); offset += len;
 	len = tvb_strsize(tvb, offset);
-	proto_tree_add_item(tree, hf_saprouter_error_unknown, tvb, offset, len, FALSE); offset += len;
+	proto_tree_add_item(tree, hf_saprouter_error_unknown, tvb, offset, len, ENC_ASCII|ENC_NA); offset += len;
 
 	len = tvb_strsize(tvb, offset);
-	proto_tree_add_item(tree, hf_saprouter_error_eyecatcher, tvb, offset, len, FALSE); offset += len;
+	proto_tree_add_item(tree, hf_saprouter_error_eyecatcher, tvb, offset, len, ENC_ASCII|ENC_NA); offset += len;
 }
 
 
@@ -422,7 +426,7 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 
 	/* Add the main SAP Router subtree */
 	if (tree) {
-		ti = proto_tree_add_item(tree, proto_saprouter, tvb, offset, -1, FALSE);
+		ti = proto_tree_add_item(tree, proto_saprouter, tvb, offset, -1, ENC_NA);
 		saprouter_tree = proto_item_add_subtree(ti, ett_saprouter);
 	}
 
@@ -433,27 +437,27 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 	if (tvb_strneql(tvb, offset, SAPROUTER_TYPE_ADMIN_STRING, eyecatcher_length) == 0){
 		col_set_str(pinfo->cinfo, COL_INFO, "Admin Message");
 
-		proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, offset, eyecatcher_length, FALSE); offset += eyecatcher_length;
+		proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, offset, eyecatcher_length, ENC_ASCII|ENC_NA); offset += eyecatcher_length;
 		proto_item_append_text(ti, ", Admin Message");
 
-		proto_tree_add_item(saprouter_tree, hf_saprouter_ni_version, tvb, offset, 1, FALSE); offset++;
+		proto_tree_add_item(saprouter_tree, hf_saprouter_ni_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
 
 		opcode = tvb_get_guint8(tvb, offset);
-		proto_tree_add_item(saprouter_tree, hf_saprouter_admin_command, tvb, offset, 1, FALSE); offset++;
+		proto_tree_add_item(saprouter_tree, hf_saprouter_admin_command, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
 
 		switch (opcode){
 			case 2:{  /* Info request */
 				offset+=2; /* Skip 2 bytes */
 				/* Check if a password was supplied */
 				if (tvb_offset_exists(tvb, offset) && (tvb_strsize(tvb, offset) > 0)){
-					admin_password = proto_tree_add_item(saprouter_tree, hf_saprouter_admin_password, tvb, offset, tvb_strsize(tvb, offset), FALSE);
+					admin_password = proto_tree_add_item(saprouter_tree, hf_saprouter_admin_password, tvb, offset, tvb_strsize(tvb, offset), ENC_ASCII|ENC_NA);
 					expert_add_info(pinfo, admin_password, &ei_saprouter_info_password_found);
 				}
 				break;
 			}
 			case 10:  /* Set Peer Trace */
 			case 11:{ /* Clear Peer Trace */
-				proto_tree_add_item(saprouter_tree, hf_saprouter_admin_address_mask, tvb, offset, 32, FALSE); offset+=32;
+				proto_tree_add_item(saprouter_tree, hf_saprouter_admin_address_mask, tvb, offset, 32, ENC_ASCII|ENC_NA); offset+=32;
 				break;
 			}
 			case 6:  /* Cancel Route request */
@@ -466,17 +470,17 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 				if (opcode == 6){
 					offset+=2; /* Skip 2 bytes for Cancel Route request*/
 					client_count = tvb_get_ntohs(tvb, offset);
-					proto_tree_add_item(saprouter_tree, hf_saprouter_admin_client_count_short, tvb, offset, 2, FALSE); offset+=2;
+					proto_tree_add_item(saprouter_tree, hf_saprouter_admin_client_count_short, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2;
 				} else {
 					client_count = tvb_get_ntohl(tvb, offset);
-					proto_tree_add_item(saprouter_tree, hf_saprouter_admin_client_count_int, tvb, offset, 4, FALSE); offset+=4;
+					proto_tree_add_item(saprouter_tree, hf_saprouter_admin_client_count_int, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 				}
 
 				/* Parse the list of client IDs */
-				ci = proto_tree_add_item(saprouter_tree, hf_saprouter_admin_client_ids, tvb, offset, 4*client_count, FALSE);
+				ci = proto_tree_add_item(saprouter_tree, hf_saprouter_admin_client_ids, tvb, offset, 4*client_count, ENC_NA);
 				clients_tree = proto_item_add_subtree(ci, ett_saprouter);
 				while (tvb_offset_exists(tvb, offset) && tvb_captured_length_remaining(tvb, offset)>=4){
-					proto_tree_add_item(clients_tree, hf_saprouter_admin_client_id, tvb, offset, 4, FALSE); offset+=4;
+					proto_tree_add_item(clients_tree, hf_saprouter_admin_client_id, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 					client_count_actual+=1;
 				}
 
@@ -504,22 +508,22 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 		route_offset = offset + SAPROUTER_ROUTE_OFFSET_OFFSET + 4;
 
 		if (tree){
-			proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, 0, eyecatcher_length, FALSE); offset += eyecatcher_length;
+			proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, 0, eyecatcher_length, ENC_ASCII|ENC_NA); offset += eyecatcher_length;
 			proto_item_append_text(ti, ", Route Message");
 			/* Add the fields */
-			proto_tree_add_item(saprouter_tree, hf_saprouter_route_version, tvb, offset, 1, FALSE); offset++;
-			proto_tree_add_item(saprouter_tree, hf_saprouter_ni_version, tvb, offset, 1, FALSE); offset++;
-			proto_tree_add_item(saprouter_tree, hf_saprouter_entries, tvb, offset, 1, FALSE); offset++;
-			proto_tree_add_item(saprouter_tree, hf_saprouter_talk_mode, tvb, offset, 1, FALSE); offset+=3; /* There're two unused bytes there */
-			proto_tree_add_item(saprouter_tree, hf_saprouter_rest_nodes, tvb, offset, 1, FALSE); offset++;
-			proto_tree_add_item(saprouter_tree, hf_saprouter_route_length, tvb, offset, 4, FALSE); offset+=4;
-			proto_tree_add_item(saprouter_tree, hf_saprouter_route_offset, tvb, offset, 4, FALSE); offset+=4;
+			proto_tree_add_item(saprouter_tree, hf_saprouter_route_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
+			proto_tree_add_item(saprouter_tree, hf_saprouter_ni_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
+			proto_tree_add_item(saprouter_tree, hf_saprouter_entries, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
+			proto_tree_add_item(saprouter_tree, hf_saprouter_talk_mode, tvb, offset, 1, ENC_BIG_ENDIAN); offset+=3; /* There're two unused bytes there */
+			proto_tree_add_item(saprouter_tree, hf_saprouter_rest_nodes, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
+			proto_tree_add_item(saprouter_tree, hf_saprouter_route_length, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
+			proto_tree_add_item(saprouter_tree, hf_saprouter_route_offset, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 			/* Add the route tree */
 			if ((guint32)tvb_captured_length_remaining(tvb, offset) != route_length){
 				expert_add_info_format(pinfo, saprouter_tree, &ei_saprouter_route_invalid_length, "Route string length is invalid (remaining=%d, route_length=%d)", tvb_captured_length_remaining(tvb, offset), route_length);
 				route_length = (guint32)tvb_captured_length_remaining(tvb, offset);
 			}
-			ri = proto_tree_add_item(saprouter_tree, hf_saprouter_route, tvb, offset, route_length, FALSE);
+			ri = proto_tree_add_item(saprouter_tree, hf_saprouter_route, tvb, offset, route_length, ENC_NA);
 			route_tree = proto_item_add_subtree(ri, ett_saprouter);
 		}
 
@@ -548,18 +552,18 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 
 			proto_item_append_text(ti, (opcode==0)? ", Error Information" : ", Control Message");
 			/* Add the fields */
-			proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, offset, eyecatcher_length, FALSE); offset += eyecatcher_length;
-			proto_tree_add_item(saprouter_tree, hf_saprouter_ni_version, tvb, offset, 1, FALSE); offset++;
-			proto_tree_add_item(saprouter_tree, hf_saprouter_opcode, tvb, offset, 1, FALSE); offset+=2; /* There's a unused byte there */
-			proto_tree_add_item(saprouter_tree, hf_saprouter_return_code, tvb, offset, 4, FALSE); offset+=4;
+			proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, offset, eyecatcher_length, ENC_ASCII|ENC_NA); offset += eyecatcher_length;
+			proto_tree_add_item(saprouter_tree, hf_saprouter_ni_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
+			proto_tree_add_item(saprouter_tree, hf_saprouter_opcode, tvb, offset, 1, ENC_BIG_ENDIAN); offset+=2; /* There's a unused byte there */
+			proto_tree_add_item(saprouter_tree, hf_saprouter_return_code, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 
 			text_length = tvb_get_ntohl(tvb, offset);
 			/* Error Information Message */
 			if (opcode == 0){
-				proto_tree_add_item(saprouter_tree, hf_saprouter_error_length, tvb, offset, 4, FALSE); offset+=4;
+				proto_tree_add_item(saprouter_tree, hf_saprouter_error_length, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 				if ((text_length > 0) && tvb_offset_exists(tvb, offset+text_length)){
 					/* Add the error string tree */
-					ei = proto_tree_add_item(saprouter_tree, hf_saprouter_error_string, tvb, offset, text_length, FALSE);
+					ei = proto_tree_add_item(saprouter_tree, hf_saprouter_error_string, tvb, offset, text_length, ENC_NA);
 					text_tree = proto_item_add_subtree(ei, ett_saprouter);
 					dissect_errorstring(tvb, text_tree, offset);
 					offset += text_length;
@@ -567,10 +571,10 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 
 			/* Control Message */
 			} else {
-				proto_tree_add_item(saprouter_tree, hf_saprouter_control_length, tvb, offset, 4, FALSE); offset+=4;
+				proto_tree_add_item(saprouter_tree, hf_saprouter_control_length, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 				if ((text_length >0) && tvb_offset_exists(tvb, offset+text_length)){
 					/* Add the control string tree */
-					proto_tree_add_item(saprouter_tree, hf_saprouter_control_string, tvb, offset, text_length, FALSE);
+					proto_tree_add_item(saprouter_tree, hf_saprouter_control_string, tvb, offset, text_length, ENC_ASCII|ENC_NA);
 					offset += text_length;
 				}
 
@@ -580,7 +584,7 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 				}
 
 			}
-			proto_tree_add_item(saprouter_tree, hf_saprouter_unknown, tvb, offset, 4, FALSE); offset+=4;
+			proto_tree_add_item(saprouter_tree, hf_saprouter_unknown, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 
 		}
 
@@ -647,7 +651,7 @@ proto_register_saprouter(void)
 		{ &hf_saprouter_entries,
 			{ "Entries", "saprouter.entries", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP Router Total number of entries", HFILL }},
 		{ &hf_saprouter_talk_mode,
-			{ "Talk Mode", "saprouter.talkmode", FT_UINT8, BASE_DEC, hf_saprouter_talk_mode_vals, 0x0, "SAP Router Talk Mode", HFILL }},
+			{ "Talk Mode", "saprouter.talkmode", FT_UINT8, BASE_DEC, VALS(saprouter_talk_mode_vals), 0x0, "SAP Router Talk Mode", HFILL }},
 		{ &hf_saprouter_rest_nodes,
 			{ "Remaining Hops", "saprouter.restnodes", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP Router Remaining Hops", HFILL }},
 		{ &hf_saprouter_route_length,
@@ -661,15 +665,15 @@ proto_register_saprouter(void)
 		{ &hf_saprouter_route_string_hostname,
 			{ "Hostname", "saprouter.routestring.hostname", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Route Hop Hostname", HFILL }},
 		{ &hf_saprouter_route_string_service,
-			{ "Service", "saprouter.routestring.service", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Route Hop Service ", HFILL }},
+			{ "Service", "saprouter.routestring.service", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Route Hop Service", HFILL }},
 		{ &hf_saprouter_route_string_password,
 			{ "Password", "saprouter.routestring.password", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Route Hop Password", HFILL }},
 
 		/* NI error information / Control messages */
 		{ &hf_saprouter_opcode,
-			{ "Operation Code", "saprouter.opcode", FT_UINT8, BASE_DEC, hf_saprouter_opcode_vals, 0x0, "SAP Router Operation Code", HFILL }},
+			{ "Operation Code", "saprouter.opcode", FT_UINT8, BASE_DEC, VALS(saprouter_opcode_vals), 0x0, "SAP Router Operation Code", HFILL }},
 		{ &hf_saprouter_return_code,
-			{ "Return Code", "saprouter.returncode", FT_INT32, BASE_DEC, hf_saprouter_return_code_vals, 0x0, "SAP Router Return Code", HFILL }},
+			{ "Return Code", "saprouter.returncode", FT_INT32, BASE_DEC, VALS(saprouter_return_code_vals), 0x0, "SAP Router Return Code", HFILL }},
 		{ &hf_saprouter_unknown,
 			{ "Unknown field", "saprouter.unknown", FT_INT32, BASE_DEC, NULL, 0x0, "SAP Router Unknown field", HFILL }},
 
@@ -721,7 +725,7 @@ proto_register_saprouter(void)
 
 		/* Router Admin messages */
 		{ &hf_saprouter_admin_command,
-			{ "Admin Command", "saprouter.command", FT_UINT8, BASE_DEC, hf_saprouter_admin_command_vals, 0x0, "SAP Router Admin Command", HFILL }},
+			{ "Admin Command", "saprouter.command", FT_UINT8, BASE_DEC, VALS(saprouter_admin_command_vals), 0x0, "SAP Router Admin Command", HFILL }},
 		{ &hf_saprouter_admin_password,
 			{ "Admin Command Info Password", "saprouter.password", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Admin Info Password", HFILL }},
 		{ &hf_saprouter_admin_client_count_short,

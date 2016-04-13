@@ -153,12 +153,12 @@ dissect_sap_protocol_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree
 	/* We are being asked for details */
 	if (tree) {
 		/* Add the main SAP Protocol subtree */
-		ti = proto_tree_add_item(tree, proto_sap_protocol, tvb, 0, -1, FALSE);
+		ti = proto_tree_add_item(tree, proto_sap_protocol, tvb, 0, -1, ENC_NA);
 		sap_protocol_tree = proto_item_add_subtree(ti, ett_sap_protocol);
 
 		/* Add the length item */
 		proto_item_append_text(ti, ", Len: %u", length);
-		sap_protocol_length = proto_tree_add_item(sap_protocol_tree, hf_sap_protocol_length, tvb, 0, 4, FALSE);
+		sap_protocol_length = proto_tree_add_item(sap_protocol_tree, hf_sap_protocol_length, tvb, 0, 4, ENC_BIG_ENDIAN);
 
 		/* Add expert info in case of no match between the given length and the actual one */
 		if (tvb_reported_length(tvb) != length + 4) {
@@ -167,7 +167,7 @@ dissect_sap_protocol_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree
 
 		/* Add the payload subtree */
 		if (length > 0){
-			proto_tree_add_item(sap_protocol_tree, hf_sap_protocol_payload, tvb, 4, -1, FALSE);
+			proto_tree_add_item(sap_protocol_tree, hf_sap_protocol_payload, tvb, 4, -1, ENC_NA);
 		}
 	}
 
@@ -176,7 +176,7 @@ dissect_sap_protocol_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree
 		col_set_str(pinfo->cinfo, COL_INFO, "Ping Message");
 		if (tree){
 			proto_item_append_text(ti, ", Ping Message (keep-alive request)");
-			proto_tree_add_item(sap_protocol_tree, hf_sap_protocol_ping, tvb, 4, -1, FALSE);
+			proto_tree_add_item(sap_protocol_tree, hf_sap_protocol_ping, tvb, 4, -1, ENC_NA);
 		}
 
 	/* Chek for NI_PONG */
@@ -190,7 +190,7 @@ dissect_sap_protocol_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree
 										 pinfo->ptype, pinfo->srcport, pinfo->destport, 0);
 		if (conversation == NULL){
 			proto_item_append_text(ti, ", Pong Message (keep-alive response)");
-			proto_tree_add_item(sap_protocol_tree, hf_sap_protocol_pong, tvb, 4, -1, FALSE);
+			proto_tree_add_item(sap_protocol_tree, hf_sap_protocol_pong, tvb, 4, -1, ENC_NA);
 
 		} else {
 			proto_item_append_text(ti, ", Pong Message (route accepted)");
