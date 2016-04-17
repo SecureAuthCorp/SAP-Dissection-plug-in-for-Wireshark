@@ -57,6 +57,7 @@ static const value_string saprfc_reqtype_values[] = {
 	{ 0x10, "GW_CANCEL_REGISTER_TP" },
 	{ 0x11, "REMOTE_GATEWAY" },
 	{ 0x12, "GW_CONTAINER_RECEIVED" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 
@@ -111,6 +112,7 @@ static const value_string saprfc_monitor_cmd_values[] = {
 	{ 0x39, "READ_CONN_TBL2" },
 	{ 0x40, "READ_GWSYS_TBL3" },
 	{ 0x41, "RELOAD_ACL" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 
@@ -147,6 +149,7 @@ static const value_string saprfc_header_reqtype_values[] = {
 	{ 0xd4, "F_SAP_SET_UID" },
 	{ 0xd5, "F_SAP_CANCEL" },
 	{ 0xd6, "F_SAP_CANCELED" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 
@@ -164,6 +167,7 @@ static const value_string saprfc_header_protocol_values[] = {
 	{ 0x45, "NE" },
 	{ 0x48, "INT" },
 	{ 0x61, "REG" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 
@@ -194,6 +198,7 @@ static const value_string saprfc_header_appc_rc_values[] = {
 	{ 0x24, "CM_SYSTEM_EVENT" },
 	{ 0x2711, "CM_SAP_TIMEOUT_RETRY" },
 	{ 0x2712, "CM_CANCEL_REQUEST" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 
@@ -202,6 +207,7 @@ static const value_string saprfc_header_ncpic_parameters_client_info_values[] = 
 	{ 0x00, "GW_NO_CLIENT_INFO" },
 	{ 0x01, "GW_EXTERNAL_CLIENT" },
 	{ 0x02, "GW_R3_CLIENT" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 

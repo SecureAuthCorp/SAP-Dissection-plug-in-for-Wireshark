@@ -57,6 +57,7 @@ static const value_string saprouter_talk_mode_vals[] = {
 	{ 0, "NI_MSG_IO" },
 	{ 1, "NI_RAW_IO" },
 	{ 2, "NI_ROUT_IO" },
+	/* NULL */
 	{ 0, NULL},
 };
 
@@ -70,6 +71,7 @@ static const value_string saprouter_opcode_vals[] = {
 	{ 8, "Send Handle (8)" },		/* TODO: Check this opcodes */
 	{ 70, "SNC request" },			/* TODO: Check this opcodes NiSncOpcode: NISNC_REQ */
 	{ 71, "SNC handshake complete" },	/* TODO: Check this opcodes NiSncOpcode: NISNC_ACK */
+	/* NULL */
 	{ 0, NULL}
 };
 
@@ -110,6 +112,7 @@ static const value_string saprouter_return_code_vals[] = {
 	{-102, "Client not available (NIEROUT_NOCLIENT)" },
 	{-103, "Error in external library (NIEROUT_EXTERN)" },
 	{-104, "Error in the SNC shift (NIEROUT_SNC_FAILURE)" },
+	/* NULL */
 	{ 0, NULL}
 };
 
@@ -129,6 +132,7 @@ static const value_string saprouter_admin_command_vals[] = {
 	{ 12, "Trace Connection" },
 	{ 13, "Trace Connection" },
 	{ 14, "Hide Error Information Request" },
+	/* NULL */
 	{ 0, NULL}
 };
 

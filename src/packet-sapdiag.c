@@ -52,7 +52,8 @@ static const value_string sapdiag_compress_vals[] = {
 	{ 0x1, "Compression switched on" },
 	{ 0x2, "Data encrypted" },
 	{ 0x3, "????" },
-	{ 0, NULL }
+	/* NULL */
+	{ 0x0, NULL }
 };
 
 /* SAP Diag Header Algorithm field values */
@@ -60,7 +61,7 @@ static const value_string sapdiag_algorithm_vals[] = {
 	{ 0x10, "LZC" },
 	{ 0x12, "LZH" },
 	/* NULL */
-	{ 0x0, NULL }
+	{ 0x00, NULL }
 };
 
 
@@ -74,7 +75,7 @@ static const value_string sapdiag_dp_request_id_vals[] = {
 	{ 0x00000005, "DSPO" },
 	{ 0x00000006, "DUP2" },
 	/* NULL */
-	{ 0, NULL}
+	{ 0x00000000, NULL}
 };
 
 /* SAP Diag DP Header Sender ID values */
@@ -88,7 +89,7 @@ static const value_string sapdiag_dp_sender_id_vals[] = {
 	{ 0xC9, "IC_MONITOR" },
 	{ 0xCB, "LCOM" },
 	/* NULL */
-	{ 0, NULL}
+	{ 0x00, NULL}
 };
 
 /* SAP Diag DP Header Action Type values */
@@ -112,7 +113,7 @@ static const value_string sapdiag_dp_action_type_vals[] = {
 	{ 0x11, "SEND_TO_MSGSERV" },
 	{ 0x12, "SEND_TO_PLUGIN" },
 	/* NULL */
-	{ 0, NULL}
+	{ 0x00, NULL}
 };
 
 /* SAP Diag DP Header Request Info Flag constants */
@@ -390,7 +391,8 @@ static const value_string sapdiag_dp_new_stat_vals[] = {
 	{ 0x20, "WP_SHUTDOWN" },
 	{ 0x40, "WP_RESTRICTED" },
 	{ 0x80, "WP_NEW" },
-	{ 0, NULL }
+	/* NULL */
+	{ 0x00, NULL }
 };
 
 /* SAP Diag Item Type values */
@@ -410,7 +412,7 @@ static const value_string sapdiag_item_type_vals[] = {
 	{ 0x13, "SLC" },
 	{ 0x15, "SBA2" },
 	/* NULL */
-	{ 0, 	NULL }
+	{ 0x00, NULL }
 };
 
 /* SAP Diag Item APPL/APPL4 ID values */
@@ -432,6 +434,7 @@ static const value_string sapdiag_item_id_vals[] = {
 	{ 0x12, "ACC_LIST" },
 	{ 0x13, "RCUI" },
 	{ 0x14, "GUI_PACKET" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 
@@ -442,6 +445,7 @@ static const value_string sapdiag_item_appl_script_vals[] = {
 	{ 0x02, "SCRIPT_SCREEN" },
 	{ 0x03, "SCRIPT_POSTSCRIPT" },
 	{ 0x04, "SCRIPT_ITF" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 
@@ -450,6 +454,7 @@ static const value_string sapdiag_item_appl_graph_vals[] = {
 	/* GRAPH */
 	{ 0x03, "GRAPH RELEASE 3" },
 	{ 0x05, "GRAPH RELEASE 5" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 
@@ -502,14 +507,16 @@ static const value_string sapdiag_item_appl_st_user_vals[] = {
 	{ 0x24, "DISPLAY_SIZE" },
 	{ 0x25, "GUI_TYPE" },
 	{ 0x26, "DIALOG_STEP_NUMBER" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 
-/* SAP Diag Item APPL/APPL4 SYNN SID values */
+/* SAP Diag Item APPL/APPL4 DYNN SID values */
 static const value_string sapdiag_item_appl_dynn_vals[] = {
 	/* DYNN */
 	{ 0x01, "CHL" },
 	{ 0x03, "XMLPROP DYNPRO" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 
@@ -558,6 +565,7 @@ static const value_string sapdiag_item_appl_st_r3info_vals[] = {
 	{ 0x28, "TICKET4GUI" },
 	{ 0x29, "KERNEL_VERSION" },
 	{ 0x2a, "STD_TOOLBAR_ITEMS" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 
@@ -565,6 +573,7 @@ static const value_string sapdiag_item_appl_st_r3info_vals[] = {
 static const value_string sapdiag_item_appl_popu_vals[] = {
 	/* POPU */
 	{ 0x02, "DEST" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 
@@ -583,6 +592,7 @@ static const value_string sapdiag_item_appl_rfc_tr_vals[] = {
 	{ 0x09, "RFC_TR_CALL" },
 	{ 0x0a, "RFC_TR_CALL_END" },
 	{ 0x0b, "RFC_TR_RES" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 
@@ -612,6 +622,7 @@ static const value_string sapdiag_item_appl_dynt_vals[] = {
 	{ 0x15, "DYNT_TC_COLUMN_TITLE_XMLP" },
 	{ 0x16, "DYNT_TC_ROW_SELECTOR_NAME" },
 	{ 0x17, "DYNT_FOCUS_FRAME" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 
@@ -630,6 +641,7 @@ static const value_string sapdiag_item_appl_container_vals[] = {
 	{ 0x0c, "XMLPROP" },
 	{ 0x0d, "SPLITTER" },
 	{ 0x0e, "SPLITTER_CELL" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 
@@ -640,6 +652,7 @@ static const value_string sapdiag_item_appl_mnuentry_vals[] = {
 	{ 0x02, "MENU_MNU" },
 	{ 0x03, "MENU_PFK" },
 	{ 0x04, "MENU_KYB" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 
@@ -661,6 +674,7 @@ static const value_string sapdiag_item_appl_varinfo_vals[] = {
 	{ 0x0d, "LIST_FOCUS" },
 	{ 0x0e, "MAINAREA_PIXELSIZE" },
 	{ 0x0f, "SERVICE_REQUEST" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 
@@ -668,6 +682,7 @@ static const value_string sapdiag_item_appl_varinfo_vals[] = {
 static const value_string sapdiag_item_appl_control_vals[] = {
 	/* CONTROL */
 	{ 0x01, "CONTROL_PROPERTIES" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 
@@ -675,6 +690,7 @@ static const value_string sapdiag_item_appl_control_vals[] = {
 static const value_string sapdiag_item_appl_ui_event_vals[] = {
 	/* UI_EVENT */
 	{ 0x01, "UI_EVENT_SOURCE" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 
@@ -683,6 +699,7 @@ static const value_string sapdiag_item_appl_acc_list_vals[] = {
 	/* ACC_LIST */
 	{ 0x01, "ACC_LIST_INFO4FIELD" },
 	{ 0x02, "ACC_LIST_CONTAINER" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 
@@ -698,6 +715,7 @@ static const value_string sapdiag_item_appl_rcui_vals[] = {
 	{ 0x07, "RCUI_COMMAND" },
 	{ 0x08, "RCUI_BDCMSG" },
 	{ 0x09, "RCUI_CONNECT_DATA" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 
@@ -706,6 +724,7 @@ static const value_string sapdiag_item_appl_gui_packet_vals[] = {
 	/* GUI_PACKET */
 	{ 0x01, "GUI_PACKET_STATE" },
 	{ 0x02, "GUI_PACKET_DATA" },
+	/* NULL */
 	{ 0x00, NULL }
 };
 
@@ -742,6 +761,7 @@ static const value_string sapdiag_item_dynt_atom_item_etype_vals[] = {
 	{ 130, "DIAG_DGOTYP_EFIELD_2" },
 	{ 131, "DIAG_DGOTYP_OFIELD_2" },
 	{ 132, "DIAG_DGOTYP_KEYWORD_2" },
+	/* NULL */
 	{ 000, NULL }
 };
 
@@ -757,7 +777,8 @@ static const value_string sapdiag_item_ui_event_event_type_vals[] = {
 	{ 0x0a, "VALUECHANGED" },
 	{ 0x0b, "STATECHANGED" },
 	{ 0x0c, "NAVIGATION" },
-	{ 0, NULL }
+	/* NULL */
+	{ 0x00, NULL }
 };
 
 static const value_string sapdiag_item_ui_event_control_type_vals[] = {
@@ -782,7 +803,8 @@ static const value_string sapdiag_item_ui_event_control_type_vals[] = {
 	{ 0x13, "MESSAGE" },
 	{ 0x14, "OKCODE" },
 	{ 0x15, "ACC_CONTAINER" },
-	{ 0, NULL }
+	/* NULL */
+	{ 0x00, NULL }
 };
 
 static const value_string sapdiag_item_ui_event_navigation_data_vals[] = {
@@ -796,7 +818,8 @@ static const value_string sapdiag_item_ui_event_navigation_data_vals[] = {
 	{ 0x08, "JUMP_SECTION_BACK" },
 	{ 0x09, "FIRST_FIELD" },
 	{ 0x0a, "LAST_FIELD" },
-	{ 0, NULL }
+	/* NULL */
+	{ 0x00, NULL }
 };
 
 /* SAP Diag Dynt Atom Attr flags */

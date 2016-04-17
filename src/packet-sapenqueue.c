@@ -32,6 +32,7 @@ static const value_string sapenqueue_type_vals[] = {
 	{  0, "SYNC_REQUEST" },
 	{  1, "ASYNC_REQUEST" },
 	{  2, "RESPONSE" },
+	/* NULL */
 	{  0, NULL }
 };
 
@@ -45,6 +46,7 @@ static const value_string sapenqueue_dest_vals[] = {
 	{  6, "CONECTION_ADMIN" },
 	{  7, "ENQ_TO_REP" },
 	{  8, "REP_TO_ENQ" },
+	/* NULL */
 	{  0, NULL },
 };
 
@@ -55,6 +57,7 @@ static const value_string sapenqueue_server_admin_opcode_vals[] = {
 	{  2, "EnAdmShutdownRequest" },
 	{  4, "EnAdmGetReplInfoRequest" },
 	{  6, "EnAdmTraceRequest" },
+	/* NULL */
 	{  0, NULL },
 };
 
@@ -65,6 +68,7 @@ static const value_string sapenqueue_server_admin_trace_action_vals[] = {
 	{  3, "Get trace state" },
 	{  4, "Set trace status" },
 	{  5, "Reset trace files" },
+	/* NULL */
 	{  0, NULL }
 };
 
@@ -75,6 +79,7 @@ static const value_string sapenqueue_server_admin_trace_limit_vals[] = {
 	{  2, "Only in repserver" },
 	{  3, "Only in threads of type" },
 	{  4, "Only in one thread of type" },
+	/* NULL */
 	{  0, NULL }
 };
 
@@ -87,6 +92,7 @@ static const value_string sapenqueue_server_admin_trace_thread_vals[] = {
 	{  4, "ADM thread" },
 	{  5, "Signal thread" },
 	{  6, "Listener thread" },
+	/* NULL */
 	{  0, NULL }
 };
 
@@ -99,6 +105,7 @@ static const value_string sapenqueue_conn_admin_opcode_vals[] = {
 	{  4, "Shutdown Write" },
 	{  5, "Shutdown Both" },
 	{  6, "Keepalive" },
+	/* NULL */
 	{  0, NULL }
 };
 
@@ -111,6 +118,7 @@ static const value_string sapenqueue_conn_admin_param_vals[] = {
 	{  4, "ENCPARAM_SET_NOSUPP" },
 	{  5, "ENCPARAM_SET_VERSION" },
 	{  6, "ENCPARAM_SET_UCSUPPORT" },
+	/* NULL */
 	{  0, NULL }
 };
 

@@ -34,6 +34,7 @@ static const value_string sapms_flag_vals[] = {
 	{  2, "MS_REQUEST" },
 	{  3, "MS_REPLY" },
 	{  4, "MS_ADMIN" },
+	/* NULL */
 	{  0, NULL }
 };
 
@@ -56,6 +57,7 @@ static const value_string sapms_iflag_vals[] = {
 	{ 16, "MS_SEND_SERVICE" },
 	{ 17, "MS_J2EE_LOGIN_3" },
 	{ 18, "MS_J2EE_LOGIN_4" },
+	/* NULL */
 	{  0, NULL }
 };
 
@@ -98,6 +100,7 @@ static const value_string sapms_errorno_vals[] = {
 	{ 101, "MSEINVAL" },
 	{ 102, "MSENOMSG" },
 	{ 103, "MSEINTERN" },
+	/* NULL */
 	{   0, NULL }
 };
 
@@ -105,6 +108,7 @@ static const value_string sapms_errorno_vals[] = {
 static const value_string sapms_adm_msgtype_vals[] = {
 	{  1, "ADM_REQUEST" },
 	{  2, "ADM_REPLY" },
+	/* NULL */
 	{  0, NULL }
 };
 
@@ -171,7 +175,8 @@ static const value_string sapms_adm_record_opcode_vals[] = {
 	{ 0x49, "AD_TEST" },
 	{ 0x4a, "AD_HANDLE_ACL" },
 	{ 0x4b, "AD_ENQ_LOG_RESET" },
-	{  0, NULL }
+	/* NULL */
+	{ 0x00, NULL }
 };
 
 /* MS Adm AD_RZL_STRG Type values */
@@ -197,6 +202,7 @@ static const value_string sapms_adm_rzl_strg_type_vals[] = {
 	{ 52, "STRG_TYPE_CREATE_C" },
 	{ 53, "STRG_TYPE_CREATE_LC" },
 	{ 90, "STRG_TYPE_DUMP" },
+	/* NULL */
 	{ 0, NULL }
 };
 
@@ -277,6 +283,7 @@ static const value_string sapms_opcode_vals[] = {
 	{ 74, "MS_SERVER_TEST_SOFT_SHUTDOWN" },
 	{ 75, "MS_J2EE_RECONNECT_P1" },
 	{ 76, "MS_J2EE_RECONNECT_P2" },
+	/* NULL */
 	{  0, NULL },
 };
 
@@ -314,6 +321,7 @@ static const value_string sapms_opcode_error_vals[] = {
 	{ 29, "MSOP_KERNEL_INCOMPATIBLE" },
 	{ 30, "MSOP_NIACLCREATE_FAILED" },
 	{ 31, "MSOP_NIACLSYNTAX_ERROR" },
+	/* NULL */
 	{  0, NULL },
 };
 
@@ -326,6 +334,7 @@ static const value_string sapms_property_id_vals[] = {
 	{  5, "MS_PROPERTY_SERVICE" },
 	{  6, "MS_PROPERTY_DELALT" },
 	{  7, "Release information" },
+	/* NULL */
 	{  0, NULL },
 };
 
@@ -358,6 +367,7 @@ static const value_string sapms_dump_command_vals[] = {
 	{ 25, "MS_DUMP_ACL_FILE_EXTBND" },
 	{ 26, "MS_DUMP_ACL_FILE_HTTP" },
 	{ 27, "MS_DUMP_ACL_FILE_HTTPS" },
+	/* NULL */
 	{  0, NULL },
 };
 
@@ -377,6 +387,7 @@ static const value_string sapms_file_reload_vals[] = {
 	{ 12, "MS_RELOAD_ACL_FILE_EXTBND" },
 	{ 13, "MS_RELOAD_ACL_FILE_HTTP" },
 	{ 14, "MS_RELOAD_ACL_FILE_HTTPS" },
+	/* NULL */
 	{ 0, NULL }
 };
 
@@ -421,6 +432,7 @@ static const value_string sapms_logon_type_vals[] = {
 	{ 35, "MS_LOGON_J2EERI" },
 	{ 36, "MS_LOGON_J2EESRI" },
 	{ 37, "MS_LOGON_TRXNS" },
+	/* NULL */
 	{ 0, NULL }
 };
 
@@ -434,6 +446,7 @@ static const value_string sapms_server_lst_status_vals[] = {
 	{ 4, "MS_STATE_STOP" },
 	{ 5, "MS_STATE_STARTING" },
 	{ 6, "MS_STATE_INIT" },
+	/* NULL */
 	{ 0, NULL }
 };
 
