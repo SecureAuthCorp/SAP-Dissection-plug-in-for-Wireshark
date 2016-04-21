@@ -822,6 +822,18 @@ static const value_string sapdiag_item_ui_event_navigation_data_vals[] = {
 	{ 0x00, NULL }
 };
 
+static const value_string sapdiag_item_control_properties_id_vals[] = {
+	{ 0x01, "CONTROL_AREA" },
+	{ 0x02, "CONTROL_ID" },
+	{ 0x03, "CONTROL_VISIBLE" },
+	{ 0x04, "CONTROL_ROW" },
+	{ 0x05, "CONTROL_COLUMN" },
+	{ 0x06, "CONTROL_ROWS" },
+	{ 0x07, "CONTROL_COLUMNS" },
+	/* NULL */
+	{ 0x00, NULL }
+};
+
 /* SAP Diag Dynt Atom Attr flags */
 #define SAPDIAG_ATOM_ATTR_DIAG_BSD_PROTECTED	0x01
 #define SAPDIAG_ATOM_ATTR_DIAG_BSD_INVISIBLE	0x02
@@ -945,6 +957,10 @@ static int hf_sapdiag_item_dynt_atom_item_attr_DIAG_BSD_JUSTRIGHT = -1;
 static int hf_sapdiag_item_dynt_atom_item_attr_DIAG_BSD_INTENSIFY = -1;
 static int hf_sapdiag_item_dynt_atom_item_attr_DIAG_BSD_INVISIBLE = -1;
 static int hf_sapdiag_item_dynt_atom_item_attr_DIAG_BSD_PROTECTED = -1;
+
+/* Control properties */
+static int hf_sapdiag_item_control_properties_id = -1;
+static int hf_sapdiag_item_control_properties_value = -1;
 
 /* UI Event Source */
 static int ht_sapdiag_item_ui_event_event_type = -1;
@@ -2058,7 +2074,7 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
 		offset+=add_item_value_stringz(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, "Kernel patch level", 1);
 
 	} else if (item_type==0x10 && item_id==0x09 && item_sid==0x0b){		/* Dynt Focus */
-		guint32 length = offset+item_length;
+		guint32 length = offset + item_length;
 		add_item_value_uint8(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, "Focus Num of Area ID"); offset+=1;
 		add_item_value_uint16(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, "Focus Row"); offset+=2;
 		add_item_value_uint16(tvb, item, item_value_tree, hf_sapdiag_item_value, offset, "Focus Col"); offset+=2;
@@ -2203,6 +2219,16 @@ dissect_sapdiag_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_
 		/* If the preference is set, report the item as partially dissected in the expert info */
 		if (global_sapdiag_highlight_items){
 			expert_add_info_format(pinfo, item, &ei_sapdiag_item_partial, "The Diag Item is dissected partially (0x%.2x, 0x%.2x, 0x%.2x)", item_type, item_id, item_sid);
+		}
+
+	/* Control Properties */
+	} else if (item_type==0x10 && item_id==0x0e && item_sid==0x01){ /* Control Properties */
+		guint32 length = offset + item_length;
+
+		while((offset < length) && (tvb_offset_exists(tvb, offset + 3))){  /* Check against at least three bytes (2 for ID, 1 for null-terminated value) */
+			proto_tree_add_item(item_value_tree, hf_sapdiag_item_control_properties_id, tvb, offset, 2, ENC_BIG_ENDIAN);
+			proto_item_append_text(item, ", Control Property ID=%d", tvb_get_ntohs(tvb, offset)); offset+=2;
+			offset+=add_item_value_stringz(tvb, item, item_value_tree, hf_sapdiag_item_control_properties_value, offset, "Control Property Value", 1);
 		}
 
 	/* UI event source */
@@ -3467,6 +3493,14 @@ proto_register_sapdiag(void)
 			HFILL }},
 		{ &hf_sapdiag_item_dynt_atom_item_attr_DIAG_BSD_PROTECTED,
 			{ "Dynt Atom Item Attribute Protected", "sapdiag.item.value.dyntatom.item.attr.PROTECTED", FT_BOOLEAN, 8, NULL, SAPDIAG_ATOM_ATTR_DIAG_BSD_PROTECTED, "SAP Dynt Atom Item Attribute Protected",
+			HFILL }},
+
+		/* Control Properties fields */
+		{ &hf_sapdiag_item_control_properties_id,
+			{ "Control Properties ID", "sapdiag.item.value.controlproperties.id", FT_UINT16, BASE_HEX, VALS(sapdiag_item_control_properties_id_vals), 0x0, "SAP Control Properties ID",
+			HFILL }},
+		{ &hf_sapdiag_item_control_properties_value,
+			{ "Control Properties Value", "sapdiag.item.value.controlproperties.value", FT_NONE, BASE_NONE, NULL, 0x0, "SAP Control Properties Value",
 			HFILL }},
 
 		/* UI Event Source fields */
