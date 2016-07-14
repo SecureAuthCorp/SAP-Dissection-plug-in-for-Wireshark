@@ -192,14 +192,15 @@ Consulting Services team of Core Security.
 Contributions made by:
 
   * Joris van de Vis
-  * Anton Bolshakov
+  * Anton Bolshakov (@blshkv)
   * Valeriy Gusev
-  * Daniel Berlin
+  * Daniel Berlin (@daberlin)
   * Victor Portal Gonzalez
   * Dave Hartley
   * Jean-Paul Roliers
   * Dongha Shin
   * Luca Di Stefano
+  * Alexis La Goutte (@alagoutte)
 
 
 References
