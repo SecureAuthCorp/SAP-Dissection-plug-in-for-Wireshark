@@ -75,7 +75,7 @@ static const value_string saprouter_opcode_vals[] = {
 	{ 0, NULL}
 };
 
-/* SAP Router Return Code values (as per SAP Note 63342 http://service.sap.com/sap/support/notes/63342) */
+/* SAP Router Return Code values (as per SAP Note 63342 https://launchpad.support.sap.com/#/notes/63342) */
 static const value_string saprouter_return_code_vals[] = {
 	{ -1, "NI-internal error (NIEINTERN)" },
 	{ -2, "Host name unknown (NIEHOST_UNKNOWN)" },

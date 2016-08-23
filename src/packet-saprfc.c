@@ -384,8 +384,8 @@ static int hf_saprfc_table_content = -1;
 static int hf_saprfc_payload = -1;
 
 
-/* TODO: Add CPIC error codes (http://service.sap.com/sap/support/notes/63347) */
-/* TODO: Add RFC logon error codes (http://service.sap.com/sap/support/notes/320991) */
+/* TODO: Add CPIC error codes (https://launchpad.support.sap.com/#/notes/63347) */
+/* TODO: Add RFC logon error codes (https://launchpad.support.sap.com/#/notes/320991) */
 
 static gint ett_saprfc = -1;
 
