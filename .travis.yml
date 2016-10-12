@@ -5,8 +5,8 @@ compiler:
   - gcc
 
 env:
-  - WIRESHARK_BRANCH=master-2.0 BUILD_STANDALONE=no
-  - WIRESHARK_BRANCH=master-2.0 BUILD_STANDALONE=yes
+  - WIRESHARK_BRANCH=master-2.2 BUILD_STANDALONE=no
+  - WIRESHARK_BRANCH=master-2.2 BUILD_STANDALONE=yes
 
 
 before_install:

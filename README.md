@@ -80,7 +80,7 @@ Installation & Build
 
 This Wireshark plugin is not distributed as part of the Wireshark source. It
 can be build as a standalone plugin, or as part of Wireshark, and is compatible
-with version 2.0.
+with version 2.2.
 
 ### Building on Linux ###
 
@@ -99,7 +99,7 @@ To build the plugin on Debian/Ubuntu linux distributions:
 
 The following steps are required to compile the plugin as part of Wireshark:
 
-1) Download [Wireshark version 2.0 source](https://www.wireshark.org/download.html) [8]
+1) Download [Wireshark version 2.2 source](https://www.wireshark.org/download.html) [8]
    or checkout the code from the [source repository](https://code.wireshark.org/review/wireshark) [9].
 
 2) Decompress the package.
@@ -112,7 +112,7 @@ The following steps are required to compile the plugin as part of Wireshark:
 5) Configure the plugin to be included in the build process. This step can be
    performed using the patch file provided. At the root directory run:
 
-	git apply plugins/sap/wireshark-master-2.0.patch
+	git apply plugins/sap/wireshark-master-2.2.patch
 
 6) Perform a new build including the plugin. At the root directory run:
 
@@ -136,7 +136,7 @@ for building Wireshark on Windows [12].
 3) Configure the plugin to be included in the build process. This step can be
    performed using the patch file provided. At the root directory run:
 
-	git apply plugins/sap/wireshark-master-2.0.patch
+	git apply plugins/sap/wireshark-master-2.2.patch
 
 4) Perform a new build including the plugin.
 
@@ -152,7 +152,7 @@ library if it was installed using `home-brew`.
 
 It's worth mentioning that compression libraries for SAP Diag/RFC protocol are
 originally written in C++, thus the entire plugin needs to be compiled for C++.
-See [Wireshark's portability notes](https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-2.0)
+See [Wireshark's portability notes](https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-2.2)
 for more information [11].
 
 
@@ -226,7 +226,7 @@ References
 
 [10] https://www.wireshark.org/docs/wsdg_html_chunked/
 
-[11] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-1.12
+[11] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-2.2
 
 [12] https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html
 
