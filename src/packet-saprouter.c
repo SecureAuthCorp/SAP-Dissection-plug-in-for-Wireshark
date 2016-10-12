@@ -389,7 +389,7 @@ dissect_saprouter_snc_frame(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
 		snc_handle = find_dissector("sapsnc");
 		if (snc_handle){
 			/* Set the column to not writable so the SNC dissector doesn't override the Diag info */
-			col_set_writable(pinfo->cinfo, FALSE);
+			col_set_writable(pinfo->cinfo, -1, FALSE);
 			/* Create a new tvb buffer and call the dissector */
 			next_tvb = tvb_new_subset(tvb, offset, -1, -1);
 			call_dissector(snc_handle, next_tvb, pinfo, tree);

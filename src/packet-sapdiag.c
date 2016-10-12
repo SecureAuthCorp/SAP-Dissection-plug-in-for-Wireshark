@@ -1539,7 +1539,7 @@ dissect_sapdiag_rfc_call(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
 		rfc_handle = find_dissector("saprfcinternal");
 		if (rfc_handle){
 			/* Set the column to not writable so the RFC dissector doesn't override the Diag info */
-			col_set_writable(pinfo->cinfo, FALSE);
+			col_set_writable(pinfo->cinfo, -1, FALSE);
 			/* Create a new tvb buffer and call the dissector */
 			next_tvb = tvb_new_subset(tvb, offset, item_length, item_length);
 			call_dissector(rfc_handle, next_tvb, pinfo, tree);
@@ -1560,7 +1560,7 @@ dissect_sapdiag_snc_frame(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, g
 		snc_handle = find_dissector("sapsnc");
 		if (snc_handle){
 			/* Set the column to not writable so the SNC dissector doesn't override the Diag info */
-			col_set_writable(pinfo->cinfo, FALSE);
+			col_set_writable(pinfo->cinfo, -1, FALSE);
 			/* Create a new tvb buffer and call the dissector */
 			next_tvb = tvb_new_subset(tvb, offset, -1, -1);
 			call_dissector(snc_handle, next_tvb, pinfo, tree);
