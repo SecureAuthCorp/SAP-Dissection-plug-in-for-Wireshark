@@ -5,7 +5,7 @@ SAP Dissector Plugin for Wireshark
 
 Copyright (C) 2012-2016 by Martin Gallo, Core Security
 
-Version 0.3.2.dev (XXX 2016)
+Version 0.3.2 (October 2016)
 
 
 Overview
@@ -226,7 +226,7 @@ References
 
 [10] https://www.wireshark.org/docs/wsdg_html_chunked/
 
-[11] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-1.12
+[11] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-2.0
 
 [12] https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html
 
