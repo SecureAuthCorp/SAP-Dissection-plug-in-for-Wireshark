@@ -1,7 +1,7 @@
 Changelog
 =========
 
-v0.3.2 - XXXX-XX-XX
+v0.3.2 - 2016-10-21
 -------------------
 
 - ChangeLog file in Markdown format for better documentation.
