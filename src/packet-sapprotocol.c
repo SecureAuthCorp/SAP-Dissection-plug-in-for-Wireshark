@@ -216,8 +216,8 @@ dissect_sap_protocol_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree
 /*
  * Performs the TCP reassembling and dissects the packet.
  */
-static void
-dissect_sap_protocol(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
+static int
+dissect_sap_protocol(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *user_data)
 {
 	tcp_dissect_pdus(tvb, pinfo, tree, global_sap_protocol_desegment, SAP_PROTOCOL_HEADER_LEN,
 		get_sap_protocol_pdu_len, dissect_sap_protocol_message, NULL);
