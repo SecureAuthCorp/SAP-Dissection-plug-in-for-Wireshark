@@ -42,7 +42,7 @@ if [ ! -e plugins/sap ]; then
 fi
 
 # Apply the patch if required
-if git apply --check $PLUGIN_DIR/wireshark-$WIRESHARK_BRANCH.patch; then
+if git apply --check $PLUGIN_DIR/wireshark-$WIRESHARK_BRANCH.patch &> /dev/null; then
   git apply $PLUGIN_DIR/wireshark-$WIRESHARK_BRANCH.patch
 fi
 
