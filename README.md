@@ -89,6 +89,8 @@ with version 2.0.
 To build the plugin on Debian/Ubuntu linux distributions:
 
     sudo apt-get install wireshark wireshark-dev
+    git clone https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/
+    cd SAP-Dissection-plug-in-for-Wireshark/
     mkdir build
     cd build
     cmake ..
@@ -106,22 +108,16 @@ The following steps are required to compile the plugin as part of Wireshark:
     cd wireshark
     git checkout master-2.0
 
-2) Configure and build the package, as described in [Wireshark's development
-   guide](https://www.wireshark.org/docs/wsdg_html_chunked/) [10].
+2) Copy the SAP Wireshark Plugin to a new `plugins/sap` directory.
 
-    mkdir -p build
-    cd build
-    cmake ..
-    make
+    git clone https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/ plugins/sap
 
-3) Copy the SAP Wireshark Plugin to a new `plugins/sap` directory.
-
-4) Configure the plugin to be included in the build process. This step can be
+3) Configure the plugin to be included in the build process. This step can be
    performed using the patch file provided. At the root directory run:
 
     git apply plugins/sap/wireshark-master-2.0.patch
 
-5) Perform a new build including the plugin. At the root directory run:
+4) Perform a new build including the plugin. At the root directory run:
 
     mkdir -p build
     cd build
@@ -164,8 +160,8 @@ case `source`:
 Windows build can be only performed as part of the whole Wireshark. The
 following steps are required to compile the plugin on Windows:
 
-1) Follow the [step-to-step guide](https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html)
-for building Wireshark on Windows [12].
+1) Follow the [step-to-step guide](https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html) [10]
+for building Wireshark on Windows.
 
 2) Copy the SAP Wireshark Plugin to a new `plugins/sap` directory.
 
@@ -260,11 +256,10 @@ References
 
 [9] https://code.wireshark.org/review/wireshark
 
-[10] https://www.wireshark.org/docs/wsdg_html_chunked/
+[10] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-2.0
 
-[11] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-2.0
+[11] https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html
 
-[12] https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html
 
 Contact
 -------
