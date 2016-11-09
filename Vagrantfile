@@ -22,6 +22,7 @@ Vagrant.configure(2) do |config|
 
   # Define a Vagrant VM to compile from source
   config.vm.define "source" do |source|
+
     source.vm.provision "shell",
       path: "tools/ubuntu-provision-source.sh",
       privileged: false,
@@ -31,8 +32,16 @@ Vagrant.configure(2) do |config|
     source.vm.provision "shell",
       path: "tools/ubuntu-build-source.sh",
       privileged: false,
-      env: {"WIRESHARK_BRANCH" => "master-2.0",
+      env: {"BUILD_WIRESHARK" => "yes",
+            "WIRESHARK_BRANCH" => "master-2.0",
             "PLUGIN_DIR" => "/vagrant/"}
+
+    # Add some memory
+    source.vm.provider "virtualbox" do |v|
+      v.memory = 2048
+      v.cpus = 2
+    end
+
   end
 
 end
