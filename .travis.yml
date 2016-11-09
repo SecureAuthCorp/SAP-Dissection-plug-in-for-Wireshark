@@ -6,7 +6,9 @@ compiler:
 
 env:
   - WIRESHARK_BRANCH=master-2.0 PLUGIN_DIR=$TRAVIS_BUILD_DIR BUILD_STANDALONE=no
-  - WIRESHARK_BRANCH=master-2.0 PLUGIN_DIR=$TRAVIS_BUILD_DIR BUILD_STANDALONE=yes
+  # Stand alone build is disabled by now, as the wireshark-dev PPA is on the
+  # Wireshark 2.2 branch and the plugin is in the 2.0 one.
+  #- WIRESHARK_BRANCH=master-2.0 PLUGIN_DIR=$TRAVIS_BUILD_DIR BUILD_STANDALONE=yes
 
 before_install:
   - if [ ${BUILD_STANDALONE} == "no" ]; then
