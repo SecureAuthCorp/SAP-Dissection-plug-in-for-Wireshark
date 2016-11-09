@@ -15,24 +15,19 @@ env:
 
 before_install:
   - if [ ${BUILD_STANDALONE} == "no" ]; then
-        $PLUGIN_DIR/tools/ubuntu-provision-source.sh;
+        ${PLUGIN_DIR}/tools/ubuntu-provision-source.sh;
     fi
   - if [ ${BUILD_STANDALONE} == "yes" ]; then
-        $PLUGIN_DIR/tools/ubuntu-provision-standalone.sh;
+        ${PLUGIN_DIR}/tools/ubuntu-provision-standalone.sh;
     fi
 
 install:
   - if [ ${BUILD_STANDALONE} == "no" ]; then
-        $PLUGIN_DIR/tools/ubuntu-build-source.sh;
+        ${PLUGIN_DIR}/tools/ubuntu-build-source.sh;
     fi
   - if [ ${BUILD_STANDALONE} == "yes" ]; then
-        $PLUGIN_DIR/tools/ubuntu-build-standalone.sh;
+        ${PLUGIN_DIR}/tools/ubuntu-build-standalone.sh;
     fi
 
 script:
-  - if [ ${BUILD_STANDALONE} == "no" ]; then
-      python ${HOME}/wireshark-$WIRESHARK_BRANCH/plugins/sap/tests/__init__.py;
-    fi
-  - if [ ${BUILD_STANDALONE} == "yes" ]; then
-      python ${TRAVIS_BUILD_DIR}/tests/__init__.py;
-    fi
+  - python ${PLUGIN_DIR}/tests/__init__.py
