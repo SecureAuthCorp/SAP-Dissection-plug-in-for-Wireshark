@@ -106,7 +106,7 @@ The following steps are required to compile the plugin as part of Wireshark:
     cd wireshark
     git checkout master-2.0
 
-3) Configure and build the package, as described in [Wireshark's development
+2) Configure and build the package, as described in [Wireshark's development
    guide](https://www.wireshark.org/docs/wsdg_html_chunked/) [10].
 
     mkdir -p build
@@ -114,14 +114,14 @@ The following steps are required to compile the plugin as part of Wireshark:
     cmake ..
     make
 
-4) Copy the SAP Wireshark Plugin to a new `plugins/sap` directory.
+3) Copy the SAP Wireshark Plugin to a new `plugins/sap` directory.
 
-5) Configure the plugin to be included in the build process. This step can be
+4) Configure the plugin to be included in the build process. This step can be
    performed using the patch file provided. At the root directory run:
 
     git apply plugins/sap/wireshark-master-2.0.patch
 
-6) Perform a new build including the plugin. At the root directory run:
+5) Perform a new build including the plugin. At the root directory run:
 
     mkdir -p build
     cd build
