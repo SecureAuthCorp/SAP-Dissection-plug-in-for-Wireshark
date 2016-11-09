@@ -144,6 +144,8 @@ The following steps can be used to setup a Vagrant machine and build the plugin:
 
 1) Install VirtualBox and Vagrant.
 
+    sudo apt-get install virtualbox vagrant
+
 2) Inside the plugin's directory, launch the desired Vagrant machine, in this
 case `source`:
 
