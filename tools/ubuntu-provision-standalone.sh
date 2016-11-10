@@ -20,6 +20,9 @@
 
 set -e
 
+# Add the wireshark-dev ppa
+sudo add-apt-repository ppa:wireshark-dev/stable -y
+
 # Update repo cache
 sudo apt-get update -qq
 
