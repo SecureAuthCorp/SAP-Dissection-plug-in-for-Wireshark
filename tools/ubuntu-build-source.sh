@@ -24,6 +24,7 @@ set -e
 cd ${HOME}/wireshark-${WIRESHARK_BRANCH}
 mkdir -p build && cd build && cmake .. && make -j3 tshark sap
 
+# Build entire wireshark if required
 if [ "${BUILD_WIRESHARK}" == "yes" ]; then
     make -j3 all;
 fi
