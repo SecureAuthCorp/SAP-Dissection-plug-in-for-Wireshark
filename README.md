@@ -131,7 +131,7 @@ The following steps are required to compile the plugin as part of Wireshark:
 [Vagrant](https://www.vagrantup.com/) is a Virtual Machine management software
 that allows creating reproducible virtual machines. In order to make it easier
 to compile and test the plugin, a pre-configured Vagrantfile is provided for
-using it with Vagrant. The Vagrantfile provided with the plugin is configured
+using it with Vagrant 1.8. The Vagrantfile provided with the plugin is configured
 to use [VirtualBox](https://www.virtualbox.org/) and perform a build of the
 plugin inside a Ubuntu 16.04 distribution.
 
@@ -142,7 +142,7 @@ Two machines are provided to build the plugin:
 
 The following steps can be used to setup a Vagrant machine and build the plugin:
 
-1) Install VirtualBox and Vagrant.
+1) Install VirtualBox and Vagrant 1.8 or greater.
 
     sudo apt-get install virtualbox vagrant
 
