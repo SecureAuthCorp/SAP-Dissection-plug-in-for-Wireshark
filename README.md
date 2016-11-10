@@ -89,6 +89,8 @@ with version 2.2.
 To build the plugin on Debian/Ubuntu linux distributions:
 
     sudo apt-get install wireshark wireshark-dev
+    git clone https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/
+    cd SAP-Dissection-plug-in-for-Wireshark/
     mkdir build
     cd build
     cmake ..
@@ -99,28 +101,60 @@ To build the plugin on Debian/Ubuntu linux distributions:
 
 The following steps are required to compile the plugin as part of Wireshark:
 
-1) Download [Wireshark version 2.2 source](https://www.wireshark.org/download.html) [8]
+1) Download and decompress the [Wireshark version 2.2 source](https://www.wireshark.org/download.html) [8]
    or checkout the code from the [source repository](https://code.wireshark.org/review/wireshark) [9].
 
-2) Decompress the package.
+    git clone https://code.wireshark.org/review/wireshark
+    cd wireshark
+    git checkout master-2.2
 
-3) Configure and build the package, as described in [Wireshark's development
-   guide](https://www.wireshark.org/docs/wsdg_html_chunked/) [10].
+2) Copy the SAP Wireshark Plugin to a new `plugins/sap` directory.
 
-4) Copy the SAP Wireshark Plugin to a new `plugins/sap` directory.
+    git clone https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/ plugins/sap
 
-5) Configure the plugin to be included in the build process. This step can be
+3) Configure the plugin to be included in the build process. This step can be
    performed using the patch file provided. At the root directory run:
 
-	git apply plugins/sap/wireshark-master-2.2.patch
+    git apply plugins/sap/wireshark-master-2.2.patch
 
-6) Perform a new build including the plugin. At the root directory run:
+4) Perform a new build including the plugin. At the root directory run:
 
-    mkdir build
+    mkdir -p build
     cd build
     cmake ..
     make
     make install
+
+
+#### Using Vagrant ####
+
+[Vagrant](https://www.vagrantup.com/) is a Virtual Machine management software
+that allows creating reproducible virtual machines. In order to make it easier
+to compile and test the plugin, a pre-configured Vagrantfile is provided for
+using it with Vagrant 1.8. The Vagrantfile provided with the plugin is configured
+to use [VirtualBox](https://www.virtualbox.org/) and perform a build of the
+plugin inside a Ubuntu 16.04 distribution.
+
+Two machines are provided to build the plugin:
+
+* `source`: for building the plugin as part of Wireshark.
+* `standalone`: for building the plugin as a standalone plugin.
+
+The following steps can be used to setup a Vagrant machine and build the plugin:
+
+1) Install VirtualBox and Vagrant 1.8 or greater.
+
+    sudo apt-get install virtualbox vagrant
+
+2) Inside the plugin's directory, launch the desired Vagrant machine, in this
+case `standalone`:
+
+    vagrant up standalone
+
+3) Login into the Vagrant machine and run Wireshark:
+
+    vagrant ssh standalone
+    wireshark
 
 
 ### Building on Windows ###
@@ -128,15 +162,15 @@ The following steps are required to compile the plugin as part of Wireshark:
 Windows build can be only performed as part of the whole Wireshark. The
 following steps are required to compile the plugin on Windows:
 
-1) Follow the [step-to-step guide](https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html)
-for building Wireshark on Windows [12].
+1) Follow the [step-to-step guide](https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html) [10]
+for building Wireshark on Windows.
 
 2) Copy the SAP Wireshark Plugin to a new `plugins/sap` directory.
 
 3) Configure the plugin to be included in the build process. This step can be
    performed using the patch file provided. At the root directory run:
 
-	git apply plugins/sap/wireshark-master-2.2.patch
+    git apply plugins/sap/wireshark-master-2.2.patch
 
 4) Perform a new build including the plugin.
 
@@ -224,11 +258,10 @@ References
 
 [9] https://code.wireshark.org/review/wireshark
 
-[10] https://www.wireshark.org/docs/wsdg_html_chunked/
+[10] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-2.2
 
-[11] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-2.2
+[11] https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html
 
-[12] https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html
 
 Contact
 -------
