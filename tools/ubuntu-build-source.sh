@@ -26,5 +26,3 @@ mkdir -p build && cd build && cmake ${HOME}/wireshark-${WIRESHARK_BRANCH} && mak
 if [ "${BUILD_WIRESHARK}" == "yes" ]; then
     make -j3 wireshark;
 fi
-
-export PATH=${PATH}:${HOME}/wireshark-${WIRESHARK_BRANCH}/build
