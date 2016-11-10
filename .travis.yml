@@ -27,7 +27,7 @@ before_install:
 install:
   - if [ ${BUILD_STANDALONE} == "no" ]; then
         ${PLUGIN_DIR}/tools/ubuntu-build-source.sh;
-        export PATH=${PATH}:${HOME}/wireshark-${WIRESHARK_BRANCH}/build;
+        export PATH=${PATH}:${HOME}/wireshark-${WIRESHARK_BRANCH}/build/run;
     fi
   - if [ ${BUILD_STANDALONE} == "yes" ]; then
         ${PLUGIN_DIR}/tools/ubuntu-build-standalone.sh;
