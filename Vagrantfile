@@ -29,14 +29,12 @@ Vagrant.configure(2) do |config|
     standalone.vm.provision "shell",
       path: "tools/ubuntu-provision-standalone.sh",
       privileged: false,
-      env: {"WIRESHARK_BRANCH" => "master-2.0",
-            "PLUGIN_DIR" => "/vagrant/"}
+      env: {"PLUGIN_DIR" => "/vagrant/"}
 
     standalone.vm.provision "shell",
       path: "tools/ubuntu-build-standalone.sh",
       privileged: false,
-      env: {"WIRESHARK_BRANCH" => "master-2.0",
-            "PLUGIN_DIR" => "/vagrant/"}
+      env: {"PLUGIN_DIR" => "/vagrant/"}
   end
 
   # Define a Vagrant VM to compile from source
