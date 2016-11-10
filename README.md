@@ -147,13 +147,13 @@ The following steps can be used to setup a Vagrant machine and build the plugin:
     sudo apt-get install virtualbox vagrant
 
 2) Inside the plugin's directory, launch the desired Vagrant machine, in this
-case `source`:
+case `standalone`:
 
-    vagrant up source
+    vagrant up standalone
 
 3) Login into the Vagrant machine and run Wireshark:
 
-    vagrant ssh source
+    vagrant ssh standalone
     wireshark
 
 
