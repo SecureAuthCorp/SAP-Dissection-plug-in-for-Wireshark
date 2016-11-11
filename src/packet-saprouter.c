@@ -399,8 +399,8 @@ dissect_saprouter_snc_frame(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree,
 }
 
 
-static void
-dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
+static int
+dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_)
 {
 	guint8 opcode = 0;
 	guint32 offset = 0, eyecatcher_length = 0;
@@ -639,6 +639,8 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 			}
 		}
 	}
+
+	return tvb_captured_length(tvb);
 }
 
 void
