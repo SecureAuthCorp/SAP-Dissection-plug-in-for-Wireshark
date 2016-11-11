@@ -2600,7 +2600,7 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data 
 			/* Decompress the payload */
 			rt = decompress_packet(tvb_get_ptr(tvb, payload_offset, -1),
 					tvb_captured_length_remaining(tvb, payload_offset),
-					decompressed_buffer,    
+					decompressed_buffer,
 					&uncompress_length);
 
 			/* Check the return code and add a expert info warning if an error occurred. The dissector continues trying to add
@@ -3565,11 +3565,7 @@ proto_register_sapdiag(void)
 	expert_module_t* sapdiag_expert;
 
 	/* Register the protocol */
-	proto_sapdiag = proto_register_protocol (
-		"SAP Diag Protocol",	/* name */
-		"SAPDIAG",	/* short name */
-		"sapdiag"	/* abbrev */
-	);
+	proto_sapdiag = proto_register_protocol("SAP Diag Protocol", "SAPDIAG", "sapdiag");
 
 	proto_register_field_array(proto_sapdiag, hf, array_length(hf));
 	proto_register_subtree_array(ett, array_length(ett));
@@ -3577,7 +3573,7 @@ proto_register_sapdiag(void)
 	sapdiag_expert = expert_register_protocol(proto_sapdiag);
 	expert_register_field_array(sapdiag_expert, ei, array_length(ei));
 
-	new_register_dissector("sapdiag", dissect_sapdiag, proto_sapdiag);
+	register_dissector("sapdiag", dissect_sapdiag, proto_sapdiag);
 
 	/* Register the preferences */
 	sapdiag_module = prefs_register_protocol(proto_sapdiag, proto_reg_handoff_sapdiag);
@@ -3618,7 +3614,7 @@ proto_reg_handoff_sapdiag(void)
 	static gboolean initialized = FALSE;
 
 	if (!initialized) {
-		sapdiag_handle = new_create_dissector_handle(dissect_sapdiag, proto_sapdiag);
+		sapdiag_handle = create_dissector_handle(dissect_sapdiag, proto_sapdiag);
 		initialized = TRUE;
 	} else {
 		range_foreach(sapdiag_port_range, range_delete_callback);
