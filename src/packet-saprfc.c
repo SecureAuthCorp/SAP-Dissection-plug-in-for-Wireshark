@@ -864,8 +864,8 @@ dissect_saprfc_header(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint
 	}
 }
 
-static void
-dissect_saprfc_internal(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
+static int
+dissect_saprfc_internal(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_)
 {
 	guint32 offset = 0;
 	proto_item *saprfc = NULL;
@@ -881,10 +881,11 @@ dissect_saprfc_internal(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 
 	dissect_saprfc_rfcheader(tvb, pinfo, saprfc_tree, offset);
 
+	return tvb_captured_length(tvb);
 }
 
-static void
-dissect_saprfc(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
+static int
+dissect_saprfc(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_)
 {
 	guint32 offset = 0;
 	guint8 version = 0, req_type = 0;
@@ -911,7 +912,7 @@ dissect_saprfc(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 			saprfc_tree = proto_item_add_subtree(saprfc, ett_saprfc);
 		}
 		dissect_saprfc_header(tvb, pinfo, saprfc_tree, offset);
-		return;
+		return tvb_captured_length(tvb);
 	}
 
 	col_append_fstr(pinfo->cinfo, COL_INFO, "Version=%d, Request Type=%s", version, val_to_str(req_type, saprfc_reqtype_values, "Unknown"));
@@ -973,6 +974,7 @@ dissect_saprfc(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 		}
 	};
 
+	return tvb_captured_length(tvb);
 }
 
 void
