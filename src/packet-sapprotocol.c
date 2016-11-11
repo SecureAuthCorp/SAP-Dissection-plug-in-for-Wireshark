@@ -262,8 +262,8 @@ proto_register_sap_protocol(void)
 	register_dissector("sapni", dissect_sap_protocol, proto_sap_protocol);
 
 	/* Sub dissector code */
-	sub_dissectors_table = register_dissector_table("sapni.port", "SAP Protocol Port", FT_UINT16, BASE_DEC);
-	heur_subdissector_list = register_heur_dissector_list("sapni");
+	sub_dissectors_table = register_dissector_table("sapni.port", "SAP Protocol Port", proto_sap_protocol, FT_UINT16, BASE_DEC);
+	heur_subdissector_list = register_heur_dissector_list("sapni", proto_sap_protocol);
 
 	/* Register the preferences */
 	sap_protocol_module = prefs_register_protocol(proto_sap_protocol, proto_reg_handoff_sap_protocol);
