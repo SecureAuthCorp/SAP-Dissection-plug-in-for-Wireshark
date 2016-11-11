@@ -24,10 +24,34 @@
 #
 
 include $(top_srcdir)/Makefile.am.inc
+include ../Makefile.am.inc
 
-INCLUDES = -I$(top_srcdir) -I$(includedir)
+# the name of the plugin
+PLUGIN_NAME = sap
 
-include Makefile.common
+# the dissector sources (without any helpers)
+DISSECTOR_SRC = \
+	src/packet-sapdiag.c \
+	src/packet-sapenqueue.c \
+	src/packet-saprouter.c \
+	src/packet-sapprotocol.c \
+	src/packet-saprfc.c \
+	src/packet-sapms.c \
+	src/packet-sapsnc.c
+
+# corresponding headers
+DISSECTOR_INCLUDES = \
+	src/packet-sapprotocol.h
+
+# Dissector helpers. They're included in the source files in this
+# directory, but they're not dissectors themselves, i.e. they're not
+# used to generate "plugin.c".
+DISSECTOR_SUPPORT_SRC = \
+	src/sapdecompress.cpp \
+	src/vpa105CsObjInt.cpp \
+	src/vpa106cslzc.cpp \
+	src/vpa107cslzh.cpp \
+	src/vpa108csulzh.cpp
 
 if HAVE_WARNINGS_AS_ERRORS
 AM_CFLAGS = -Werror
@@ -43,8 +67,13 @@ sap_la_SOURCES = \
 	$(DISSECTOR_SRC) \
 	$(DISSECTOR_SUPPORT_SRC) \
 	$(DISSECTOR_INCLUDES)
-	
-sap_la_LDFLAGS = -module -avoid-version
+
+sap_la_CPPFLAGS = $(AM_CPPFLAGS) $(PLUGIN_CPPFLAGS)
+
+sap_la_CFLAGS = $(AM_CFLAGS) $(PLUGIN_CFLAGS)
+
+sap_la_LDFLAGS = $(PLUGIN_LDFLAGS)
+
 sap_la_LIBADD = @PLUGIN_LIBS@
 
 # Libs must be cleared, or else libtool won't create a shared module.
@@ -119,9 +148,6 @@ MAINTAINERCLEANFILES = \
 	plugin.c
 
 EXTRA_DIST = \
-	Makefile.common		\
-	Makefile.nmake		\
-	moduleinfo.nmake	\
 	plugin.rc.in		\
 	CMakeLists.txt
 
