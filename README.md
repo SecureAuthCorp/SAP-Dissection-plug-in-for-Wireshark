@@ -82,11 +82,11 @@ This Wireshark plugin is not distributed as part of the Wireshark source. It
 can be build as a standalone plugin, or as part of Wireshark, and is compatible
 with version 2.0.
 
-### Building on Linux ###
+### Installing on Linux ###
 
 #### As a standalone plugin ####
 
-To build the plugin on Debian/Ubuntu linux distributions:
+To build and install the plugin on Debian/Ubuntu linux distributions:
 
     sudo apt-get install wireshark wireshark-dev
     git clone https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/
@@ -99,7 +99,7 @@ To build the plugin on Debian/Ubuntu linux distributions:
 
 #### As part of Wireshark ####
 
-The following steps are required to compile the plugin as part of Wireshark:
+The following steps are required to build and install the plugin as part of Wireshark:
 
 1) Download and decompress the [Wireshark version 2.0 source](https://www.wireshark.org/download.html) [8]
    or checkout the code from the [source repository](https://code.wireshark.org/review/wireshark) [9].
@@ -157,7 +157,7 @@ case `standalone`:
     wireshark
 
 
-### Building on Windows ###
+### Installing on Windows ###
 
 Windows build can be only performed as part of the whole Wireshark. The
 following steps are required to compile the plugin on Windows:
@@ -175,11 +175,19 @@ for building Wireshark on Windows.
 4) Perform a new build including the plugin.
 
 
-### Building on OSX ###
+### Installing on OSX ###
 
 The build process for OSX is similar to the one for Linux systems. It was
 reported that compiling Wireshark on OSX requires fixing link for the `gettext`
 library if it was installed using `home-brew`.
+
+
+### Installing on Pentoo ###
+
+The plugin is available for installation on the [Pentoo](http://www.pentoo.ch/)
+penetration testing livecd distribution.
+
+	emerge net-misc/wireshark-sap-plugin
 
 
 ### Additional notes ###
