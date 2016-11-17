@@ -467,7 +467,7 @@ dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 		 * occurred. The dissector continues trying to add the payload,
 		 * however the returned size should be 0.  */
 		if (rt < 0){
-			expert_add_info_format(pinfo, compression_header, &ei_saprfc_invalid_decompresssion, "Decompression of payload failed with return code %d (%s)", rt, val_to_str(rt, decompress_return_code_vals, "Unknown"));
+			expert_add_info_format(pinfo, compression_header, &ei_saprfc_invalid_decompresssion, "Decompression of payload failed with return code %d (%s)", rt, decompress_error_string(rt));
 		}
 
 		/* Check the length returned for the compression routine. If differs
@@ -477,7 +477,8 @@ dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 			expert_add_info_format(pinfo, rl, &ei_saprfc_invalid_decompress_length, "The uncompressed payload length (%d) differs with the reported length (%d)", uncompress_length, reported_length);
 		}
 
-		/* TODO: Add the return code to the tree */
+		/* Add the return code to the tree */
+		proto_tree_add_int_format_value(compression_header_tree, hf_saprfc_table_return_code, tvb, offset, 8, rt, "%d (%s)", rt, decompress_error_string(rt));
 
 		if (uncompress_length != 0){
 			/* Now re-setup the tvb buffer to have the new data */
@@ -1217,7 +1218,7 @@ proto_register_saprfc(void)
 		{ &hf_saprfc_table_special,
 			{ "Special", "saprfc.table.compression.special", FT_UINT8, BASE_HEX, NULL, 0x0, "SAP RFC Table Special", HFILL }},
 		{ &hf_saprfc_table_return_code,
-			{ "Decompress Return Code", "saprfc.table.compression.returncode", FT_UINT8, BASE_DEC, VALS(decompress_return_code_vals), 0x0, "SAP RFC Decompression routine return code", HFILL }},
+			{ "Decompress Return Code", "saprfc.table.compression.returncode", FT_INT8, BASE_DEC, NULL, 0x0, "SAP RFC Decompression routine return code", HFILL }},
 		{ &hf_saprfc_table_content,
 			{ "Content", "saprfc.table.content", FT_NONE, BASE_NONE, NULL, 0x0, "SAP RFC Table Content", HFILL }},
 
