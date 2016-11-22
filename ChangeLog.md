@@ -1,6 +1,16 @@
 Changelog
 =========
 
+v0.4.1 - 2016-XX-XX
+-------------------
+
+- Switched to Wireshark 2.2 trunk. Ported the plugin to the use of new APIs.
+- Added Vagrant configuration files to build and run the plugin.
+- Added provision and build scripts to use in both Travis and Vagrant build
+  process.
+- `src/sapdecompress.cpp`: Removed use of value_string for decompression return code (#10).
+
+
 v0.3.2 - 2016-10-21
 -------------------
 
@@ -10,7 +20,7 @@ v0.3.2 - 2016-10-21
 - `src/packet-sapdiag.c`: Partially dissecting `Info flag` Diag item.
 - `src/packet-sapdiag.c`: Splitted `SBA`/`SFE`/`SLC` fields.
 - `src/packet-sapdiag.c`: Parsing list focus item, list cell text value, renamed error flag to error number.
-- `src/packet-sapdiag.c`: Added dissection of `Control Properties` item. 
+- `src/packet-sapdiag.c`: Added dissection of `Control Properties` item.
 
 
 v0.3.1 - 2016-03-25
@@ -76,16 +86,16 @@ v0.1.4 - 2014-03-25
 - `packet-sapdiag.c`: Fixed some support bits and added new ones found on SAP GUI version 7.30.
 - `packet-sapdiag.c`: Added dissection of new Diag Items: `WindowsSize`.
 - `packet-sapenqueue.c`: New dissector. Parsing of Enqueue Server packets.
-- `packet-sapms.c`: New dissector. Parsing of Message Server packets. 
-- `packet-sapprotocol.c`: Sub-dissectors tables are now handled only on the NI Protocol dissector. 
+- `packet-sapms.c`: New dissector. Parsing of Message Server packets.
+- `packet-sapprotocol.c`: Sub-dissectors tables are now handled only on the NI Protocol dissector.
 - `packet-sapprotocol.h`: Exported function to look at the NI Protocol sub-dissector table.
 - `packet-saprfc.c`: The RFC dissector now registers two separate handlers: one for internal calls (e.g. from SAP Diag
-  dissector) and another for external communications (e.g. RFC or Gateway Monitor). 
-- `packet-saprfc.c`: Refactored almost all of the dissector code. Added lot of new fields and fixed some issues. 
-- `packet-saprfc.c`: Fixed reassemble of RFC tables. 
+  dissector) and another for external communications (e.g. RFC or Gateway Monitor).
+- `packet-saprfc.c`: Refactored almost all of the dissector code. Added lot of new fields and fixed some issues.
+- `packet-saprfc.c`: Fixed reassemble of RFC tables.
 - `packet-saprouter.c`: Added dissection of Admin and Control messages.
 - `packet-saprouter.c`: Protocol port preference changed to a range to cover the port used by `niping`.
-- `packet-sapsnc.c`: New dissector. Moved dissection of SNC frames to a new dissector for using it as sub-dissector of 
+- `packet-sapsnc.c`: New dissector. Moved dissection of SNC frames to a new dissector for using it as sub-dissector of
   both SAP Router and SAP Diag packets.
 - `sapdecompress.h`: Exported return code strings for using it in both Diag and RFC dissectors.
 - `wireshark.patch`: Switched patch file to Git as the repository isn't updated on SVN now.
