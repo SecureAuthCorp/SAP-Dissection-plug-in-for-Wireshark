@@ -88,6 +88,8 @@ with version 2.2.
 
 To build and install the plugin on Debian/Ubuntu linux distributions:
 
+    sudo add-apt-repository ppa:wireshark-dev/stable -y
+    sudo apt-get update
     sudo apt-get install wireshark wireshark-dev
     git clone https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/
     cd SAP-Dissection-plug-in-for-Wireshark/
