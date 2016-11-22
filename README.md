@@ -217,6 +217,8 @@ The same results can be achieved also using expert info (security group):
 
 	sapdiag.item.value.dyntatom.item.password
 
+![SAP Diag login password](https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/raw/master/docs/sapdiag_login_password.png "SAP Diag login password")
+
 
 License
 -------
