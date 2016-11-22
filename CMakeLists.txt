@@ -21,13 +21,13 @@ project(sap-wireshark-plugin C CXX)
 
 cmake_minimum_required(VERSION 2.6)
 set(CMAKE_BACKWARDS_COMPATIBILITY 2.6)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake) 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 find_package(Wireshark)
 
 if(WIRESHARK_FOUND)
 
-  MESSAGE(STATUS "Wireshark libraries found, performing a stand-alone plug-in build.") 
+  MESSAGE(STATUS "Wireshark libraries found, performing a stand-alone plug-in build.")
 
   if(NOT CMAKE_INSTALL_LIBDIR )
     set(CMAKE_INSTALL_LIBDIR ~/.wireshark/plugins)
@@ -48,10 +48,10 @@ if(WIRESHARK_FOUND)
 
 else(WIRESHARK_FOUND)
 
-  MESSAGE(STATUS "Wireshark libraries not found, performing a Wireshark plug-in build.") 
+  MESSAGE(STATUS "Wireshark libraries not found, performing a Wireshark plug-in build.")
 
   include(WiresharkPlugin)
-  set_module_info(sap 0 3 2 0)
+  set_module_info(sap 0 4 1 0)
 
 endif(WIRESHARK_FOUND)
 
@@ -126,5 +126,15 @@ else(WIRESHARK_FOUND)
           ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/${CPACK_PACKAGE_NAME}/plugins/${CPACK_PACKAGE_VERSION}
   )
 
-endif(WIRESHARK_FOUND)
+  file(GLOB DISSECTOR_HEADERS RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "*.h")
+  CHECKAPI(
+  	NAME
+  	  sap
+  	SWITCHES
+  	  -g abort -g termoutput -build
+  	SOURCES
+  	  ${DISSECTOR_SRC}
+  	  ${DISSECTOR_HEADERS}
+  )
 
+endif(WIRESHARK_FOUND)

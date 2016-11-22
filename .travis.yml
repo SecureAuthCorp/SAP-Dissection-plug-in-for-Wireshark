@@ -8,10 +8,8 @@ compiler:
   - gcc
 
 env:
-  - WIRESHARK_BRANCH=master-2.0 PLUGIN_DIR=$TRAVIS_BUILD_DIR BUILD_STANDALONE=no
-  # Stand alone build is disabled by now, as the wireshark-dev PPA is on the
-  # Wireshark 2.2 branch and the plugin is in the 2.0 one.
-  #- WIRESHARK_BRANCH=master-2.0 PLUGIN_DIR=$TRAVIS_BUILD_DIR BUILD_STANDALONE=yes
+  - WIRESHARK_BRANCH=master-2.2 PLUGIN_DIR=$TRAVIS_BUILD_DIR BUILD_STANDALONE=no
+  - WIRESHARK_BRANCH=master-2.2 PLUGIN_DIR=$TRAVIS_BUILD_DIR BUILD_STANDALONE=yes
 
 before_install:
   # See https://github.com/travis-ci/travis-ci/issues/5326

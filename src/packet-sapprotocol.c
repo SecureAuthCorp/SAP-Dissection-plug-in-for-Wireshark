@@ -216,11 +216,12 @@ dissect_sap_protocol_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree
 /*
  * Performs the TCP reassembling and dissects the packet.
  */
-static void
-dissect_sap_protocol(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
+static int
+dissect_sap_protocol(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data)
 {
 	tcp_dissect_pdus(tvb, pinfo, tree, global_sap_protocol_desegment, SAP_PROTOCOL_HEADER_LEN,
-		get_sap_protocol_pdu_len, dissect_sap_protocol_message, NULL);
+		get_sap_protocol_pdu_len, dissect_sap_protocol_message, data);
+	return tvb_reported_length(tvb);
 }
 
 void
@@ -262,8 +263,8 @@ proto_register_sap_protocol(void)
 	register_dissector("sapni", dissect_sap_protocol, proto_sap_protocol);
 
 	/* Sub dissector code */
-	sub_dissectors_table = register_dissector_table("sapni.port", "SAP Protocol Port", FT_UINT16, BASE_DEC);
-	heur_subdissector_list = register_heur_dissector_list("sapni");
+	sub_dissectors_table = register_dissector_table("sapni.port", "SAP Protocol Port", proto_sap_protocol, FT_UINT16, BASE_DEC);
+	heur_subdissector_list = register_heur_dissector_list("sapni", proto_sap_protocol);
 
 	/* Register the preferences */
 	sap_protocol_module = prefs_register_protocol(proto_sap_protocol, proto_reg_handoff_sap_protocol);

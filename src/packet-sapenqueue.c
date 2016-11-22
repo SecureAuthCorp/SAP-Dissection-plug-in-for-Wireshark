@@ -360,8 +360,8 @@ dissect_sapenqueue_conn_admin(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tre
 }
 
 
-static void
-dissect_sapenqueue(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
+static int
+dissect_sapenqueue(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_)
 {
 	guint8 dest = 0, type = 0, opcode = 0;
 	guint32 offset = 4;
@@ -372,7 +372,7 @@ dissect_sapenqueue(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 	 * Enqueue server packet.
 	 */
 	if (tvb_captured_length(tvb) < 20){
-		return;
+		return 0;
 	}
 
 	/* Add the protocol to the column */
@@ -390,7 +390,6 @@ dissect_sapenqueue(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 	if (dest == 0x06){
 		col_append_fstr(pinfo->cinfo, COL_INFO, ",Opcode=%s", val_to_str(opcode, sapenqueue_conn_admin_opcode_vals, "Unknown"));
 	}
-
 
 	if (tree){ /* we are being asked for details */
 
@@ -421,7 +420,7 @@ dissect_sapenqueue(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 			}
 		}
 	}
-
+	return tvb_captured_length(tvb);
 }
 
 
@@ -441,7 +440,7 @@ dissect_sapenqueue_heur(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, voi
 	conversation_set_dissector(conversation, sapenqueue_handle);
 
 	/* Now dissect the packet */
-	dissect_sapenqueue(tvb, pinfo, tree);
+	dissect_sapenqueue(tvb, pinfo, tree, data);
 
 	return (TRUE);
 }
@@ -556,7 +555,7 @@ proto_register_sapenqueue(void)
 	expert_module_t* sapenqueue_expert;
 
 	/* Register the protocol */
-	proto_sapenqueue = proto_register_protocol ("SAP Enqueue Protocol", "SAPENQUEUE", "sapenqueue" );
+	proto_sapenqueue = proto_register_protocol("SAP Enqueue Protocol", "SAPENQUEUE", "sapenqueue");
 
 	proto_register_field_array(proto_sapenqueue, hf, array_length(hf));
 	proto_register_subtree_array(ett, array_length(ett));

@@ -1539,7 +1539,7 @@ dissect_sapdiag_rfc_call(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
 		rfc_handle = find_dissector("saprfcinternal");
 		if (rfc_handle){
 			/* Set the column to not writable so the RFC dissector doesn't override the Diag info */
-			col_set_writable(pinfo->cinfo, FALSE);
+			col_set_writable(pinfo->cinfo, -1, FALSE);
 			/* Create a new tvb buffer and call the dissector */
 			next_tvb = tvb_new_subset(tvb, offset, item_length, item_length);
 			call_dissector(rfc_handle, next_tvb, pinfo, tree);
@@ -1560,7 +1560,7 @@ dissect_sapdiag_snc_frame(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, g
 		snc_handle = find_dissector("sapsnc");
 		if (snc_handle){
 			/* Set the column to not writable so the SNC dissector doesn't override the Diag info */
-			col_set_writable(pinfo->cinfo, FALSE);
+			col_set_writable(pinfo->cinfo, -1, FALSE);
 			/* Create a new tvb buffer and call the dissector */
 			next_tvb = tvb_new_subset(tvb, offset, -1, -1);
 			call_dissector(snc_handle, next_tvb, pinfo, tree);
@@ -2600,13 +2600,13 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data 
 			/* Decompress the payload */
 			rt = decompress_packet(tvb_get_ptr(tvb, payload_offset, -1),
 					tvb_captured_length_remaining(tvb, payload_offset),
-					decompressed_buffer,    
+					decompressed_buffer,
 					&uncompress_length);
 
 			/* Check the return code and add a expert info warning if an error occurred. The dissector continues trying to add
 			adding the payload, however the returned size should be 0.  */
 			if (rt < 0){
-				expert_add_info_format(pinfo, compression_header, &ei_sapdiag_invalid_decompresssion, "Decompression of payload failed with return code %d (%s)", rt, val_to_str(rt, decompress_return_code_vals, "Unknown"));
+				expert_add_info_format(pinfo, compression_header, &ei_sapdiag_invalid_decompresssion, "Decompression of payload failed with return code %d (%s)", rt, decompress_error_string(rt));
 			}
 
 			/* Check the length returned for the compression routine. If differs with the reported, use the actual one and add
@@ -2616,7 +2616,7 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data 
 			}
 
 			/* Add the return code to the tree */
-			proto_tree_add_int(compression_header_tree, hf_sapdiag_decompress_return_code, tvb, payload_offset, 8, rt);
+			proto_tree_add_int_format_value(compression_header_tree, hf_sapdiag_decompress_return_code, tvb, payload_offset, 8, rt, "%d (%s)", rt, decompress_error_string(rt));
 
 			if (uncompress_length != 0){
 				/* Now re-setup the tvb buffer to have the new data */
@@ -2720,7 +2720,7 @@ proto_register_sapdiag(void)
 		{ &hf_sapdiag_special,
 			{ "Special", "sapdiag.header.compression.special", FT_UINT8, BASE_HEX, NULL, 0x0, "SAP Diag Special", HFILL }},
 		{ &hf_sapdiag_decompress_return_code,
-			{ "Decompress Return Code", "sapdiag.header.compression.returncode", FT_INT8, BASE_DEC, VALS(decompress_return_code_vals), 0x0, "SAP Diag Decompression routine return code", HFILL }},
+			{ "Decompress Return Code", "sapdiag.header.compression.returncode", FT_INT8, BASE_DEC, NULL, 0x0, "SAP Diag Decompression routine return code", HFILL }},
 		/* SAPDiag Messages */
 		{ &hf_sapdiag_item,
 			{ "Item", "sapdiag.item", FT_NONE, BASE_NONE, NULL, 0x0, "SAP Diag Item", HFILL }},
@@ -3565,11 +3565,7 @@ proto_register_sapdiag(void)
 	expert_module_t* sapdiag_expert;
 
 	/* Register the protocol */
-	proto_sapdiag = proto_register_protocol (
-		"SAP Diag Protocol",	/* name */
-		"SAPDIAG",	/* short name */
-		"sapdiag"	/* abbrev */
-	);
+	proto_sapdiag = proto_register_protocol("SAP Diag Protocol", "SAPDIAG", "sapdiag");
 
 	proto_register_field_array(proto_sapdiag, hf, array_length(hf));
 	proto_register_subtree_array(ett, array_length(ett));
@@ -3577,7 +3573,7 @@ proto_register_sapdiag(void)
 	sapdiag_expert = expert_register_protocol(proto_sapdiag);
 	expert_register_field_array(sapdiag_expert, ei, array_length(ei));
 
-	new_register_dissector("sapdiag", dissect_sapdiag, proto_sapdiag);
+	register_dissector("sapdiag", dissect_sapdiag, proto_sapdiag);
 
 	/* Register the preferences */
 	sapdiag_module = prefs_register_protocol(proto_sapdiag, proto_reg_handoff_sapdiag);
@@ -3618,7 +3614,7 @@ proto_reg_handoff_sapdiag(void)
 	static gboolean initialized = FALSE;
 
 	if (!initialized) {
-		sapdiag_handle = new_create_dissector_handle(dissect_sapdiag, proto_sapdiag);
+		sapdiag_handle = create_dissector_handle(dissect_sapdiag, proto_sapdiag);
 		initialized = TRUE;
 	} else {
 		range_foreach(sapdiag_port_range, range_delete_callback);

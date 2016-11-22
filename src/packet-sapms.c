@@ -1078,8 +1078,8 @@ dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
 }
 
 
-static void
-dissect_sapms(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
+static int
+dissect_sapms(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_)
 {
 	/* Add the protocol to the column */
 	col_add_str(pinfo->cinfo, COL_PROTOCOL, "SAPMS");
@@ -1133,7 +1133,7 @@ dissect_sapms(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 			offset+=2; /* Skip 2 bytes */
 
 			if (!tvb_offset_exists(tvb, offset)){
-				return;
+				return 0;
 			}
 
 			/* The remaining of the packet is dissected based on the flag */
@@ -1181,6 +1181,8 @@ dissect_sapms(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 
 		}
 	}
+
+	return tvb_captured_length(tvb);
 }
 
 void

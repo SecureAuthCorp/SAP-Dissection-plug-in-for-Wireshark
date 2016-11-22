@@ -44,8 +44,8 @@ static dissector_handle_t sapsnc_handle;
 void proto_reg_handoff_sapsnc(void);
 
 
-static void
-dissect_sapsnc(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
+static int
+dissect_sapsnc(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_)
 {
 	/* Add the protocol to the column */
 	col_add_str(pinfo->cinfo, COL_PROTOCOL, ", SAPSNC");
@@ -75,6 +75,8 @@ dissect_sapsnc(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
 		proto_tree_add_item(sapsnc_frame_tree, hf_sapsnc_extflags, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 
 	}
+
+	return tvb_captured_length(tvb);
 }
 
 void
