@@ -28,7 +28,7 @@ before_build:
   - cmd: set WIRESHARK_TARGET_PLATFORM=win64
   - cmd: set QT5_BASE_DIR=c:\Qt\5.6\msvc2013
   # insert our plugin files to wireshark
-  - cmd: xcopy /E c:\projects\sap-plugin plugins\sap
+  - cmd: xcopy /E c:\projects\sap-plugin\ plugins\sap
   # run the adjustment scripts
   - bash patch plugins/sap/wireshark-master-2.2.patch
   - ps: Invoke-WebRequest -Uri https://cygwin.com/setup-x86_64.exe -OutFile c:\projects\cygwin-setup.exe
