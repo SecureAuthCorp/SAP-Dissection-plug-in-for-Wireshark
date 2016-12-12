@@ -1,0 +1,52 @@
+version: '0.0.1-{build}'
+
+clone_folder: c:\projects\sap-plugin
+
+environment:
+  CYG_ROOT: C:\cygwin64
+
+# script after cloning repo:
+install:
+  - echo Install Script now!
+  - mkdir c:\own-download
+  - cd c:\own-download
+  # Download winflexbison and add to PATH:
+  - appveyor DownloadFile http://darki2002.bplaced.net/amos/win_flex_bison-2.5.5.zip
+  - 7z x win_flex_bison-2.5.5.zip
+  - set Path=c:\own-download\win_flex_bison-2.5.5;%Path%
+
+platform:
+  - x64
+
+before_build:
+  - echo BeforeBuild Script now!
+  # add Cygwin to PATH
+  - set PATH=%PATH%;C:\cygwin64\bin\
+  - set PATH=C:\cygwin64\bin\;%PATH%
+  - mkdir c:\projects\wireshark
+  # get Wireshark and checkout the branch
+  - cd C:\projects\wireshark
+  - git init
+  - git remote add -t master-2.2 -f origin https://github.com/wireshark/wireshark
+  - git checkout master-2.2
+  # set necessary environment variables:
+  - cmd: set CYGWIN=nodosfilewarning
+  - cmd: set WIRESHARK_BASE_DIR=c:\projects
+  - cmd: set WIRESHARK_TARGET_PLATFORM=win64
+  - cmd: set QT5_BASE_DIR=c:\Qt\5.6\msvc2013
+  - cmd: set WIRESHARK_VERSION_EXTRA=-YourExtraVersionInfo
+  # insert our plugin files to wireshark
+  - cmd: xcopy /E c:\projects\sap-plugin\ plugins/sap
+  # run the adjustment scripts
+  - bash patch plugins/sap/wireshark-master-2.2.patch
+  - ps: Invoke-WebRequest -Uri https://cygwin.com/setup-x86_64.exe -OutFile c:\projects\cygwin-setup.exe
+  - mkdir c:\projects\cyg-packages
+  - c:\projects\cygwin-setup.exe -q -n -N -d -R C:\cygwin64 -s http://ftp.hawo.stw.uni-erlangen.de/cygwin/ -l c:\projects\cyg-packages -P flex -P bison
+  - cmd: set WIRESHARK_CYGWIN_INSTALL_PATH=C:\cygwin64
+
+build_script:
+  - echo Build Script now!
+  - mkdir c:\projects\wiresharkBuild
+  - cd  c:\projects\wiresharkBuild
+  - cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 12 Win64" c:\projects\wireshark
+  - msbuild /m /p:Configuration=RelWithDebInfo c:\projects\wiresharkBuild\plugins\sap\sap.vcxproj
