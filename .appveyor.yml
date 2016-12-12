@@ -41,3 +41,9 @@ build_script:
   - cd  c:\projects\wireshark-build
   - cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 12 Win64" c:\projects\wireshark
   - msbuild /m /p:Configuration=RelWithDebInfo c:\projects\wireshark-build\plugins\sap\sap.vcxproj
+
+after_test:
+  - cp c:\projects\wireshark-build\run\RelWithDebInfo\plugins\sap.dll c:\projects\sap_build$env:appveyor_build_number.dll
+
+artifacts:
+  - path: c:\projects\sap_build$env:appveyor_build_number.dll
