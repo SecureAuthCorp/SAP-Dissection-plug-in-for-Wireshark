@@ -44,7 +44,7 @@ build_script:
   - msbuild /m /p:Configuration=RelWithDebInfo c:\projects\wireshark-build\plugins\sap\sap.vcxproj
 
 after_test:
-  - cp c:\projects\wireshark-build\run\RelWithDebInfo\plugins\sap.dll c:\projects\sap_build$env:appveyor_build_number.dll
+  - cp c:\projects\wireshark-build\run\RelWithDebInfo\plugins\sap.dll c:\projects\sap\sap_build$env:appveyor_build_number.dll
 
 artifacts:
-  - path: c:\projects\sap_build$env:appveyor_build_number.dll
+  - path: sap_build$env:appveyor_build_number.dll
