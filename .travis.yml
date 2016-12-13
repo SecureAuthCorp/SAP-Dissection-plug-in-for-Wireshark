@@ -34,3 +34,6 @@ install:
 
 script:
   - python ${PLUGIN_DIR}/tests/__init__.py
+
+before_deploy:
+  - cp /home/travis/.wireshark/plugins/sap.so ${PLUGIN_DIR}/sap-${TRAVIS_TAG}_linux_x86-64.so
