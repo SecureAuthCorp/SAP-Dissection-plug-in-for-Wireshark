@@ -8,6 +8,7 @@ v0.4.1 - 2016-XX-XX
 - Added Vagrant configuration files to build and run the plugin.
 - Added provision and build scripts to use in both Travis and Vagrant build
   process.
+- Building in Windows with Appveyor.
 - `src/sapdecompress.cpp`: Removed use of value_string for decompression return code ([\#10](https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/issues/10)).
 
 
