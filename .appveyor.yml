@@ -18,7 +18,7 @@ before_build:
   - set PATH=C:\cygwin64\bin\;%PATH%
   # get Wireshark and checkout the branch
   - mkdir c:\projects\wireshark
-  - cd C:\projects\wireshark
+  - cd c:\projects\wireshark
   - git init
   - git remote add -t master-2.2 -f origin https://github.com/wireshark/wireshark
   - git checkout master-2.2
@@ -40,7 +40,7 @@ before_build:
 build_script:
   - mkdir c:\projects\sap\build
   - cd c:\projects\sap\build
-  - cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 12 Win64" ..
+  - cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 12 Win64" c:\projects\wireshark
   - msbuild /m /p:Configuration=RelWithDebInfo plugins\sap\sap.vcxproj
 
 artifacts:
