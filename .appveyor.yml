@@ -13,6 +13,9 @@ install:
 platform:
   - x64
 
+configuration:
+  - RelWithDebInfo
+
 before_build:
   # add Cygwin to PATH
   - set PATH=%PATH%;C:\cygwin64\bin\
