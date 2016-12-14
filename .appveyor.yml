@@ -51,4 +51,4 @@ after_build:
   - copy c:\projects\sap\build\run\%configuration%\plugins\sap.dll c:\projects\sap\build\sap-%version%.dll
 
 artifacts:
-  - path: "build\\sap-%version%.dll"
+  - path: "build\\sap-$(version).dll"
