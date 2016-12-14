@@ -19,38 +19,13 @@ matrix:
   fast_finish: true
 
 before_build:
-  # add Cygwin to PATH
-  - set PATH=%PATH%;C:\cygwin64\bin\
-  - set PATH=C:\cygwin64\bin\;%PATH%
-  # get Wireshark and checkout the branch
-  - mkdir c:\projects\wireshark
-  - cd c:\projects\wireshark
-  - git init
-  - git remote add -t master-2.2 -f origin https://github.com/wireshark/wireshark
-  - git checkout master-2.2
-  # set necessary environment variables:
-  - set CYGWIN=nodosfilewarning
-  - set WIRESHARK_BASE_DIR=c:\projects
-  - set WIRESHARK_TARGET_PLATFORM=win64
-  - set QT5_BASE_DIR=c:\Qt\5.6\msvc2013
-  # insert our plugin files to wireshark
-  - mkdir C:\projects\wireshark\plugins\sap
-  - xcopy /E c:\projects\sap C:\projects\wireshark\plugins\sap
-  # run the adjustment scripts
-  - git apply plugins/sap/wireshark-master-2.2.patch
-  - ps: Invoke-WebRequest -Uri https://cygwin.com/setup-x86_64.exe -OutFile c:\projects\cygwin-setup.exe
-  - mkdir c:\projects\cyg-packages
-  - c:\projects\cygwin-setup.exe -q -n -N -d -R C:\cygwin64 -s http://ftp.hawo.stw.uni-erlangen.de/cygwin/ -l c:\projects\cyg-packages -P flex -P bison
-  - set WIRESHARK_CYGWIN_INSTALL_PATH=C:\cygwin64
+  - ps: .\tools\windows-provision-source.ps1
 
 build_script:
-  - mkdir c:\projects\sap\build
-  - cd c:\projects\sap\build
-  - cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 12 Win64" c:\projects\wireshark
-  - msbuild /m /p:Configuration=$(configuration) /logger:"C:\\Program Files\\AppVeyor\\BuildAgent\\Appveyor.MSBuildLogger.dll" plugins\sap\sap.vcxproj
+  - ps: .\tools\windows-build-source.ps1
 
 after_build:
-  - copy c:\projects\sap\build\run\$(configuration)\plugins\sap.dll c:\projects\sap\build\sap-v0.4.1-dev.dll
+  - copy c:\projects\sap\build\run\%Configuration%\plugins\sap.dll c:\projects\sap\build\sap-v0.4.1-dev.dll
 
 artifacts:
   - path: "build\\*.dll"
