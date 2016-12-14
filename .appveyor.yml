@@ -12,20 +12,21 @@ install:
 platform:
   - x64
 
-configuration:
-  - RelWithDebInfo
-
-matrix:
-  fast_finish: true
-
 before_build:
   - ps: .\tools\windows-provision-source.ps1
 
 build_script:
+<<<<<<< HEAD
   - ps: .\tools\windows-build-source.ps1
 
 after_build:
   - copy c:\projects\sap\build\run\%Configuration%\plugins\sap.dll c:\projects\sap\build\sap-v0.4.1-dev.dll
+=======
+  - mkdir c:\projects\sap\build
+  - cd c:\projects\sap\build
+  - cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 12 Win64" c:\projects\wireshark
+  - msbuild /m /p:Configuration=RelWithDebInfo plugins\sap\sap.vcxproj
+>>>>>>> parent of 4b35a66... Using configuration variable
 
 artifacts:
-  - path: "build\\*.dll"
+  - path: "build\\run\\RelWithDebInfo\\plugins\\sap.dll"
