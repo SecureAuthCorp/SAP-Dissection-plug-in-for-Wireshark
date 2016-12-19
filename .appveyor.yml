@@ -52,3 +52,15 @@ after_build:
 
 artifacts:
   - path: "*.dll"
+
+deploy:
+  release: "SAP plug-in for wireshark $(APPVEYOR_REPO_TAG_NAME)"
+  provider: GitHub
+  auth_token:
+    secure: lVpg1wc61eLYE6vgxAuOwDxm3MyN3hUqrXyodRbcSb8LXej95tpUUDljEymBh0DT
+  artifact: *.dll
+  draft: true
+  force_update: true
+  on:
+    branch: master
+    appveyor_repo_tag: true
