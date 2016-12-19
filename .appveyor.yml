@@ -11,6 +11,7 @@ install:
   - refreshenv
 
 platform:
+  - x86
   - x64
 
 configuration:
@@ -29,7 +30,8 @@ before_build:
   # set necessary environment variables:
   - set CYGWIN=nodosfilewarning
   - set WIRESHARK_BASE_DIR=c:\projects
-  - set WIRESHARK_TARGET_PLATFORM=win64
+  - if "%platform%"=="x86" (set WIRESHARK_TARGET_PLATFORM=win32)
+  - if "%platform%"=="x64" (set WIRESHARK_TARGET_PLATFORM=win64)
   - set QT5_BASE_DIR=c:\Qt\5.6\msvc2013
   # insert our plugin files to wireshark
   - mkdir C:\projects\wireshark\plugins\sap
@@ -44,7 +46,8 @@ before_build:
 build_script:
   - mkdir c:\projects\sap\build
   - cd c:\projects\sap\build
-  - cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 12 Win64" c:\projects\wireshark
+  - if "%platform%"=="x86" (cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 12" c:\projects\wireshark)
+  - if "%platform%"=="x64" (cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 12 Win64" c:\projects\wireshark)
   - msbuild /m /p:Configuration=%configuration% /logger:"C:\\Program Files\\AppVeyor\\BuildAgent\\Appveyor.MSBuildLogger.dll" plugins\sap\sap.vcxproj
 
 after_build:
