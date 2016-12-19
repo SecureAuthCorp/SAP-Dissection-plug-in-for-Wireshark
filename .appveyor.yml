@@ -51,14 +51,14 @@ after_build:
   - copy c:\projects\sap\build\run\%configuration%\plugins\sap.dll c:\projects\sap\sap-$(APPVEYOR_BUILD_VERSION).dll
 
 artifacts:
-  - path: "*.dll"
+  - path: "sap-$(APPVEYOR_BUILD_VERSION).dll"
 
 deploy:
   release: "SAP plug-in for wireshark $(APPVEYOR_REPO_TAG_NAME)"
   provider: GitHub
   auth_token:
     secure: lVpg1wc61eLYE6vgxAuOwDxm3MyN3hUqrXyodRbcSb8LXej95tpUUDljEymBh0DT
-  artifact: *.dll
+  artifact: "sap-$(APPVEYOR_BUILD_VERSION).dll"
   draft: true
   force_update: true
   on:
