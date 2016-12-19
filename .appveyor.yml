@@ -48,17 +48,17 @@ build_script:
   - msbuild /m /p:Configuration=%configuration% /logger:"C:\\Program Files\\AppVeyor\\BuildAgent\\Appveyor.MSBuildLogger.dll" plugins\sap\sap.vcxproj
 
 after_build:
-  - copy c:\projects\sap\build\run\%configuration%\plugins\sap.dll c:\projects\sap\sap-$(APPVEYOR_BUILD_VERSION).dll
+  - copy c:\projects\sap\build\run\%configuration%\plugins\sap.dll c:\projects\sap\sap-%APPVEYOR_BUILD_VERSION%-%WIRESHARK_TARGET_PLATFORM%.dll
 
 artifacts:
-  - path: "sap-$(APPVEYOR_BUILD_VERSION).dll"
+  - path: "sap-*.dll"
 
 deploy:
   release: "SAP plug-in for wireshark $(APPVEYOR_REPO_TAG_NAME)"
   provider: GitHub
   auth_token:
     secure: lVpg1wc61eLYE6vgxAuOwDxm3MyN3hUqrXyodRbcSb8LXej95tpUUDljEymBh0DT
-  artifact: "sap-$(APPVEYOR_BUILD_VERSION).dll"
+  artifact: "sap-*.dll"
   draft: true
   force_update: true
   on:
