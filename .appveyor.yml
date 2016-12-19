@@ -48,7 +48,7 @@ build_script:
   - msbuild /m /p:Configuration=%configuration% /logger:"C:\\Program Files\\AppVeyor\\BuildAgent\\Appveyor.MSBuildLogger.dll" plugins\sap\sap.vcxproj
 
 after_build:
-  - copy c:\projects\sap\build\run\%configuration%\plugins\sap.dll c:\projects\sap\sap-%version%.dll
+  - copy c:\projects\sap\build\run\%configuration%\plugins\sap.dll c:\projects\sap\sap-$(APPVEYOR_BUILD_VERSION).dll
 
 artifacts:
   - path: "*.dll"
