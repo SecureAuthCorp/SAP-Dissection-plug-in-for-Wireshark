@@ -49,4 +49,3 @@ deploy:
         tags: true
         repo: CoreSecurity/pysap
         condition: "${BUILD_STANDALONE} == \"yes\""
->>>>>>> appveyor
