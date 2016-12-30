@@ -36,4 +36,17 @@ script:
   - python ${PLUGIN_DIR}/tests/__init__.py
 
 before_deploy:
-  - cp /home/travis/.wireshark/plugins/sap.so ${PLUGIN_DIR}/sap-${TRAVIS_TAG}_linux_x86-64.so
+  - cp build/run/plugins/sap.so build/sap-${TRAVIS_TAG}-linux-x64.so
+
+deploy:
+    provider: releases
+    api_key:
+        secure: "HmUIZ6L/W2Njxnm8z1xWrtka1cxzQRZo62asHljFXYj9QCMBmCDGr3CHvJW42D9c8dV3Q7f2HOO0WEatDo+1IWtoZZtuQ8Jbxhz5cegobhuO5Wj7q+45DPf31/dILufDG9Sy2vmgJV0EWxuvYJXMelxjd8+yfXCtGLrZbpcWUPU="
+    file: "build/*.so"
+    file_glob: true
+    skip_cleanup: true
+    on:
+        tags: true
+        repo: CoreSecurity/pysap
+        condition: "${BUILD_STANDALONE} == \"yes\""
+>>>>>>> appveyor
