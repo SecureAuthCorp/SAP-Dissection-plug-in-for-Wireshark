@@ -1,7 +1,7 @@
 Changelog
 =========
 
-v0.4.1 - 2016-XX-XX
+v0.4.1 - 2016-12-30
 -------------------
 
 - Switched to Wireshark 2.2 trunk. Ported the plugin to the use of new APIs.
