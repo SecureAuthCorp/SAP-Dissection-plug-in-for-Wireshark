@@ -47,5 +47,5 @@ deploy:
     skip_cleanup: true
     on:
         tags: true
-        repo: CoreSecurity/pysap
+        repo: CoreSecurity/SAP-Dissection-plug-in-for-Wireshark
         condition: "${BUILD_STANDALONE} == \"yes\""
