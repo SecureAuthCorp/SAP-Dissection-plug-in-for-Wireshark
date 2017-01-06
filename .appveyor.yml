@@ -60,7 +60,7 @@ deploy:
   release: "SAP plug-in for wireshark $(APPVEYOR_REPO_TAG_NAME)"
   provider: GitHub
   auth_token:
-    secure: cYlpmHBTL5qds/AcekHQTV/c+L37cAifUniQYeDbFBAE996THDtNT7n8kKpibGG7
+    secure: LvW415L8UTYoBK7tZKI+cn5VyL4OTuyGTGQG/E/8suaRomn+AtLzCV7tjZOMa5eF
   artifact: "sap-*.dll"
   draft: true
   force_update: true
