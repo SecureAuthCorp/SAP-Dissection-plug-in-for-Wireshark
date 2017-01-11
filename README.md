@@ -185,12 +185,25 @@ reported that compiling Wireshark on OSX requires fixing link for the `gettext`
 library if it was installed using `home-brew`.
 
 
-### Installing on Pentoo ###
+### Penetration testing distribution and frameworks ###
 
-The plugin is available for installation on the [Pentoo](http://www.pentoo.ch/)
-penetration testing livecd distribution.
+The plugin is available for installation on several penetration testing
+distributions and frameworks.
+
+#### Installing on Pentoo ####
+
+Installation on the [Pentoo](http://www.pentoo.ch/) livecd distribution:
 
 	emerge net-misc/wireshark-sap-plugin
+
+#### Installing with The PenTesters Framework (PTF) ####
+
+Installation on Debian, Ubuntu and ArchLinux can be performed using
+[The PenTesters Framework (PTF)](https://github.com/trustedsec/ptf). From inside
+the `ptf` command-line, run:
+
+  use modules/intelligence-gathering/sap-wireshark-plugin
+  install
 
 
 ### Additional notes ###
