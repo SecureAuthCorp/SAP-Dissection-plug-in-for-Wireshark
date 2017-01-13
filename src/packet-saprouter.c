@@ -446,7 +446,8 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 		proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, offset, 10, ENC_ASCII|ENC_NA); offset += 10;
 		proto_item_append_text(ti, ", Niping message");
 
-		proto_tree_add_item(saprouter_tree, hf_saprouter_niping_message, tvb, offset, -1, ENC_ASCII|ENC_NA);
+		if (tvb_captured_length_remaining(tvb, offset))
+			proto_tree_add_item(saprouter_tree, hf_saprouter_niping_message, tvb, offset, -1, ENC_ASCII|ENC_NA);
 
 	}
 	/* Admin Message Type */
