@@ -425,8 +425,6 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 
 	/* Add the protocol to the column */
 	col_add_str(pinfo->cinfo, COL_PROTOCOL, "SAPROUTER");
-	/* Clear out stuff in the info column */
-	col_clear(pinfo->cinfo,COL_INFO);
 
 	/* Add the main SAP Router subtree */
 	if (tree) {
@@ -439,10 +437,10 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 
 	/* Admin Message Type */
 	if (tvb_strneql(tvb, offset, SAPROUTER_TYPE_ADMIN_STRING, eyecatcher_length) == 0){
-		col_set_str(pinfo->cinfo, COL_INFO, "Admin Message");
+		col_set_str(pinfo->cinfo, COL_INFO, "Admin message");
 
 		proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, offset, eyecatcher_length, ENC_ASCII|ENC_NA); offset += eyecatcher_length;
-		proto_item_append_text(ti, ", Admin Message");
+		proto_item_append_text(ti, ", Admin message");
 
 		proto_tree_add_item(saprouter_tree, hf_saprouter_ni_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
 
@@ -505,7 +503,7 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 	} else if (tvb_strneql(tvb, offset, SAPROUTER_TYPE_ROUTE_STRING, eyecatcher_length) == 0){
 		guint32 route_length = 0, route_offset = 0;
 
-		col_set_str(pinfo->cinfo, COL_INFO, "Route Message");
+		col_set_str(pinfo->cinfo, COL_INFO, "Route message");
 
 		/* Get the route length/offset */
 		route_length = tvb_get_ntohl(tvb, offset + SAPROUTER_ROUTE_LENGTH_OFFSET);
@@ -513,7 +511,7 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 
 		if (tree){
 			proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, 0, eyecatcher_length, ENC_ASCII|ENC_NA); offset += eyecatcher_length;
-			proto_item_append_text(ti, ", Route Message");
+			proto_item_append_text(ti, ", Route message");
 			/* Add the fields */
 			proto_tree_add_item(saprouter_tree, hf_saprouter_route_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
 			proto_tree_add_item(saprouter_tree, hf_saprouter_ni_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
@@ -556,12 +554,12 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 			opcode = 0;
 		}
 
-		col_set_str(pinfo->cinfo, COL_INFO, (opcode==0)? "Error Information" : "Control Message");
+		col_set_str(pinfo->cinfo, COL_INFO, (opcode==0)? "Error information" : "Control message");
 
 		if (tree){
 			guint32 text_length = 0;
 
-			proto_item_append_text(ti, (opcode==0)? ", Error Information" : ", Control Message");
+			proto_item_append_text(ti, (opcode==0)? ", Error information" : ", Control message");
 			/* Add the fields */
 			proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, offset, eyecatcher_length, ENC_ASCII|ENC_NA); offset += eyecatcher_length;
 			proto_tree_add_item(saprouter_tree, hf_saprouter_ni_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
@@ -583,8 +581,8 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 			/* Control Message */
 			} else {
 				/* Add the opcode name */
-				proto_item_append_text(ti, ", Opcode=%s", val_to_str(opcode, saprouter_opcode_vals, "Unknown"));
-				col_append_fstr(pinfo->cinfo, COL_INFO, ", Opcode=%s", val_to_str(opcode, saprouter_opcode_vals, "Unknown"));
+				proto_item_append_text(ti, ", opcode=%s", val_to_str(opcode, saprouter_opcode_vals, "Unknown"));
+				col_append_fstr(pinfo->cinfo, COL_INFO, ", opcode=%s", val_to_str(opcode, saprouter_opcode_vals, "Unknown"));
 
 				proto_tree_add_item(saprouter_tree, hf_saprouter_control_length, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 				if ((text_length >0) && tvb_offset_exists(tvb, offset+text_length)){
@@ -608,9 +606,9 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 		/* Route information available */
 		if (session_state && session_state->route_information){
 			session_state->route_accepted = TRUE;
-			col_add_fstr(pinfo->cinfo, COL_INFO, "Route from %s:%d to %s:%d accepted ", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
+			col_append_fstr(pinfo->cinfo, COL_INFO, ", from %s:%d to %s:%d", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
 			if (tree){
-				proto_item_append_text(ti, ", Route from %s:%d to %s:%d accepted ", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
+				proto_item_append_text(ti, ", from %s:%d to %s:%d", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
 			}
 		}
 
