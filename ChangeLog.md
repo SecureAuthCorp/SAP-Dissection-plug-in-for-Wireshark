@@ -4,6 +4,10 @@ Changelog
 v0.4.2 - 2017-XX-XX
 -------------------
 
+- `src/packet-sapprotocol.cpp`: Clarified some column strings.
+- `src/packet-saprouter.cpp`: Clarified some column strings.
+- `src/packet-saprouter.cpp`: Added parsing of niping tool messages.
+
 
 v0.4.1 - 2016-12-30
 -------------------
