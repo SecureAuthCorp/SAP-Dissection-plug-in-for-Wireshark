@@ -548,7 +548,14 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 
 	/* Error Information/Control Message Type */
 	} else if (tvb_strneql(tvb, offset, SAPROUTER_TYPE_ERR_STRING, eyecatcher_length) == 0){
-		opcode = tvb_get_guint8(tvb, offset + 10);
+
+		/* Extract the opcode if possible to determine the type of message */
+		if (tvb_offset_exists(tvb, offset + 10)) {
+			opcode = tvb_get_guint8(tvb, offset + 10);
+		} else {
+			opcode = 0;
+		}
+
 		col_set_str(pinfo->cinfo, COL_INFO, (opcode==0)? "Error Information" : "Control Message");
 
 		if (tree){
@@ -575,6 +582,10 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 
 			/* Control Message */
 			} else {
+				/* Add the opcode name */
+				proto_item_append_text(ti, ", Opcode=%s", val_to_str(opcode, saprouter_opcode_vals, "Unknown"));
+				col_append_fstr(pinfo->cinfo, COL_INFO, ", Opcode=%s", val_to_str(opcode, saprouter_opcode_vals, "Unknown"));
+
 				proto_tree_add_item(saprouter_tree, hf_saprouter_control_length, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 				if ((text_length >0) && tvb_offset_exists(tvb, offset+text_length)){
 					/* Add the control string tree */
