@@ -47,6 +47,7 @@
 #define SAPROUTER_ROUTE_OFFSET_OFFSET	20
 
 /* SAP Router Eye Catcher strings */
+#define SAPROUTER_TYPE_NIPING_STRING "EYECATCHER"
 #define SAPROUTER_TYPE_ROUTE_STRING	"NI_ROUTE"
 #define SAPROUTER_TYPE_ROUTE_ACCEPT	"NI_PONG"
 #define SAPROUTER_TYPE_ERR_STRING	"NI_RTERR"
@@ -142,6 +143,9 @@ static int proto_saprouter = -1;
 /* General fields */
 static int hf_saprouter_type = -1;
 static int hf_saprouter_ni_version = -1;
+
+/* Niping messages */
+static int hf_saprouter_niping_message = -1;
 
 /* Route information */
 static int hf_saprouter_route_version = -1;
@@ -435,8 +439,18 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 	/* Get the 'eye catcher' length */
 	eyecatcher_length = tvb_strsize(tvb, offset);
 
+	/* Niping message */
+	if (tvb_captured_length_remaining(tvb, offset) >= 10 && tvb_strneql(tvb, offset, SAPROUTER_TYPE_NIPING_STRING, 10) == 0) {
+		col_set_str(pinfo->cinfo, COL_INFO, "Niping message");
+
+		proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, offset, 10, ENC_ASCII|ENC_NA); offset += 10;
+		proto_item_append_text(ti, ", Niping message");
+
+		proto_tree_add_item(saprouter_tree, hf_saprouter_niping_message, tvb, offset, -1, ENC_ASCII|ENC_NA);
+
+	}
 	/* Admin Message Type */
-	if (tvb_strneql(tvb, offset, SAPROUTER_TYPE_ADMIN_STRING, eyecatcher_length) == 0){
+	else if (tvb_strneql(tvb, offset, SAPROUTER_TYPE_ADMIN_STRING, eyecatcher_length) == 0) {
 		col_set_str(pinfo->cinfo, COL_INFO, "Admin message");
 
 		proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, offset, eyecatcher_length, ENC_ASCII|ENC_NA); offset += eyecatcher_length;
@@ -658,6 +672,11 @@ proto_register_saprouter(void)
 	static hf_register_info hf[] = {
 		{ &hf_saprouter_type,
 			{ "Type", "saprouter.type", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Type", HFILL }},
+
+		/* Niping message */
+		{ &hf_saprouter_niping_message,
+			{ "Niping message", "saprouter.message", FT_NONE, BASE_NONE, NULL, 0x0, "SAP Router Niping message", HFILL }},
+
 		/* NI Route messages */
 		{ &hf_saprouter_route_version,
 			{ "Route version", "saprouter.version", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP Router Version", HFILL }},
