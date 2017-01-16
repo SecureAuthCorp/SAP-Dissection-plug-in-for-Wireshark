@@ -28,6 +28,16 @@
 /* Define default ports */
 #define SAPMS_PORT_RANGE "3600-3699,3900-3999"
 
+/* MS Domain values */
+static const value_string sapms_domain_vals[] = {
+	{  0x00, "ABAP" },
+	{  0x01, "J2EE" },
+	{  0x02, "JSTARTUP" },
+	/* NULL */
+	{ 0, NULL }
+};
+
+
 /* MS Flag values */
 static const value_string sapms_flag_vals[] = {
 	{  1, "MS_ONE_WAY" },
@@ -476,6 +486,7 @@ static int hf_sapms_msgtypes_spo = -1;
 static int hf_sapms_msgtypes_up2 = -1;
 static int hf_sapms_msgtypes_atp = -1;
 static int hf_sapms_msgtypes_icm = -1;
+static int hf_sapms_domain = -1;
 static int hf_sapms_reserved = -1;
 static int hf_sapms_key = -1;
 static int hf_sapms_flag = -1;
@@ -1115,7 +1126,9 @@ dissect_sapms(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U
 			proto_tree_add_item(msg_types_tree, hf_sapms_msgtypes_up2, tvb, offset, 1, ENC_BIG_ENDIAN);
 			proto_tree_add_item(msg_types_tree, hf_sapms_msgtypes_atp, tvb, offset, 1, ENC_BIG_ENDIAN);
 			proto_tree_add_item(msg_types_tree, hf_sapms_msgtypes_icm, tvb, offset, 1, ENC_BIG_ENDIAN); offset+=1;
-			proto_tree_add_item(sapms_tree, hf_sapms_reserved, tvb, offset, 3, ENC_NA); offset+=3;
+			proto_tree_add_item(sapms_tree, hf_sapms_reserved, tvb, offset, 1, ENC_NA); offset+=1;
+			proto_tree_add_item(sapms_tree, hf_sapms_domain, tvb, offset, 1, ENC_BIG_ENDIAN); offset+=1;
+			proto_tree_add_item(sapms_tree, hf_sapms_reserved, tvb, offset, 1, ENC_NA); offset+=1;
 			proto_tree_add_item(sapms_tree, hf_sapms_key, tvb, offset, 8, ENC_NA); offset+=8;
 
 			flag = tvb_get_guint8(tvb, offset);
@@ -1224,6 +1237,8 @@ proto_register_sapms(void)
 		{ &hf_sapms_msgtypes_icm,
 			{ "ICM", "sapms.msgtype.icm", FT_BOOLEAN, 8, NULL, SAPMS_MSG_TYPE_ICM, "SAP MS Message Type ICM",
 			HFILL }},
+		{ &hf_sapms_domain,
+			{ "Domain", "sapms.domain", FT_UINT8, BASE_HEX, VALS(sapms_domain_vals), 0x0, "SAP MS Domain", HFILL }},
 		{ &hf_sapms_reserved,
 			{ "Reserved", "sapms.reserved", FT_NONE, BASE_NONE, NULL, 0x0, "SAP MS Reserved", HFILL }},
 		{ &hf_sapms_key,
