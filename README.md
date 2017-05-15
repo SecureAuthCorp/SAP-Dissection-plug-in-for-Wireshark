@@ -18,12 +18,12 @@ Communication between components uses different network protocols. While
 some of them are standard and well-known protocols, others are proprietaries
 and public information is not available.
 
-This [Wireshark](https://www.wireshark.org/) [2] plugin  provides dissection
-of SAP's NI, Message Server, Router, Diag and Enqueue protocols. The
+This [Wireshark](https://www.wireshark.org/) [2] plugin provides dissection
+of SAP's NI, Message Server, Router, Diag, Enqueue and SNC protocols. The
 dissectors are based on information acquired at researching the different
 protocols and services. Additional experimental support is included for SAP's
-RFC and SNC protocols. Detailed information about the research can be found
-at [3], [4], [5], [6] and [7].
+RFC protocol. Detailed information about the research can be found at [3],
+[4], [5], [6] and [7].
 
 
 Features
@@ -65,15 +65,19 @@ This plugin counts on several different dissectors:
     This module dissects packets used by SAP's Standalone Enqueue and
     Replication Servers.
 
+- SAP SNC (Secure Network Connection) Protocol dissector
+
+	This dissector parses SNC frames and their fields. When the frames contains
+	wrapped data that wasn't encrypted, it allows calling dissectors to get
+	access to the unwrapped data for further dissecting it, as the case of Diag
+	dissector when SNC is used in authentication only or integrity protection
+	quality of protection levels.
+
 - SAP RFC (Remote Function Call) Protocol dissector (experimental)
 
     This dissector perform some basic dissection on the main components of the
     RFC protocol. It dissects general items and does some basic reassembling
     and decompression of table contents.
-
-- SAP SNC (Secure Network Connection) Protocol dissector (experimental)
-
-	This dissector perform some basic parsing of SNC frames.
 
 
 Installation & Build
