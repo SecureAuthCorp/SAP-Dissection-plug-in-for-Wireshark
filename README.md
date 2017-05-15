@@ -214,8 +214,19 @@ See [Wireshark's portability notes](https://code.wireshark.org/review/gitweb?p=w
 for more information [11].
 
 
-Example uses
-------------
+Usage
+-----
+
+### Traffic dissection ###
+
+After the plugin is installed, it will automatically dissect SAP protocols'
+traffic if using default ports. If required, ports can be modified on SAP NI
+protocol as well as sub-dissectors' preferences.
+
+![SAP NI preferences](https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/raw/master/docs/sapni_preferences.png "SAP NI preferences")
+
+![SAP Diag preferences](https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/raw/master/docs/sapdiag_preferences.png "SAP Diag preferences")
+
 
 ### SAP Diag Gui Logon Password filter ###
 
