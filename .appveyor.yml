@@ -25,8 +25,8 @@ before_build:
   - mkdir c:\projects\wireshark
   - cd c:\projects\wireshark
   - git init
-  - git remote add -t master-2.2 -f origin https://github.com/wireshark/wireshark
-  - git checkout master-2.2
+  - git remote add -t master-2.4 -f origin https://github.com/wireshark/wireshark
+  - git checkout master-2.4
   # set necessary environment variables:
   - set CYGWIN=nodosfilewarning
   - set WIRESHARK_BASE_DIR=c:\projects
@@ -37,7 +37,7 @@ before_build:
   - mkdir C:\projects\wireshark\plugins\sap
   - xcopy /E c:\projects\sap C:\projects\wireshark\plugins\sap
   # run the adjustment scripts
-  - git apply plugins/sap/wireshark-master-2.2.patch
+  - git apply plugins/sap/wireshark-master-2.4.patch
   - ps: Invoke-WebRequest -Uri https://cygwin.com/setup-x86_64.exe -OutFile c:\projects\cygwin-setup.exe
   - mkdir c:\projects\cyg-packages
   - c:\projects\cygwin-setup.exe -q -n -N -d -R C:\cygwin64 -s http://mirrors.kernel.org/sourceware/cygwin/ -l c:\projects\cyg-packages -P flex -P bison
