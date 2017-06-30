@@ -1,6 +1,10 @@
 Changelog
 =========
 
+v0.4.3 - 2017-XX-XX
+-------------------
+
+
 v0.4.2 - 2017-06-30
 -------------------
 - Added initial support for dissecting SNC frames and some of their fields.
