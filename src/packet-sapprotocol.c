@@ -2,7 +2,7 @@
 # ===========
 # SAP Dissector Plugin for Wireshark
 #
-# Copyright (C) 2012-2016 by Martin Gallo, Core Security
+# Copyright (C) 2012-2017 by Martin Gallo, Core Security
 #
 # The plugin was designed and developed by Martin Gallo from the Security
 # Consulting Services team of Core Security.
@@ -173,15 +173,16 @@ dissect_sap_protocol_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree
 
 	/* Check for NI_PING */
 	if ((length == 8)&&(tvb_strneql(tvb, 4, "NI_PING\00", 8) == 0)){
-		col_set_str(pinfo->cinfo, COL_INFO, "Ping Message");
+		col_set_str(pinfo->cinfo, COL_INFO, "Ping message");
 		if (tree){
-			proto_item_append_text(ti, ", Ping Message (keep-alive request)");
+			proto_item_append_text(ti, ", Ping message (keep-alive request)");
 			proto_tree_add_item(sap_protocol_tree, hf_sap_protocol_ping, tvb, 4, -1, ENC_NA);
 		}
 
 	/* Chek for NI_PONG */
 	} else if ((length == 8)&&(tvb_strneql(tvb, 4, "NI_PONG\00", 8) == 0)){
-		col_set_str(pinfo->cinfo, COL_INFO, "Pong Message");
+		col_set_str(pinfo->cinfo, COL_INFO, "Pong message");
+		proto_item_append_text(ti, ", Pong message");
 
 		/* We need to check if this is a keep-alive response, or it's part of
 		 * a SAP Router conversation and thus a route accepted message.
@@ -189,11 +190,13 @@ dissect_sap_protocol_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree
 		conversation = find_conversation(pinfo->fd->num, &pinfo->src, &pinfo->dst,
 										 pinfo->ptype, pinfo->srcport, pinfo->destport, 0);
 		if (conversation == NULL){
-			proto_item_append_text(ti, ", Pong Message (keep-alive response)");
+			col_append_str(pinfo->cinfo, COL_INFO, " (keep-alive response)");
+			proto_item_append_text(ti, " (keep-alive response)");
 			proto_tree_add_item(sap_protocol_tree, hf_sap_protocol_pong, tvb, 4, -1, ENC_NA);
 
 		} else {
-			proto_item_append_text(ti, ", Pong Message (route accepted)");
+			col_append_str(pinfo->cinfo, COL_INFO, " (route accepted)");
+			proto_item_append_text(ti, " (route accepted)");
 
 			/* Call the SAP Router dissector */
 			router_handle = find_dissector("saprouter");

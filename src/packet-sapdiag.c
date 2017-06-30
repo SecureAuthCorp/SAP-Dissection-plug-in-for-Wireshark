@@ -2,7 +2,7 @@
 # ===========
 # SAP Dissector Plugin for Wireshark
 #
-# Copyright (C) 2012-2016 by Martin Gallo, Core Security
+# Copyright (C) 2012-2017 by Martin Gallo, Core Security
 #
 # The plugin was designed and developed by Martin Gallo from the Security
 # Consulting Services team of Core Security.
@@ -32,6 +32,7 @@
 /* SAP Decompression routine */
 #include "sapdecompress.h"
 
+
 /* Define default ports. It could be 3200-3299, but 3298 it's usually
  * used for the niping tool and 3299 is associated to SAP Router. */
 #define SAPDIAG_PORT_RANGE "3200-3297"
@@ -51,7 +52,7 @@ static const value_string sapdiag_compress_vals[] = {
 	{ 0x0, "Compression switched off" },
 	{ 0x1, "Compression switched on" },
 	{ 0x2, "Data encrypted" },
-	{ 0x3, "????" },
+	{ 0x3, "Data encrypted wrap" },
 	/* NULL */
 	{ 0x0, NULL }
 };
@@ -1549,26 +1550,6 @@ dissect_sapdiag_rfc_call(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
 }
 
 
-static void
-dissect_sapdiag_snc_frame(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset){
-
-	tvbuff_t *next_tvb = NULL;
-	dissector_handle_t snc_handle;
-
-	/* Call the SNC dissector */
-	if (global_sapdiag_snc_dissection == TRUE){
-		snc_handle = find_dissector("sapsnc");
-		if (snc_handle){
-			/* Set the column to not writable so the SNC dissector doesn't override the Diag info */
-			col_set_writable(pinfo->cinfo, -1, FALSE);
-			/* Create a new tvb buffer and call the dissector */
-			next_tvb = tvb_new_subset(tvb, offset, -1, -1);
-			call_dissector(snc_handle, next_tvb, pinfo, tree);
-		}
-	}
-
-}
-
 gboolean
 check_length(packet_info *pinfo, proto_tree *tree, guint32 expected, guint32 real, const char *name_string){
 	if (expected != real){
@@ -2482,14 +2463,140 @@ dissect_sapdiag_payload(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, pro
 }
 
 static int
-check_sapdiag_dp(tvbuff_t *tvb, guint32 offset){
-
+check_sapdiag_dp(tvbuff_t *tvb, guint32 offset)
+{
 	/* Since there's no SAP Diag mode 0xff, if the first byte is a 0xFF the
 	 * packet probably holds an initialization DP Header */
 	if ((tvb_captured_length_remaining(tvb, offset) >= 200 + 8) && tvb_get_guint8(tvb, offset) == 0xFF){
 		return (TRUE);
 	}
 	return (FALSE);
+}
+
+static int
+check_sapdiag_compression(tvbuff_t *tvb, guint32 offset)
+{
+	/* We check for the length, the algorithm value and the presence of magic bytes */
+	if ((tvb_captured_length_remaining(tvb, offset) >= 8) &&
+		((tvb_get_guint8(tvb, offset+4) == 0x11) || (tvb_get_guint8(tvb, offset+4) == 0x12)) &&
+		(tvb_get_guint16(tvb, offset+5, ENC_LITTLE_ENDIAN) == 0x9d1f)){
+		return (TRUE);
+	}
+	return (FALSE);
+}
+
+static void
+dissect_sapdiag_compressed_payload(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, proto_item *sapdiag, guint32 offset)
+{
+	int rt = 0;
+	tvbuff_t *next_tvb;
+	guint8 *decompressed_buffer = NULL;
+	guint32 reported_length = 0, uncompress_length = 0, payload_offset = 0;
+	proto_item *compression_header = NULL, *rl = NULL, *payload = NULL;
+	proto_tree *compression_header_tree = NULL, *payload_tree = NULL;
+
+	/* Add the compression header subtree */
+	compression_header = proto_tree_add_item(tree, hf_sapdiag_compress_header, tvb, offset, 8, ENC_NA);
+	compression_header_tree = proto_item_add_subtree(compression_header, ett_sapdiag);
+
+	payload_offset = offset;
+
+	/* Add the uncompressed length */
+	reported_length = tvb_get_letohl(tvb, offset);
+	rl = proto_tree_add_uint(compression_header_tree, hf_sapdiag_uncomplength, tvb, offset, 4, reported_length); offset+=4;
+	proto_item_append_text(sapdiag, ", Uncompressed Len: %u", reported_length);
+	col_append_fstr(pinfo->cinfo, COL_INFO, " Uncompressed Length=%u ", reported_length);
+
+	/* Add the algorithm */
+	proto_tree_add_item(compression_header_tree, hf_sapdiag_algorithm, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
+	/* Add the magic bytes */
+	proto_tree_add_item(compression_header_tree, hf_sapdiag_magic, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2;
+	/* Add the max bits */
+	proto_tree_add_item(compression_header_tree, hf_sapdiag_special, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
+
+	if (global_sapdiag_decompress == TRUE){
+
+		/* Allocate the buffer only in the scope of current packet, using the reported length */
+		decompressed_buffer = (guint8 *)wmem_alloc0(wmem_packet_scope(), reported_length);
+		if (!decompressed_buffer){
+			return;
+		}
+
+		uncompress_length = reported_length;
+
+		/* Decompress the payload */
+		rt = decompress_packet(tvb_get_ptr(tvb, payload_offset, -1),
+				tvb_captured_length_remaining(tvb, payload_offset),
+				decompressed_buffer,
+				&uncompress_length);
+
+		/* Check the return code and add a expert info warning if an error occurred. The dissector continues trying to add
+		adding the payload, however the returned size should be 0.  */
+		if (rt < 0){
+			expert_add_info_format(pinfo, compression_header, &ei_sapdiag_invalid_decompresssion, "Decompression of payload failed with return code %d (%s)", rt, decompress_error_string(rt));
+		}
+
+		/* Check the length returned for the compression routine. If differs with the reported, use the actual one and add
+		an expert info warning. */
+		if (uncompress_length != reported_length){
+			expert_add_info_format(pinfo, rl, &ei_sapdiag_invalid_decompress_length, "The uncompressed payload length (%d) differs with the reported length (%d)", uncompress_length, reported_length);
+		}
+
+		/* Add the return code to the tree */
+		proto_tree_add_int_format_value(compression_header_tree, hf_sapdiag_decompress_return_code, tvb, payload_offset, 8, rt, "%d (%s)", rt, decompress_error_string(rt));
+
+		if (uncompress_length != 0){
+			/* Now re-setup the tvb buffer to have the new data */
+			next_tvb = tvb_new_real_data(decompressed_buffer, uncompress_length, uncompress_length);
+			tvb_set_child_real_data_tvbuff(tvb, next_tvb);
+			add_new_data_source(pinfo, next_tvb, "Uncompressed Data");
+
+			/* Add the payload subtree using the new tvb*/
+			payload = proto_tree_add_item(tree, hf_sapdiag_payload, next_tvb, 0, -1, ENC_NA);
+			payload_tree = proto_item_add_subtree(payload, ett_sapdiag);
+
+			/* Dissect the new uncompressed payload */
+			dissect_sapdiag_payload(next_tvb, pinfo, payload_tree, tree, 0);
+		} else {
+
+		}
+	} else {
+		/* Add the payload subtree */
+		payload = proto_tree_add_item(tree, hf_sapdiag_payload, tvb, offset, -1, ENC_NA);
+		payload_tree = proto_item_add_subtree(payload, ett_sapdiag);
+	}
+}
+
+
+static void
+dissect_sapdiag_snc_frame(tvbuff_t *tvb, packet_info *pinfo, proto_tree *sapdiag_tree, proto_tree *tree, guint32 offset){
+
+	tvbuff_t *next_tvb = NULL;
+	proto_item *payload = NULL;
+	proto_tree *payload_tree = NULL;
+
+	/* Call the SNC dissector */
+	if (global_sapdiag_snc_dissection == TRUE){
+		next_tvb = dissect_sapsnc_frame(tvb, pinfo, tree, offset);
+
+		/* If the SNC dissection returned a new tvb, we've a payload to dissect */
+		if (next_tvb != NULL) {
+
+		/* Add a new data source for the unwrapped data. From now on, the offset is relative
+		to the new tvb so its zero. */
+			add_new_data_source(pinfo, next_tvb, "SNC unwrapped Data");
+
+			/* Add the payload subtree using the new tvb*/
+			payload = proto_tree_add_item(sapdiag_tree, hf_sapdiag_payload, next_tvb, 0, -1, FALSE);
+			payload_tree = proto_item_add_subtree(payload, ett_sapdiag);
+
+			if (check_sapdiag_compression(next_tvb, 0)) {
+				dissect_sapdiag_compressed_payload(next_tvb, pinfo, payload_tree, payload, 0);
+			} else {
+				dissect_sapdiag_payload(next_tvb, pinfo, payload_tree, payload, 0);
+			}
+		}
+	}
 }
 
 static int
@@ -2564,85 +2671,15 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data 
 
 	/* If the message is compressed */
 	} else if ((compress == 0x01) && (tvb_captured_length_remaining(tvb, offset) >= 8)){
-		guint8 *decompressed_buffer;
-		guint32 reported_length = 0, uncompress_length = 0, payload_offset = 0;;
 
-		/* Add the compression header subtree */
-		compression_header = proto_tree_add_item(sapdiag_tree, hf_sapdiag_compress_header, tvb, offset, 8, ENC_NA);
-		compression_header_tree = proto_item_add_subtree(compression_header, ett_sapdiag);
+		/* Dissect the compressed payload */
+		dissect_sapdiag_compressed_payload(tvb, pinfo, sapdiag_tree, sapdiag, offset);
 
-		payload_offset = offset;
-
-		/* Add the uncompressed length */
-		reported_length = tvb_get_letohl(tvb, offset);
-		rl = proto_tree_add_uint(compression_header_tree, hf_sapdiag_uncomplength, tvb, offset, 4, reported_length); offset+=4;
-		proto_item_append_text(sapdiag, ", Uncompressed Len: %u", reported_length);
-		col_append_fstr(pinfo->cinfo, COL_INFO, " Uncompressed Length=%u ", reported_length);
-
-		/* Add the algorithm */
-		proto_tree_add_item(compression_header_tree, hf_sapdiag_algorithm, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
-		/* Add the magic bytes */
-		proto_tree_add_item(compression_header_tree, hf_sapdiag_magic, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2;
-		/* Add the max bits */
-		proto_tree_add_item(compression_header_tree, hf_sapdiag_special, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
-
-		if (global_sapdiag_decompress == TRUE){
-			int rt = 0;
-
-			/* Allocate the buffer only in the scope of current packet, using the reported length */
-			decompressed_buffer = (guint8 *)wmem_alloc0(wmem_packet_scope(), reported_length);
-			if (!decompressed_buffer){
-				return offset;
-			}
-
-			uncompress_length = reported_length;
-
-			/* Decompress the payload */
-			rt = decompress_packet(tvb_get_ptr(tvb, payload_offset, -1),
-					tvb_captured_length_remaining(tvb, payload_offset),
-					decompressed_buffer,
-					&uncompress_length);
-
-			/* Check the return code and add a expert info warning if an error occurred. The dissector continues trying to add
-			adding the payload, however the returned size should be 0.  */
-			if (rt < 0){
-				expert_add_info_format(pinfo, compression_header, &ei_sapdiag_invalid_decompresssion, "Decompression of payload failed with return code %d (%s)", rt, decompress_error_string(rt));
-			}
-
-			/* Check the length returned for the compression routine. If differs with the reported, use the actual one and add
-			an expert info warning. */
-			if (uncompress_length != reported_length){
-				expert_add_info_format(pinfo, rl, &ei_sapdiag_invalid_decompress_length, "The uncompressed payload length (%d) differs with the reported length (%d)", uncompress_length, reported_length);
-			}
-
-			/* Add the return code to the tree */
-			proto_tree_add_int_format_value(compression_header_tree, hf_sapdiag_decompress_return_code, tvb, payload_offset, 8, rt, "%d (%s)", rt, decompress_error_string(rt));
-
-			if (uncompress_length != 0){
-				/* Now re-setup the tvb buffer to have the new data */
-				next_tvb = tvb_new_real_data(decompressed_buffer, uncompress_length, uncompress_length);
-				tvb_set_child_real_data_tvbuff(tvb, next_tvb);
-				add_new_data_source(pinfo, next_tvb, "Uncompressed Data");
-
-				/* Add the payload subtree using the new tvb*/
-				payload = proto_tree_add_item(sapdiag_tree, hf_sapdiag_payload, next_tvb, 0, -1, ENC_NA);
-				payload_tree = proto_item_add_subtree(payload, ett_sapdiag);
-
-				/* Dissect the new uncompressed payload */
-				dissect_sapdiag_payload(next_tvb, pinfo, payload_tree, tree, 0);
-			} else {
-			}
-		} else {
-			/* Add the payload subtree */
-			payload = proto_tree_add_item(sapdiag_tree, hf_sapdiag_payload, tvb, offset, -1, ENC_NA);
-			payload_tree = proto_item_add_subtree(payload, ett_sapdiag);
-		}
-
-	/* Message encrypted with SNC */
+	/* Message wrapped with SNC */
 	} else if (((compress == 0x02) || (compress == 0x03)) && (tvb_captured_length_remaining(tvb, offset) > 0)){
 
 		/* Call the SNC dissector */
-		dissect_sapdiag_snc_frame(tvb, pinfo, tree, offset);
+		dissect_sapdiag_snc_frame(tvb, pinfo, sapdiag_tree, tree, offset);
 
 	/* Uncompressed payload */
 	} else {

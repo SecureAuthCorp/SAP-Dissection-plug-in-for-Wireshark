@@ -1,0 +1,69 @@
+# AppVeyor configuration based on https://github.com/AMOS-ss16-proj3/amos-ss16-proj3/blob/master/appveyor.yml
+version: "v0.4.2-{build}"
+
+clone_folder: c:\projects\sap
+
+environment:
+  CYG_ROOT: C:\cygwin64
+
+install:
+  - cinst winflexbison
+  - refreshenv
+
+platform:
+  - x86
+  - x64
+
+configuration:
+  - RelWithDebInfo
+
+before_build:
+  # add Cygwin to PATH
+  - set PATH=%PATH%;C:\cygwin64\bin\
+  - set PATH=C:\cygwin64\bin\;%PATH%
+  # get Wireshark and checkout the branch
+  - mkdir c:\projects\wireshark
+  - cd c:\projects\wireshark
+  - git init
+  - git remote add -t master-2.2 -f origin https://github.com/wireshark/wireshark
+  - git checkout master-2.2
+  # set necessary environment variables:
+  - set CYGWIN=nodosfilewarning
+  - set WIRESHARK_BASE_DIR=c:\projects
+  - if "%platform%"=="x86" (set WIRESHARK_TARGET_PLATFORM=win32)
+  - if "%platform%"=="x64" (set WIRESHARK_TARGET_PLATFORM=win64)
+  - set QT5_BASE_DIR=c:\Qt\5.6\msvc2013
+  # insert our plugin files to wireshark
+  - mkdir C:\projects\wireshark\plugins\sap
+  - xcopy /E c:\projects\sap C:\projects\wireshark\plugins\sap
+  # run the adjustment scripts
+  - git apply plugins/sap/wireshark-master-2.2.patch
+  - ps: Invoke-WebRequest -Uri https://cygwin.com/setup-x86_64.exe -OutFile c:\projects\cygwin-setup.exe
+  - mkdir c:\projects\cyg-packages
+  - c:\projects\cygwin-setup.exe -q -n -N -d -R C:\cygwin64 -s http://mirrors.kernel.org/sourceware/cygwin/ -l c:\projects\cyg-packages -P flex -P bison
+  - set WIRESHARK_CYGWIN_INSTALL_PATH=C:\cygwin64
+
+build_script:
+  - mkdir c:\projects\sap\build
+  - cd c:\projects\sap\build
+  - if "%platform%"=="x86" (cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 12" c:\projects\wireshark)
+  - if "%platform%"=="x64" (cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 12 Win64" c:\projects\wireshark)
+  - msbuild /m /p:Configuration=%configuration% /logger:"C:\\Program Files\\AppVeyor\\BuildAgent\\Appveyor.MSBuildLogger.dll" plugins\sap\sap.vcxproj
+
+after_build:
+  - copy c:\projects\sap\build\run\%configuration%\plugins\sap.dll c:\projects\sap\sap-%APPVEYOR_BUILD_VERSION%-%WIRESHARK_TARGET_PLATFORM%.dll
+
+artifacts:
+  - path: "sap-*.dll"
+
+deploy:
+  release: "SAP plug-in for wireshark $(APPVEYOR_REPO_TAG_NAME)"
+  provider: GitHub
+  auth_token:
+    secure: LvW415L8UTYoBK7tZKI+cn5VyL4OTuyGTGQG/E/8suaRomn+AtLzCV7tjZOMa5eF
+  artifact: "sap-*.dll"
+  draft: true
+  force_update: true
+  on:
+    branch: master
+    appveyor_repo_tag: true

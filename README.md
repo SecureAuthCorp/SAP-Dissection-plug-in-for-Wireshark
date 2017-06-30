@@ -2,10 +2,11 @@ SAP Dissector Plugin for Wireshark
 ==================================
 
 [![Build Status](https://travis-ci.org/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark.svg?branch=master)](https://travis-ci.org/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark)
+[![Build status](https://ci.appveyor.com/api/projects/status/x6emndcoufys3iro?svg=true)](https://ci.appveyor.com/project/CoreSecurity/sap-dissection-plug-in-for-wireshark)
 
-Copyright (C) 2012-2016 by Martin Gallo, Core Security
+Copyright (C) 2012-2017 by Martin Gallo, Core Security
 
-Version 0.4.1-dev (XXX 2016)
+Version 0.4.2 (June 2017)
 
 
 Overview
@@ -17,12 +18,12 @@ Communication between components uses different network protocols. While
 some of them are standard and well-known protocols, others are proprietaries
 and public information is not available.
 
-This [Wireshark](https://www.wireshark.org/) [2] plugin  provides dissection
-of SAP's NI, Message Server, Router, Diag and Enqueue protocols. The
+This [Wireshark](https://www.wireshark.org/) [2] plugin provides dissection
+of SAP's NI, Message Server, Router, Diag, Enqueue and SNC protocols. The
 dissectors are based on information acquired at researching the different
 protocols and services. Additional experimental support is included for SAP's
-RFC and SNC protocols. Detailed information about the research can be found
-at [3], [4], [5], [6] and [7].
+RFC protocol. Detailed information about the research can be found at [3],
+[4], [5], [6] and [7].
 
 
 Features
@@ -64,15 +65,19 @@ This plugin counts on several different dissectors:
     This module dissects packets used by SAP's Standalone Enqueue and
     Replication Servers.
 
+- SAP SNC (Secure Network Connection) Protocol dissector
+
+	This dissector parses SNC frames and their fields. When the frames contains
+	wrapped data that wasn't encrypted, it allows calling dissectors to get
+	access to the unwrapped data for further dissecting it, as the case of Diag
+	dissector when SNC is used in authentication only or integrity protection
+	quality of protection levels.
+
 - SAP RFC (Remote Function Call) Protocol dissector (experimental)
 
     This dissector perform some basic dissection on the main components of the
     RFC protocol. It dissects general items and does some basic reassembling
     and decompression of table contents.
-
-- SAP SNC (Secure Network Connection) Protocol dissector (experimental)
-
-	This dissector perform some basic parsing of SNC frames.
 
 
 Installation & Build
@@ -184,12 +189,25 @@ reported that compiling Wireshark on OSX requires fixing link for the `gettext`
 library if it was installed using `home-brew`.
 
 
-### Installing on Pentoo ###
+### Penetration testing distribution and frameworks ###
 
-The plugin is available for installation on the [Pentoo](http://www.pentoo.ch/)
-penetration testing livecd distribution.
+The plugin is available for installation on several penetration testing
+distributions and frameworks.
+
+#### Installing on Pentoo ####
+
+Installation on the [Pentoo](http://www.pentoo.ch/) livecd distribution:
 
 	emerge net-misc/wireshark-sap-plugin
+
+#### Installing with The PenTesters Framework (PTF) ####
+
+Installation on Debian, Ubuntu and ArchLinux can be performed using
+[The PenTesters Framework (PTF)](https://github.com/trustedsec/ptf). From inside
+the `ptf` command-line, run:
+
+  use modules/intelligence-gathering/sap-wireshark-plugin
+  install
 
 
 ### Additional notes ###
@@ -200,8 +218,19 @@ See [Wireshark's portability notes](https://code.wireshark.org/review/gitweb?p=w
 for more information [11].
 
 
-Example uses
-------------
+Usage
+-----
+
+### Traffic dissection ###
+
+After the plugin is installed, it will automatically dissect SAP protocols'
+traffic if using default ports. If required, ports can be modified on SAP NI
+protocol as well as sub-dissectors' preferences.
+
+![SAP NI preferences](https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/raw/master/docs/sapni_preferences.png "SAP NI preferences")
+
+![SAP Diag preferences](https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/raw/master/docs/sapdiag_preferences.png "SAP Diag preferences")
+
 
 ### SAP Diag Gui Logon Password filter ###
 

@@ -1,7 +1,7 @@
 # ===========
 # SAP Dissector Plugin for Wireshark
 #
-# Copyright (C) 2012-2016 by Martin Gallo, Core Security
+# Copyright (C) 2012-2017 by Martin Gallo, Core Security
 #
 # The plugin was designed and developed by Martin Gallo from the Security
 # Consulting Services team of Core Security.
@@ -51,7 +51,7 @@ else(WIRESHARK_FOUND)
   MESSAGE(STATUS "Wireshark libraries not found, performing a Wireshark plug-in build.")
 
   include(WiresharkPlugin)
-  set_module_info(sap 0 4 1 0)
+  set_module_info(sap 0 4 2 0)
 
 endif(WIRESHARK_FOUND)
 

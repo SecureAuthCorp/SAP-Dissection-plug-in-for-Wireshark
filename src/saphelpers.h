@@ -2,7 +2,7 @@
 # ===========
 # SAP Dissector Plugin for Wireshark
 #
-# Copyright (C) 2012-2016 by Martin Gallo, Core Security
+# Copyright (C) 2012-2017 by Martin Gallo, Core Security
 #
 # The plugin was designed and developed by Martin Gallo from the Security
 # Consulting Services team of Core Security.
@@ -23,6 +23,9 @@
 #define __PACKET_SAPHELPERS_H__
 
 #include <epan/packet.h>
+
+tvbuff_t*
+dissect_sapsnc_frame(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset);
 
 gboolean
 check_length(packet_info *pinfo, proto_tree *tree, guint32 expected, guint32 real, const char *name_string);

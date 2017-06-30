@@ -2,7 +2,7 @@
 # ===========
 # SAP Dissector Plugin for Wireshark
 #
-# Copyright (C) 2012-2016 by Martin Gallo, Core Security
+# Copyright (C) 2012-2017 by Martin Gallo, Core Security
 #
 # The plugin was designed and developed by Martin Gallo from the Security
 # Consulting Services team of Core Security.
@@ -30,6 +30,7 @@
 #include <epan/conversation.h>
 
 #include "packet-sapprotocol.h"
+#include "saphelpers.h"
 
 
 /* Define default ports */
@@ -47,6 +48,7 @@
 #define SAPROUTER_ROUTE_OFFSET_OFFSET	20
 
 /* SAP Router Eye Catcher strings */
+#define SAPROUTER_TYPE_NIPING_STRING "EYECATCHER"
 #define SAPROUTER_TYPE_ROUTE_STRING	"NI_ROUTE"
 #define SAPROUTER_TYPE_ROUTE_ACCEPT	"NI_PONG"
 #define SAPROUTER_TYPE_ERR_STRING	"NI_RTERR"
@@ -143,6 +145,9 @@ static int proto_saprouter = -1;
 static int hf_saprouter_type = -1;
 static int hf_saprouter_ni_version = -1;
 
+/* Niping messages */
+static int hf_saprouter_niping_message = -1;
+
 /* Route information */
 static int hf_saprouter_route_version = -1;
 static int hf_saprouter_entries = -1;
@@ -188,6 +193,7 @@ static int hf_saprouter_error_unknown= -1;  /* TODO: Unknown fields */
 /* Control Messages */
 static int hf_saprouter_control_length = -1;
 static int hf_saprouter_control_string = -1;
+static int hf_saprouter_control_unknown = -1;
 
 /* Admin Messages */
 static int hf_saprouter_admin_command = -1;
@@ -220,6 +226,7 @@ static dissector_handle_t saprouter_handle;
 typedef struct saprouter_session_state {
 	gboolean route_information;
 	gboolean route_accepted;
+	gboolean route_snc_protected;
 	guchar *src_hostname;		/* Source hostname (first entry in the route string) */
 	guint32 src_port;		/* Source port number */
 	guchar *src_password;		/* Source password XXX: Check if possible */
@@ -378,30 +385,22 @@ dissect_errorstring(tvbuff_t *tvb, proto_tree *tree, guint32 offset)
 }
 
 
-static void
+static tvbuff_t*
 dissect_saprouter_snc_frame(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset){
-
-	tvbuff_t *next_tvb = NULL;
-	dissector_handle_t snc_handle;
 
 	/* Call the SNC dissector */
 	if (global_saprouter_snc_dissection == TRUE){
-		snc_handle = find_dissector("sapsnc");
-		if (snc_handle){
-			/* Set the column to not writable so the SNC dissector doesn't override the Diag info */
-			col_set_writable(pinfo->cinfo, -1, FALSE);
-			/* Create a new tvb buffer and call the dissector */
-			next_tvb = tvb_new_subset(tvb, offset, -1, -1);
-			call_dissector(snc_handle, next_tvb, pinfo, tree);
-		}
+		return dissect_sapsnc_frame(tvb, pinfo, tree, offset);
 	}
 
+	return NULL;
 }
 
 
 static int
 dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_)
 {
+	tvbuff_t *next_tvb = NULL;
 	guint8 opcode = 0;
 	guint32 offset = 0, eyecatcher_length = 0;
 	conversation_t *conversation = NULL;
@@ -417,6 +416,7 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 		if (session_state){
 			session_state->route_information = FALSE;
 			session_state->route_accepted = FALSE;
+			session_state->route_snc_protected = FALSE;
 			session_state->src_hostname = NULL; session_state->src_port = 0; session_state->src_password = NULL;
 			session_state->dest_hostname = NULL; session_state->dest_port = 0; session_state->dest_password = NULL;
 			conversation_add_proto_data(conversation, proto_saprouter, session_state);
@@ -425,8 +425,6 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 
 	/* Add the protocol to the column */
 	col_add_str(pinfo->cinfo, COL_PROTOCOL, "SAPROUTER");
-	/* Clear out stuff in the info column */
-	col_clear(pinfo->cinfo,COL_INFO);
 
 	/* Add the main SAP Router subtree */
 	if (tree) {
@@ -437,12 +435,23 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 	/* Get the 'eye catcher' length */
 	eyecatcher_length = tvb_strsize(tvb, offset);
 
+	/* Niping message */
+	if (tvb_captured_length_remaining(tvb, offset) >= 10 && tvb_strneql(tvb, offset, SAPROUTER_TYPE_NIPING_STRING, 10) == 0) {
+		col_set_str(pinfo->cinfo, COL_INFO, "Niping message");
+
+		proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, offset, 10, ENC_ASCII|ENC_NA); offset += 10;
+		proto_item_append_text(ti, ", Niping message");
+
+		if (tvb_captured_length_remaining(tvb, offset))
+			proto_tree_add_item(saprouter_tree, hf_saprouter_niping_message, tvb, offset, -1, ENC_ASCII|ENC_NA);
+
+	}
 	/* Admin Message Type */
-	if (tvb_strneql(tvb, offset, SAPROUTER_TYPE_ADMIN_STRING, eyecatcher_length) == 0){
-		col_set_str(pinfo->cinfo, COL_INFO, "Admin Message");
+	else if (tvb_strneql(tvb, offset, SAPROUTER_TYPE_ADMIN_STRING, eyecatcher_length) == 0) {
+		col_set_str(pinfo->cinfo, COL_INFO, "Admin message");
 
 		proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, offset, eyecatcher_length, ENC_ASCII|ENC_NA); offset += eyecatcher_length;
-		proto_item_append_text(ti, ", Admin Message");
+		proto_item_append_text(ti, ", Admin message");
 
 		proto_tree_add_item(saprouter_tree, hf_saprouter_ni_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
 
@@ -505,7 +514,7 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 	} else if (tvb_strneql(tvb, offset, SAPROUTER_TYPE_ROUTE_STRING, eyecatcher_length) == 0){
 		guint32 route_length = 0, route_offset = 0;
 
-		col_set_str(pinfo->cinfo, COL_INFO, "Route Message");
+		col_set_str(pinfo->cinfo, COL_INFO, "Route message");
 
 		/* Get the route length/offset */
 		route_length = tvb_get_ntohl(tvb, offset + SAPROUTER_ROUTE_LENGTH_OFFSET);
@@ -513,7 +522,7 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 
 		if (tree){
 			proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, 0, eyecatcher_length, ENC_ASCII|ENC_NA); offset += eyecatcher_length;
-			proto_item_append_text(ti, ", Route Message");
+			proto_item_append_text(ti, ", Route message");
 			/* Add the fields */
 			proto_tree_add_item(saprouter_tree, hf_saprouter_route_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
 			proto_tree_add_item(saprouter_tree, hf_saprouter_ni_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
@@ -548,13 +557,20 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 
 	/* Error Information/Control Message Type */
 	} else if (tvb_strneql(tvb, offset, SAPROUTER_TYPE_ERR_STRING, eyecatcher_length) == 0){
-		opcode = tvb_get_guint8(tvb, offset + 10);
-		col_set_str(pinfo->cinfo, COL_INFO, (opcode==0)? "Error Information" : "Control Message");
+
+		/* Extract the opcode if possible to determine the type of message */
+		if (tvb_offset_exists(tvb, offset + 10)) {
+			opcode = tvb_get_guint8(tvb, offset + 10);
+		} else {
+			opcode = 0;
+		}
+
+		col_set_str(pinfo->cinfo, COL_INFO, (opcode==0)? "Error information" : "Control message");
 
 		if (tree){
 			guint32 text_length = 0;
 
-			proto_item_append_text(ti, (opcode==0)? ", Error Information" : ", Control Message");
+			proto_item_append_text(ti, (opcode==0)? ", Error information" : ", Control message");
 			/* Add the fields */
 			proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, offset, eyecatcher_length, ENC_ASCII|ENC_NA); offset += eyecatcher_length;
 			proto_tree_add_item(saprouter_tree, hf_saprouter_ni_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
@@ -573,8 +589,15 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 					offset += text_length;
 				}
 
+				/* Add an unknown int field */
+				proto_tree_add_item(saprouter_tree, hf_saprouter_unknown, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
+
 			/* Control Message */
 			} else {
+				/* Add the opcode name */
+				proto_item_append_text(ti, ", opcode=%s", val_to_str(opcode, saprouter_opcode_vals, "Unknown"));
+				col_append_fstr(pinfo->cinfo, COL_INFO, ", opcode=%s", val_to_str(opcode, saprouter_opcode_vals, "Unknown"));
+
 				proto_tree_add_item(saprouter_tree, hf_saprouter_control_length, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 				if ((text_length >0) && tvb_offset_exists(tvb, offset+text_length)){
 					/* Add the control string tree */
@@ -582,13 +605,20 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 					offset += text_length;
 				}
 
-				/* Dissect the SNC Frame for SNC opcodes */
+				/* SNC request, mark the conversation as SNC protected and dissect the SNC frame */
 				if (opcode == 70 || opcode == 71){
+					if (session_state) {
+						session_state->route_snc_protected = TRUE;
+					}
 					dissect_saprouter_snc_frame(tvb, pinfo, tree, offset);
+
+				/* Other opcodes */
+				} else {
+
+					proto_tree_add_item(saprouter_tree, hf_saprouter_control_unknown, tvb, offset, 4, ENC_ASCII|ENC_NA); offset+=4;
 				}
 
 			}
-			proto_tree_add_item(saprouter_tree, hf_saprouter_unknown, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 
 		}
 
@@ -597,45 +627,72 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 		/* Route information available */
 		if (session_state && session_state->route_information){
 			session_state->route_accepted = TRUE;
-			col_add_fstr(pinfo->cinfo, COL_INFO, "Route from %s:%d to %s:%d accepted ", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
+			col_append_fstr(pinfo->cinfo, COL_INFO, ", from %s:%d to %s:%d", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
 			if (tree){
-				proto_item_append_text(ti, ", Route from %s:%d to %s:%d accepted ", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
+				proto_item_append_text(ti, ", from %s:%d to %s:%d", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
 			}
 		}
 
 	/* Uknown Message Type */
 	} else {
-		/* Route information available */
-		if (session_state && session_state->route_information){
 
-			/* TODO: Add a link to the packet were the route was requested
-			 * (like TCP reassembled packets).
-			 */
-			/* Route accepted */
-			if (session_state->route_accepted){
+		/* Session state was established */
+		if (session_state) {
 
-				col_add_fstr(pinfo->cinfo, COL_INFO, "Message routed from %s:%d to %s:%d ", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
-				if (tree){
-					proto_item_append_text(ti, ", Message routed from %s:%d to %s:%d ", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
-				}
-
-			/* Route not accepted but some information available */
-			} else {
-				col_add_fstr(pinfo->cinfo, COL_INFO, "Message routed to unknown destination");
-				if (tree){
-					proto_item_append_text(ti, ", Message routed to unknown destination");
-				}
+			col_add_fstr(pinfo->cinfo, COL_INFO, "Routed message");
+			if (tree){
+				proto_item_append_text(ti, ", Routed message");
 			}
 
-			/* Call the dissector in the NI protocol subdissectors table
-			 * according to the route destination port number. */
-			dissect_sap_protocol_payload(tvb, offset, pinfo, tree, 0, session_state->dest_port);
+			/* If the session is protected with SNC, first dissect the SNC frame
+			 * and save the content for further disscetion.
+			 */
+			if (session_state->route_snc_protected) {
+				col_append_fstr(pinfo->cinfo, COL_INFO, ", SNC protected");
+				if (tree){
+					proto_item_append_text(ti, ", SNC protected");
+				}
+				next_tvb = dissect_saprouter_snc_frame(tvb, pinfo, tree, offset);
 
-		} else {
-			/* No route information available */
-			col_add_fstr(pinfo->cinfo, COL_INFO, "Unknown message or message routed to unknown destination");
-			if (tree){
-				proto_item_append_text(ti, ", Unknown message or message routed to unknown destination");
+			/* If the session is not protected dissect the entire payload */
+			} else {
+				next_tvb = tvb;
+			}
+
+			/* If the session has information about the route requested */
+			if (session_state->route_information){
+
+				/* TODO: Add a link to the packet were the route was requested
+				 * (like TCP reassembled packets).
+				 */
+				/* Route accepted */
+				if (session_state->route_accepted){
+
+					col_append_fstr(pinfo->cinfo, COL_INFO, ", from %s:%d to %s:%d ", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
+					if (tree){
+						proto_item_append_text(ti, ", from %s:%d to %s:%d ", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
+					}
+
+				/* Route not accepted but some information available */
+				} else {
+					col_append_fstr(pinfo->cinfo, COL_INFO, ", to unknown destination");
+					if (tree){
+						proto_item_append_text(ti, ", to unknown destination");
+					}
+				}
+
+				/* Call the dissector in the NI protocol subdissectors table
+				 * according to the route destination port number. */
+				if (next_tvb) {
+					dissect_sap_protocol_payload(next_tvb, offset, pinfo, tree, 0, session_state->dest_port);
+				}
+
+			} else {
+				/* No route information available */
+				col_append_fstr(pinfo->cinfo, COL_INFO, ", to unknown destination");
+				if (tree){
+					proto_item_append_text(ti, ", to unknown destination");
+				}
 			}
 		}
 	}
@@ -649,6 +706,11 @@ proto_register_saprouter(void)
 	static hf_register_info hf[] = {
 		{ &hf_saprouter_type,
 			{ "Type", "saprouter.type", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Type", HFILL }},
+
+		/* Niping message */
+		{ &hf_saprouter_niping_message,
+			{ "Niping message", "saprouter.message", FT_NONE, BASE_NONE, NULL, 0x0, "SAP Router Niping message", HFILL }},
+
 		/* NI Route messages */
 		{ &hf_saprouter_route_version,
 			{ "Route version", "saprouter.version", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP Router Version", HFILL }},
@@ -728,6 +790,8 @@ proto_register_saprouter(void)
 			{ "Control Text Length", "saprouter.controllength", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP Router Control Text length", HFILL }},
 		{ &hf_saprouter_control_string,
 			{ "Control Text", "saprouter.controltext", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Control Text", HFILL }},
+		{ &hf_saprouter_control_unknown,
+			{ "Control Unknown field", "saprouter.controlunknown", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Control Unknown field", HFILL }},
 
 		/* Router Admin messages */
 		{ &hf_saprouter_admin_command,

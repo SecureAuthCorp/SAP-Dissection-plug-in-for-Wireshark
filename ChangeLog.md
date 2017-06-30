@@ -1,13 +1,25 @@
 Changelog
 =========
 
-v0.4.1 - 2016-XX-XX
+v0.4.2 - 2017-06-30
+-------------------
+- Added initial support for dissecting SNC frames and some of their fields.
+- `src/packet-sapdiag.cpp`: Dissection of SNC frames uses new helper functions.
+- `src/packet-sapprotocol.cpp`: Clarified some column strings.
+- `src/packet-saprouter.cpp`: Clarified some column strings.
+- `src/packet-saprouter.cpp`: Added parsing of niping tool messages.
+- `src/packet-saprouter.cpp`: Dissection of SNC frames uses new helper functions.
+- `src/packet-sapsnc.cpp`: Added more fields as part of the SNC frame dissection.
+
+
+v0.4.1 - 2016-12-30
 -------------------
 
 - Switched to Wireshark 2.2 trunk. Ported the plugin to the use of new APIs.
 - Added Vagrant configuration files to build and run the plugin.
 - Added provision and build scripts to use in both Travis and Vagrant build
   process.
+- Building in Windows with Appveyor.
 - `src/sapdecompress.cpp`: Removed use of value_string for decompression return code ([\#10](https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/issues/10)).
 
 
