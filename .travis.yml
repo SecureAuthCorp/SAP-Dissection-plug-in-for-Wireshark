@@ -17,21 +17,29 @@ env:
 
 matrix:
   exclude:
+    # Exclude gcc build on OSX
     - os: osx
-      compilerr: gcc
+      compiler: gcc
+    # Exclude standalone build on OSX
     - os: osx
       env: WIRESHARK_BRANCH=master-2.2 PLUGIN_DIR=$TRAVIS_BUILD_DIR BUILD_STANDALONE=yes
   allow_failures:
     - os: osx
 
 before_install:
+  - echo $TRAVIS_OS_NAME
+
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+        ${PLUGIN_DIR}/tools/macos-provision-source.sh;
+    fi
+
   # See https://github.com/travis-ci/travis-ci/issues/5326
   - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
 
-  - if [ ${BUILD_STANDALONE} == "no" ]; then
+  - if [ "$TRAVIS_OS_NAME" == "linux" ] && [ ${BUILD_STANDALONE} == "no" ]; then
         ${PLUGIN_DIR}/tools/ubuntu-provision-source.sh;
     fi
-  - if [ ${BUILD_STANDALONE} == "yes" ]; then
+  - if [ "$TRAVIS_OS_NAME" == "linux" ] && [ ${BUILD_STANDALONE} == "yes" ]; then
         ${PLUGIN_DIR}/tools/ubuntu-provision-standalone.sh;
     fi
 
@@ -49,7 +57,13 @@ script:
   - python ${PLUGIN_DIR}/tests/__init__.py
 
 before_deploy:
-  - cp build/run/plugins/sap.so build/sap-${TRAVIS_TAG}-linux-x64.so
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+      cp build/run/plugins/sap.so build/sap-${TRAVIS_TAG}-osx-x64.so
+    fi
+
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+      cp build/run/plugins/sap.so build/sap-${TRAVIS_TAG}-linux-x64.so
+    fi
 
 deploy:
     provider: releases
