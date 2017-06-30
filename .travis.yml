@@ -30,7 +30,7 @@ before_install:
   - echo $TRAVIS_OS_NAME
 
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-        ${PLUGIN_DIR}/tools/macos-provision-source.sh;
+        ${PLUGIN_DIR}/tools/osx-provision-source.sh;
     fi
 
   # See https://github.com/travis-ci/travis-ci/issues/5326
