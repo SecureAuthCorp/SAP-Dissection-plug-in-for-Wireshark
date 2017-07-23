@@ -25,7 +25,7 @@ sudo apt-get update -qq
 
 # Install build requirements
 sudo apt-get build-dep -yqq wireshark
-sudo apt-get install -yqq cmake qt5-default libqt5multimedia5 qtmultimedia5-dev qttools5-dev qttools5-dev-tools
+sudo apt-get install -yqq cmake libgcrypt20-dev qt5-default libqt5multimedia5 qtmultimedia5-dev qttools5-dev qttools5-dev-tools
 
 # Check out source
 mkdir -p ${HOME}/wireshark-$WIRESHARK_BRANCH
