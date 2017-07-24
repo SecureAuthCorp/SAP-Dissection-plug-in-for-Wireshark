@@ -27,6 +27,8 @@
 #include <epan/dissectors/packet-tcp.h>
 #include <epan/next_tvb.h>
 #include <epan/conversation.h>
+#include <epan/wmem/wmem.h>
+
 
 #include "packet-sapprotocol.h"
 
@@ -272,7 +274,7 @@ proto_register_sap_protocol(void)
 	/* Register the preferences */
 	sap_protocol_module = prefs_register_protocol(proto_sap_protocol, proto_reg_handoff_sap_protocol);
 
-	range_convert_str(&global_sap_protocol_port_range, SAP_PROTOCOL_PORT_RANGE, MAX_TCP_PORT);
+	range_convert_str(wmem_epan_scope(), &global_sap_protocol_port_range, SAP_PROTOCOL_PORT_RANGE, MAX_TCP_PORT);
 	prefs_register_range_preference(sap_protocol_module, "tcp_ports", "SAP NI Protocol TCP port numbers", "Port numbers used for SAP NI Protocol (default " SAP_PROTOCOL_PORT_RANGE ")", &global_sap_protocol_port_range, MAX_TCP_PORT);
 
 	prefs_register_bool_preference(sap_protocol_module, "desegment", "Reassemble SAP NI Protocol messages spanning multiple TCP segments", "Whether the SAP NI Protocol dissector should reassemble messages spanning multiple TCP segments.", &global_sap_protocol_desegment);
@@ -305,10 +307,10 @@ proto_reg_handoff_sap_protocol(void)
 		initialized = TRUE;
 	} else {
 		range_foreach(sap_protocol_port_range, range_delete_callback);
-		g_free(sap_protocol_port_range);
+		wmem_free(wmem_epan_scope(), sap_protocol_port_range);
 	}
 
-	sap_protocol_port_range = range_copy(global_sap_protocol_port_range);
+	sap_protocol_port_range = range_copy(wmem_epan_scope(), global_sap_protocol_port_range);
 	range_foreach(sap_protocol_port_range, range_add_callback);
 }
 

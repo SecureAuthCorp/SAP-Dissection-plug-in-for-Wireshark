@@ -840,7 +840,7 @@ proto_register_saprouter(void)
 	/* Register the preferences */
 	saprouter_module = prefs_register_protocol(proto_saprouter, proto_reg_handoff_saprouter);
 
-	range_convert_str(&global_saprouter_port_range, SAPROUTER_PORT_RANGE, MAX_TCP_PORT);
+	range_convert_str(wmem_epan_scope(), &global_saprouter_port_range, SAPROUTER_PORT_RANGE, MAX_TCP_PORT);
 	prefs_register_range_preference(saprouter_module, "tcp_ports", "SAP Router Protocol TCP port numbers", "Port numbers used for SAP Router Protocol (default " SAPROUTER_PORT_RANGE ")", &global_saprouter_port_range, MAX_TCP_PORT);
 
 	prefs_register_bool_preference(saprouter_module, "snc_dissection", "Dissect SAP SNC frames", "Whether the SAP Router Protocol dissector should call the SAP SNC dissector for SNC frames", &global_saprouter_snc_dissection);
@@ -873,10 +873,10 @@ proto_reg_handoff_saprouter(void)
 		initialized = TRUE;
 	} else {
 		range_foreach(saprouter_port_range, range_delete_callback);
-		g_free(saprouter_port_range);
+		wmem_free(wmem_epan_scope(), saprouter_port_range);
 	}
 
-	saprouter_port_range = range_copy(global_saprouter_port_range);
+	saprouter_port_range = range_copy(wmem_epan_scope(), global_saprouter_port_range);
 	range_foreach(saprouter_port_range, range_add_callback);
 
 }
