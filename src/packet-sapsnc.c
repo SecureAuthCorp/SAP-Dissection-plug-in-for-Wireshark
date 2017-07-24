@@ -44,6 +44,7 @@ static const value_string hf_sapsnc_frame_type_vals[] = {
     { 0x0c, "REJECTED" },
     { 0x0d, "ERROR" },
     { 0x0e, "UNKNOWN" },
+    { 0, NULL }
 };
 
 /* SNC Mech ID values */
@@ -59,7 +60,7 @@ static const value_string hf_sapsnc_mech_id_vals[] = {
     { 0x08, "itsec" },
     { 0x09, "SDTI Connect Agent" },
     { 0x0a, "AccessMaster DCE" },
-
+    { 0, NULL }
 };
 
 /* SNC Quality of protection values */
@@ -71,6 +72,7 @@ static const value_string hf_sapsnc_qop_vals[] = {
     { 0x07, "MIN" },
     { 0x08, "DEFAULT" },
     { 0x09, "MAX" },
+    { 0, NULL }
 };
 
 
