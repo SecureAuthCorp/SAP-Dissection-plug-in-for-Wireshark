@@ -44,6 +44,7 @@ static const value_string hf_sapsnc_frame_type_vals[] = {
     { 0x0c, "REJECTED" },
     { 0x0d, "ERROR" },
     { 0x0e, "UNKNOWN" },
+    { 0, NULL }
 };
 
 /* SNC Mech ID values */
@@ -59,7 +60,7 @@ static const value_string hf_sapsnc_mech_id_vals[] = {
     { 0x08, "itsec" },
     { 0x09, "SDTI Connect Agent" },
     { 0x0a, "AccessMaster DCE" },
-
+    { 0, NULL }
 };
 
 /* SNC Quality of protection values */
@@ -71,6 +72,7 @@ static const value_string hf_sapsnc_qop_vals[] = {
     { 0x07, "MIN" },
     { 0x08, "DEFAULT" },
     { 0x09, "MAX" },
+    { 0, NULL }
 };
 
 
@@ -242,7 +244,7 @@ proto_register_sapsnc(void)
 		{ &hf_sapsnc_eye_catcher,
 			{ "SNC Eye Catcher", "sapsnc.eyecatcher", FT_STRING, BASE_NONE, NULL, 0x0, "SAP SNC Eye Catcher", HFILL }},
 		{ &hf_sapsnc_frame_type,
-			{ "SNC Frame Type", "saprouter.frame.type", FT_UINT8, BASE_HEX, hf_sapsnc_frame_type_vals, 0x0, "SAP SNC Frame Type", HFILL }},
+			{ "SNC Frame Type", "saprouter.frame.type", FT_UINT8, BASE_HEX, VALS(hf_sapsnc_frame_type_vals), 0x0, "SAP SNC Frame Type", HFILL }},
 		{ &hf_sapsnc_protocol_version,
 			{ "SNC Protocol Version", "saprouter.frame.protocolversion", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP SNC Protocol Version", HFILL }},
 		{ &hf_sapsnc_header_length,
@@ -252,21 +254,21 @@ proto_register_sapsnc(void)
 		{ &hf_sapsnc_data_length,
 			{ "SNC Data length", "sapsnc.frame.datalength", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP SNC Data Length", HFILL }},
 		{ &hf_sapsnc_mech_id,
-			{ "SNC Mech ID", "sapsnc.frame.mech_id", FT_UINT16, BASE_HEX, hf_sapsnc_mech_id_vals, 0x0, "SAP SNC Mech ID", HFILL }},
+			{ "SNC Mech ID", "sapsnc.frame.mech_id", FT_UINT16, BASE_HEX, VALS(hf_sapsnc_mech_id_vals), 0x0, "SAP SNC Mech ID", HFILL }},
 		{ &hf_sapsnc_flags,
 			{ "SNC Flags", "sapsnc.frame.flags", FT_UINT16, BASE_HEX, NULL, 0x0, "SAP SNC Flags", HFILL }},
 		{ &hf_sapsnc_qop_min,
-			{ "SNC QOP Min", "sapsnc.frame.qop_min", FT_UINT8, BASE_HEX, hf_sapsnc_qop_vals, 0x0, "SAP SNC QOP Min", HFILL }},
+			{ "SNC QOP Min", "sapsnc.frame.qop_min", FT_UINT8, BASE_HEX, VALS(hf_sapsnc_qop_vals), 0x0, "SAP SNC QOP Min", HFILL }},
 		{ &hf_sapsnc_qop_max,
-			{ "SNC QOP Max", "sapsnc.frame.qop_max", FT_UINT8, BASE_HEX, hf_sapsnc_qop_vals, 0x0, "SAP SNC QOP Max", HFILL }},
+			{ "SNC QOP Max", "sapsnc.frame.qop_max", FT_UINT8, BASE_HEX, VALS(hf_sapsnc_qop_vals), 0x0, "SAP SNC QOP Max", HFILL }},
 		{ &hf_sapsnc_qop_use,
-			{ "SNC QOP Use", "sapsnc.frame.qop_use", FT_UINT8, BASE_HEX, hf_sapsnc_qop_vals, 0x0, "SAP SNC QOP Use", HFILL }},
+			{ "SNC QOP Use", "sapsnc.frame.qop_use", FT_UINT8, BASE_HEX, VALS(hf_sapsnc_qop_vals), 0x0, "SAP SNC QOP Use", HFILL }},
 		{ &hf_sapsnc_ext_flags,
-			{ "SNC Ext Flags", "sapsnc.frame.ext_flags", FT_UINT32, BASE_HEX, NULL, 0x0, "SAP SNC Ext Flags", HFILL }},
+			{ "SNC Ext Flags", "sapsnc.frame.ext_flags", FT_UINT32, BASE_HEX, NULL, 0x0, "SAP SNC Extensions Flags", HFILL }},
 		{ &hf_sapsnc_ext_field_length,
-			{ "SNC Ext Field length", "sapsnc.frame.ext_field_length", FT_UINT16, BASE_DEC, NULL, 0x0, "SNC Ext Field length", HFILL }},
+			{ "SNC Ext Field length", "sapsnc.frame.ext_field_length", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP SNC Extensions Field length", HFILL }},
 		{ &hf_sapsnc_ext_field,
-			{ "SNC Ext Field", "sapsnc.frame.ext_field", FT_NONE, BASE_NONE, NULL, 0x0, "SNC Ext Field", HFILL }},
+			{ "SNC Ext Field", "sapsnc.frame.ext_field", FT_NONE, BASE_NONE, NULL, 0x0, "SAP SNC Extensions Field", HFILL }},
 		{ &hf_sapsnc_token,
 			{ "SNC Token", "sapsnc.frame.token", FT_NONE, BASE_NONE, NULL, 0x0, "SAP SNC Token", HFILL }},
 		{ &hf_sapsnc_data,
