@@ -1542,7 +1542,7 @@ dissect_sapdiag_rfc_call(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
 			/* Set the column to not writable so the RFC dissector doesn't override the Diag info */
 			col_set_writable(pinfo->cinfo, -1, FALSE);
 			/* Create a new tvb buffer and call the dissector */
-			next_tvb = tvb_new_subset(tvb, offset, item_length, item_length);
+			next_tvb = tvb_new_subset_length(tvb, offset, item_length);
 			call_dissector(rfc_handle, next_tvb, pinfo, tree);
 		}
 	}
