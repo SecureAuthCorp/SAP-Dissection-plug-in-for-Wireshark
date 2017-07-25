@@ -1,12 +1,19 @@
 Changelog
 =========
 
-v0.4.2 - 2017-XX-XX
+v0.4.3 - 2017-XX-XX
 -------------------
 
+
+v0.4.2 - 2017-06-30
+-------------------
+- Added initial support for dissecting SNC frames and some of their fields.
+- `src/packet-sapdiag.cpp`: Dissection of SNC frames uses new helper functions.
 - `src/packet-sapprotocol.cpp`: Clarified some column strings.
 - `src/packet-saprouter.cpp`: Clarified some column strings.
 - `src/packet-saprouter.cpp`: Added parsing of niping tool messages.
+- `src/packet-saprouter.cpp`: Dissection of SNC frames uses new helper functions.
+- `src/packet-sapsnc.cpp`: Added more fields as part of the SNC frame dissection.
 
 
 v0.4.1 - 2016-12-30

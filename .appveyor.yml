@@ -1,5 +1,5 @@
 # AppVeyor configuration based on https://github.com/AMOS-ss16-proj3/amos-ss16-proj3/blob/master/appveyor.yml
-version: "v0.4.2.dev-{build}"
+version: "v0.4.3.dev-{build}"
 
 clone_folder: c:\projects\sap
 
@@ -40,7 +40,7 @@ before_build:
   - git apply plugins/sap/wireshark-master-2.2.patch
   - ps: Invoke-WebRequest -Uri https://cygwin.com/setup-x86_64.exe -OutFile c:\projects\cygwin-setup.exe
   - mkdir c:\projects\cyg-packages
-  - c:\projects\cygwin-setup.exe -q -n -N -d -R C:\cygwin64 -s http://ftp.hawo.stw.uni-erlangen.de/cygwin/ -l c:\projects\cyg-packages -P flex -P bison
+  - c:\projects\cygwin-setup.exe -q -n -N -d -R C:\cygwin64 -s http://mirrors.kernel.org/sourceware/cygwin/ -l c:\projects\cyg-packages -P flex -P bison
   - set WIRESHARK_CYGWIN_INSTALL_PATH=C:\cygwin64
 
 build_script:

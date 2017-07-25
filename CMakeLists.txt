@@ -51,7 +51,7 @@ else(WIRESHARK_FOUND)
   MESSAGE(STATUS "Wireshark libraries not found, performing a Wireshark plug-in build.")
 
   include(WiresharkPlugin)
-  set_module_info(sap 0 4 2 0)
+  set_module_info(sap 0 4 3 0)
 
 endif(WIRESHARK_FOUND)
 

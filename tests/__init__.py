@@ -19,21 +19,13 @@
 # ==============
 
 # Standard imports
+import sys
 import unittest
 from os import remove, path
-# Custom imports
-import sapni_test
-import sapdiag_test
-import saprouter_test
-
-
-def suite():
-    suite = unittest.TestSuite()
-    suite.addTests(sapni_test.suite())
-    suite.addTests(sapdiag_test.suite())
-    suite.addTests(saprouter_test.suite())
-    return suite
 
 
 if __name__ == '__main__':
-    unittest.TextTestRunner(verbosity=2).run(suite())
+    test_suite = unittest.defaultTestLoader.discover('.', '*_test.py')
+    test_runner = unittest.TextTestRunner(verbosity=2, resultclass=unittest.TextTestResult)
+    result = test_runner.run(test_suite)
+    sys.exit(not result.wasSuccessful())

@@ -24,6 +24,9 @@
 
 #include <epan/packet.h>
 
+tvbuff_t*
+dissect_sapsnc_frame(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset);
+
 gboolean
 check_length(packet_info *pinfo, proto_tree *tree, guint32 expected, guint32 real, const char *name_string);
 
