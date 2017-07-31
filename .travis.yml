@@ -31,6 +31,7 @@ before_install:
 
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
         ${PLUGIN_DIR}/tools/osx-provision-source.sh;
+        PATH=/usr/local/opt/qt5/bin:$PATH;
     fi
 
   # See https://github.com/travis-ci/travis-ci/issues/5326

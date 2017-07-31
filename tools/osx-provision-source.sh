@@ -34,9 +34,6 @@ VERSION=`brew info qt5 | grep /usr/local/Cellar | tail -n 1 | cut -d '/' -f6 | c
 sudo ln -s /usr/local/Cellar/qt5/$VERSION/mkspecs /usr/local/
 sudo ln -s /usr/local/Cellar/qt5/$VERSION/plugins /usr/local/
 
-# Set path for QT5
-PATH=/usr/local/opt/qt5/bin:$PATH;
-
 # Check out source
 mkdir -p ${HOME}/wireshark-$WIRESHARK_BRANCH
 cd ${HOME}/wireshark-$WIRESHARK_BRANCH
