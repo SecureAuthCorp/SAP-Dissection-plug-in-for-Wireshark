@@ -47,7 +47,7 @@ before_install:
 install:
   - if [ ${BUILD_STANDALONE} == "no" ]; then
         ${PLUGIN_DIR}/tools/ubuntu-build-source.sh;
-        export PATH=${PATH}:${HOME}/wireshark-${WIRESHARK_BRANCH}/build/run:${HOME}/wireshark-${WIRESHARK_BRANCH}/build/run/Wireshark.app/Contents/MacOS/;
+        export PATH=${PATH}:${HOME}/wireshark-${WIRESHARK_BRANCH}/build/run;
         export WIRESHARK_RUN_FROM_BUILD_DIRECTORY=1;
     fi
   - if [ ${BUILD_STANDALONE} == "yes" ]; then
@@ -58,13 +58,7 @@ script:
   - python ${PLUGIN_DIR}/tests/__init__.py
 
 before_deploy:
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-      cp build/run/plugins/sap.so build/sap-${TRAVIS_TAG}-osx-x64.so
-    fi
-
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-      cp build/run/plugins/sap.so build/sap-${TRAVIS_TAG}-linux-x64.so
-    fi
+  - cp build/run/plugins/sap.so build/sap-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-x64.so
 
 deploy:
     provider: releases
