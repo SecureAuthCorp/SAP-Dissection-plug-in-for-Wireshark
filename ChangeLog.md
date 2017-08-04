@@ -4,6 +4,8 @@ Changelog
 v0.4.3 - 2017-XX-XX
 -------------------
 
+- Building in OSX with Travis.
+
 
 v0.4.2 - 2017-06-30
 -------------------
