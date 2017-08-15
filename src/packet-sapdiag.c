@@ -2604,9 +2604,8 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data 
 {
 	guint8 compress = 0, error_no = 0;
 	guint32 offset = 0;
-	proto_item *sapdiag = NULL, *header = NULL, *com_flag = NULL, *compression_header = NULL, *payload = NULL, *rl = NULL;
-	proto_tree *sapdiag_tree = NULL, *header_tree = NULL, *com_flag_tree = NULL, *compression_header_tree = NULL, *payload_tree = NULL;
-	tvbuff_t *next_tvb;
+	proto_item *sapdiag = NULL, *header = NULL, *com_flag = NULL, *payload = NULL;
+	proto_tree *sapdiag_tree = NULL, *header_tree = NULL, *com_flag_tree = NULL, *payload_tree = NULL;
 
 	/* Add the protocol to the column */
 	col_add_str(pinfo->cinfo, COL_PROTOCOL, "SAPDIAG");
@@ -2662,7 +2661,7 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data 
 
 	/* Check for error messages */
 	if ((error_no != 0x00) && (tvb_captured_length_remaining(tvb, offset) > 0)){
-		gchar  *error_message = NULL;
+		guint8 *error_message = NULL;
 		guint32 error_message_length = 0;
 
 		error_message_length = (guint32)tvb_captured_length_remaining(tvb, offset) - 1;

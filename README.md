@@ -271,7 +271,7 @@ Contributions made by:
   * Valeriy Gusev
   * Daniel Berlin ([@daberlin](https://github.com/daberlin))
   * Victor Portal Gonzalez
-  * Dave Hartley
+  * Dave Hartley ([@nmonkee](https://twitter.com/nmonkee))
   * Jean-Paul Roliers
   * Dongha Shin
   * Luca Di Stefano
