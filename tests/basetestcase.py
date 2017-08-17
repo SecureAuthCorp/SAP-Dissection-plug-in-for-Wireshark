@@ -50,7 +50,7 @@ class WiresharkTestCase(unittest.TestCase):
     def get_capture(self, pkt):
         """Write down a scapy packet to a pcap file and dissect it using
         tshark."""
-        # Remove the pcap if already exists 
+        # Remove the pcap if already exists
         if path.exists(self.tests_filename):
             remove(self.tests_filename)
         # Write it using scapy
@@ -58,6 +58,25 @@ class WiresharkTestCase(unittest.TestCase):
         # Parse it using pyshark
         cap = pyshark.FileCapture(self.tests_filename, tshark_path=TSHARK_PATH)
         return cap
+
+    def assert_fields(self, scapy_pkt, pyshark_pkt, mapping):
+        """Checks value of fields against a scapy packet and a pyshark packet
+        given a mapping or attribute names and transform functions.
+        """
+        for field, value in scapy_pkt.fields.items():
+            if field in mapping:
+                if isinstance(mapping[field], tuple) and len(mapping[field]) == 2:
+                    field, function = mapping[field]
+                else:
+                    field = mapping[field]
+                    function = None
+
+                pyshark_value = getattr(pyshark_pkt, field)
+
+                if function is not None:
+                    pyshark_value = function(pyshark_value)
+
+                self.assertEqual(value, pyshark_value)
 
     def tearDown(self):
         if path.exists(self.tests_filename):
