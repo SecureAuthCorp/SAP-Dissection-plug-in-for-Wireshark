@@ -67,6 +67,36 @@ class WiresharkSAPDiagTestCase(WiresharkTestCase):
         self.assertEqual("The uncompressed payload length (0) differs with the reported length (661)",
                          packet['sapdiag'].header_compression_uncomplength_invalid)
 
+    def test_login_screen(self):
+        """Test decompression of a login screen packet. The result is
+        compared with data obtained from SAP GUI."""
+
+        login_screen_compressed = read_data_file('nw_703_login_screen_compressed.data')
+        login_screen_decompressed = read_data_file('nw_703_login_screen_decompressed.data')
+
+        pkt = Ether()/IP()/TCP(dport=3200)/SAPNI()/Raw(str(SAPDiag(compress=1))[:-8])/login_screen_compressed
+
+        packet = self.get_capture(pkt)[0]
+
+        self.assertIn('sapdiag', packet)
+        self.assertEqual(1, int(packet['sapdiag'].header_compression_returncode))
+        self.assertEqual(len(login_screen_decompressed), int(packet['sapdiag'].header_compression_uncomplength))
+
+    def test_login(self):
+        """Test decompression of a login packet. The result is
+        compared with data obtained from SAP GUI."""
+
+        login_compressed = read_data_file('sapgui_730_login_compressed.data')
+        login_decompressed = read_data_file('sapgui_730_login_decompressed.data')
+
+        pkt = Ether()/IP()/TCP(dport=3200)/SAPNI()/Raw(str(SAPDiag(compress=1))[:-8])/login_compressed
+
+        packet = self.get_capture(pkt)[0]
+
+        self.assertIn('sapdiag', packet)
+        self.assertEqual(1, int(packet['sapdiag'].header_compression_returncode))
+        self.assertEqual(len(login_decompressed), int(packet['sapdiag'].header_compression_uncomplength))
+
 
 def suite():
     loader = unittest.TestLoader()
