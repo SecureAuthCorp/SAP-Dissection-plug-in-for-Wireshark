@@ -83,13 +83,11 @@ set(CLEAN_FILES
 	${PLUGIN_FILES}
 )
 
-if (WERROR)
-	set_source_files_properties(
-		${CLEAN_FILES}
-		PROPERTIES
-		COMPILE_FLAGS -Werror
-	)
-endif()
+set_source_files_properties(
+	${CLEAN_FILES}
+	PROPERTIES
+	COMPILE_FLAGS "${WERROR_COMMON_FLAGS}"
+)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
