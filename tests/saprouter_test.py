@@ -171,7 +171,6 @@ class WiresharkSAPRouterTestCase(WiresharkTestCase):
 
         packet = self.get_capture(pkt)[0]
 
-        print(dir(packet["saprouter"]))
         self.assertIn('sapni', packet)
         self.assertEqual(int(packet['sapni'].length), len(p))
         self.assertIn('saprouter', packet)

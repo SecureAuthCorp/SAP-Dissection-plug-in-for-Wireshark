@@ -26,6 +26,8 @@
 
 #include <glib.h>
 
+#include <epan/wmem/wmem.h>
+
 #include "sapdecompress.h"
 
 #include "hpa101saptype.h"
@@ -114,7 +116,7 @@ int decompress_packet (const guint8 *in, gint in_length, guint8 *out, guint *out
 
 	/* Allocate buffers */
 	bufin_length = bufin_rest = (SAP_INT)in_length;
-	bufin = bufin_pos = (SAP_BYTE*) malloc(in_length);
+	bufin = bufin_pos = (SAP_BYTE*) wmem_alloc0(wmem_packet_scope(), in_length);
 	if (!bufin){
 		return (CS_E_MEMORY_ERROR);
 	}
@@ -130,7 +132,7 @@ int decompress_packet (const guint8 *in, gint in_length, guint8 *out, guint *out
 #ifdef DEBUG
 		printf("sapdecompress.cpp: Initialization failed !\n");
 #endif
-		free(bufin);
+		wmem_free(wmem_packet_scope(), bufin);
 		*out_length = 0;
 		return (rt);
 	}
@@ -141,7 +143,7 @@ int decompress_packet (const guint8 *in, gint in_length, guint8 *out, guint *out
 #ifdef DEBUG
 		printf("sapdecompress.cpp: Length reported (%d) doesn't match with the one in the header (%d)\n", *out_length, data_length);
 #endif
-		free(bufin);
+		wmem_free(wmem_packet_scope(), bufin);
 		*out_length = 0;
 		return (CS_E_OUT_BUFFER_LEN);
 	}
@@ -157,10 +159,10 @@ int decompress_packet (const guint8 *in, gint in_length, guint8 *out, guint *out
 	 * as the output buffer size.
 	 */
 	bufout_length = bufout_rest = *out_length;
-	bufout = bufout_pos = (SAP_BYTE*) malloc(bufout_length);
+	bufout = bufout_pos = (SAP_BYTE*) wmem_alloc0(wmem_packet_scope(), bufout_length);
 	if (!bufout){
 		*out_length = 0;
-		free(bufin);
+		wmem_free(wmem_packet_scope(), bufin);
 		return (CS_E_MEMORY_ERROR);
 	}
 	memset(bufout, 0, bufout_length);
@@ -215,7 +217,7 @@ int decompress_packet (const guint8 *in, gint in_length, guint8 *out, guint *out
 	}
 
 	/* Free the buffers */
-	free(bufin); free(bufout);
+	wmem_free(wmem_packet_scope(), bufin); wmem_free(wmem_packet_scope(), bufout);
 
 #ifdef DEBUG
 	printf("sapdecompress.cpp: Out Length: %d\n", *out_length);
