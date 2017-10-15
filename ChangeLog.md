@@ -5,19 +5,19 @@ v0.4.3 - 2017-XX-XX
 -------------------
 
 - Building in OSX with Travis.
-- `src/packet-sapsnc.cpp`: Minor changes based on checkAPI's findings.
+- `src/packet-sapsnc.c`: Minor changes based on checkAPI's findings.
 - `src/packet-sapms.c`: Added Message Server Domain field. Thanks Albert Zedlitz!
 
 
 v0.4.2 - 2017-06-30
 -------------------
 - Added initial support for dissecting SNC frames and some of their fields.
-- `src/packet-sapdiag.cpp`: Dissection of SNC frames uses new helper functions.
-- `src/packet-sapprotocol.cpp`: Clarified some column strings.
-- `src/packet-saprouter.cpp`: Clarified some column strings.
-- `src/packet-saprouter.cpp`: Added parsing of niping tool messages.
-- `src/packet-saprouter.cpp`: Dissection of SNC frames uses new helper functions.
-- `src/packet-sapsnc.cpp`: Added more fields as part of the SNC frame dissection.
+- `src/packet-sapdiag.c`: Dissection of SNC frames uses new helper functions.
+- `src/packet-sapprotocol.c`: Clarified some column strings.
+- `src/packet-saprouter.c`: Clarified some column strings.
+- `src/packet-saprouter.c`: Added parsing of niping tool messages.
+- `src/packet-saprouter.c`: Dissection of SNC frames uses new helper functions.
+- `src/packet-sapsnc.c`: Added more fields as part of the SNC frame dissection.
 
 
 v0.4.1 - 2016-12-30
