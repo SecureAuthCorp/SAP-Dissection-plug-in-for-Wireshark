@@ -6,6 +6,7 @@ v0.4.3 - 2017-XX-XX
 
 - Building in OSX with Travis.
 - `src/packet-sapsnc.cpp`: Minor changes based on checkAPI's findings.
+- `src/packet-sapms.c`: Added Message Server Domain field. Thanks Albert Zedlitz!
 
 
 v0.4.2 - 2017-06-30
