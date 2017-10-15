@@ -1,9 +1,10 @@
 Changelog
 =========
 
-v0.4.3 - 2017-XX-XX
+v0.5.1 - 2017-XX-XX
 -------------------
 
+- Switched to Wireshark 2.4 branch. Ported the plugin to the use of new APIs.
 - Building in OSX with Travis.
 - `src/packet-sapsnc.cpp`: Minor changes based on checkAPI's findings.
 
