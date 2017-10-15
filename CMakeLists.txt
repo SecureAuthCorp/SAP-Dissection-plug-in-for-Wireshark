@@ -41,7 +41,7 @@ if(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MIN
   find_package(GLIB2)
   include_directories (${GLIB2_INCLUDE_DIRS})
 
-  include_directories (${WIRESHARK_INCLUDE_DIRS})
+  include_directories (${Wireshark_INCLUDE_DIR})
 
   set(LINK_MODE_LIB SHARED)
   set(LINK_MODE_MODULE MODULE)
