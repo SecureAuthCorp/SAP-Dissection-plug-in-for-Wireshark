@@ -1254,7 +1254,7 @@ proto_register_saprfc(void)
 	/* Register the preferences */
 	saprfc_module = prefs_register_protocol(proto_saprfc, proto_reg_handoff_saprfc);
 
-	range_convert_str(&global_saprfc_port_range, SAPRFC_PORT_RANGE, MAX_TCP_PORT);
+	range_convert_str(wmem_epan_scope(), &global_saprfc_port_range, SAPRFC_PORT_RANGE, MAX_TCP_PORT);
 	prefs_register_range_preference(saprfc_module, "tcp_ports", "SAP RFC Protocol TCP port numbers", "Port numbers used for SAP RFC Protocol (default " SAPRFC_PORT_RANGE ")", &global_saprfc_port_range, MAX_TCP_PORT);
 
 	prefs_register_bool_preference(saprfc_module, "decompress", "Decompress SAP RFC Protocol message payloads", "Whether the SAP RFC Protocol dissector should decompress message's payloads.", &global_saprfc_decompress);
@@ -1292,10 +1292,10 @@ proto_reg_handoff_saprfc(void)
 		initialized = TRUE;
 	} else {
 		range_foreach(saprfc_port_range, range_delete_callback);
-		g_free(saprfc_port_range);
+		wmem_free(wmem_epan_scope(), saprfc_port_range);
 	}
 
-	saprfc_port_range = range_copy(global_saprfc_port_range);
+	saprfc_port_range = range_copy(wmem_epan_scope(), global_saprfc_port_range);
 	range_foreach(saprfc_port_range, range_add_callback);
 }
 

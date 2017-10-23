@@ -24,6 +24,8 @@
 #include <epan/packet.h>
 #include <epan/prefs.h>
 #include <epan/expert.h>
+#include <epan/wmem/wmem.h>
+
 
 /* Define default ports */
 #define SAPMS_PORT_RANGE "3600-3699,3900-3999"
@@ -1520,7 +1522,7 @@ proto_register_sapms(void)
 	/* Register the preferences */
 	sapms_module = prefs_register_protocol(proto_sapms, proto_reg_handoff_sapms);
 
-	range_convert_str(&global_sapms_port_range, SAPMS_PORT_RANGE, MAX_TCP_PORT);
+	range_convert_str(wmem_epan_scope(), &global_sapms_port_range, SAPMS_PORT_RANGE, MAX_TCP_PORT);
 	prefs_register_range_preference(sapms_module, "tcp_ports", "SAP MS Protocol TCP port numbers", "Port numbers used for SAP MS Protocol (default " SAPMS_PORT_RANGE ")", &global_sapms_port_range, MAX_TCP_PORT);
 
 	prefs_register_bool_preference(sapms_module, "highlight_unknown_items", "Highlight unknown SAP MS messages", "Whether the SAP MS Protocol dissector should highlight unknown MS messages (migth be noise and generate a lot of expert warnings)", &global_sapms_highlight_items);
@@ -1554,10 +1556,10 @@ proto_reg_handoff_sapms(void)
 		initialized = TRUE;
 	} else {
 		range_foreach(sapms_port_range, range_delete_callback);
-		g_free(sapms_port_range);
+		wmem_free(wmem_epan_scope(), sapms_port_range);
 	}
 
-	sapms_port_range = range_copy(global_sapms_port_range);
+	sapms_port_range = range_copy(wmem_epan_scope(), global_sapms_port_range);
 	range_foreach(sapms_port_range, range_add_callback);
 }
 

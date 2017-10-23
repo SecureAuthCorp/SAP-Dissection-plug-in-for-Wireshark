@@ -1542,7 +1542,7 @@ dissect_sapdiag_rfc_call(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
 			/* Set the column to not writable so the RFC dissector doesn't override the Diag info */
 			col_set_writable(pinfo->cinfo, -1, FALSE);
 			/* Create a new tvb buffer and call the dissector */
-			next_tvb = tvb_new_subset(tvb, offset, item_length, item_length);
+			next_tvb = tvb_new_subset_length(tvb, offset, item_length);
 			call_dissector(rfc_handle, next_tvb, pinfo, tree);
 		}
 	}
@@ -3614,7 +3614,7 @@ proto_register_sapdiag(void)
 	/* Register the preferences */
 	sapdiag_module = prefs_register_protocol(proto_sapdiag, proto_reg_handoff_sapdiag);
 
-	range_convert_str(&global_sapdiag_port_range, SAPDIAG_PORT_RANGE, MAX_TCP_PORT);
+	range_convert_str(wmem_epan_scope(), &global_sapdiag_port_range, SAPDIAG_PORT_RANGE, MAX_TCP_PORT);
 	prefs_register_range_preference(sapdiag_module, "tcp_ports", "SAP Diag Protocol TCP port numbers", "Port numbers used for SAP Diag Protocol (default " SAPDIAG_PORT_RANGE ")", &global_sapdiag_port_range, MAX_TCP_PORT);
 
 	prefs_register_bool_preference(sapdiag_module, "decompress", "Decompress SAP Diag Protocol message payloads", "Whether the SAP Diag Protocol dissector should decompress message's payloads.", &global_sapdiag_decompress);
@@ -3654,10 +3654,10 @@ proto_reg_handoff_sapdiag(void)
 		initialized = TRUE;
 	} else {
 		range_foreach(sapdiag_port_range, range_delete_callback);
-		g_free(sapdiag_port_range);
+		wmem_free(wmem_epan_scope(), sapdiag_port_range);
 	}
 
-	sapdiag_port_range = range_copy(global_sapdiag_port_range);
+	sapdiag_port_range = range_copy(wmem_epan_scope(), global_sapdiag_port_range);
 	range_foreach(sapdiag_port_range, range_add_callback);
 }
 

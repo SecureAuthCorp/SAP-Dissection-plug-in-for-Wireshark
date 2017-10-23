@@ -210,7 +210,7 @@ dissect_sapsnc_frame(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
 			/* If the frame contain data being wrapped or sealed, put it into a new tvb for
 			   further dissection of the upper layer */
 			if ((frame_type == 0x07) || (frame_type == 0x08)) {
-			    next_tvb = tvb_new_subset(tvb, offset, -1, -1);
+			    next_tvb = tvb_new_subset_remaining(tvb, offset);
 			}
 			offset+=data_length;
 		}

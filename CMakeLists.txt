@@ -25,7 +25,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 find_package(Wireshark)
 
-if(WIRESHARK_FOUND)
+if(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 4)
 
   MESSAGE(STATUS "Wireshark libraries found, performing a stand-alone plug-in build.")
 
@@ -41,19 +41,19 @@ if(WIRESHARK_FOUND)
   find_package(GLIB2)
   include_directories (${GLIB2_INCLUDE_DIRS})
 
-  include_directories (${WIRESHARK_INCLUDE_DIRS})
+  include_directories (${Wireshark_INCLUDE_DIR})
 
   set(LINK_MODE_LIB SHARED)
   set(LINK_MODE_MODULE MODULE)
 
-else(WIRESHARK_FOUND)
+else(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 4)
 
   MESSAGE(STATUS "Wireshark libraries not found, performing a Wireshark plug-in build.")
 
   include(WiresharkPlugin)
-  set_module_info(sap 0 4 3 0)
+  set_module_info(sap 0 5 1 0)
 
-endif(WIRESHARK_FOUND)
+endif(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 4)
 
 set(DISSECTOR_SRC
 	src/packet-sapdiag.c
@@ -83,13 +83,11 @@ set(CLEAN_FILES
 	${PLUGIN_FILES}
 )
 
-if (WERROR)
-	set_source_files_properties(
-		${CLEAN_FILES}
-		PROPERTIES
-		COMPILE_FLAGS -Werror
-	)
-endif()
+set_source_files_properties(
+	${CLEAN_FILES}
+	PROPERTIES
+	COMPILE_FLAGS "${WERROR_COMMON_FLAGS}"
+)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -99,7 +97,7 @@ register_dissector_files(plugin.c
         ${DISSECTOR_SUPPORT_SRC}
 )
 
-if(WIRESHARK_FOUND)
+if(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 4)
 
   add_library(sap ${LINK_MODE_MODULE}
                   ${PLUGIN_FILES}
@@ -116,7 +114,7 @@ if(WIRESHARK_FOUND)
           ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   )
 
-else(WIRESHARK_FOUND)
+else(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 4)
 
   add_plugin_library(sap)
 
@@ -137,4 +135,17 @@ else(WIRESHARK_FOUND)
   	  ${DISSECTOR_HEADERS}
   )
 
-endif(WIRESHARK_FOUND)
+endif(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 4)
+
+#
+# Editor modelines  -  http://www.wireshark.org/tools/modelines.html
+#
+# Local variables:
+# c-basic-offset: 8
+# tab-width: 8
+# indent-tabs-mode: t
+# End:
+#
+# vi: set shiftwidth=8 tabstop=8 noexpandtab:
+# :indentSize=8:tabSize=8:noTabs=false:
+#
