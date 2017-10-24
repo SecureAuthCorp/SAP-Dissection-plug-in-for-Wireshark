@@ -22,7 +22,7 @@ matrix:
       compiler: gcc
     # Exclude standalone build on OSX
     - os: osx
-      env: WIRESHARK_BRANCH=master-2.2 PLUGIN_DIR=$TRAVIS_BUILD_DIR BUILD_STANDALONE=yes
+      env: WIRESHARK_BRANCH=master-2.4 PLUGIN_DIR=$TRAVIS_BUILD_DIR BUILD_STANDALONE=yes
   allow_failures:
     - os: osx
 
