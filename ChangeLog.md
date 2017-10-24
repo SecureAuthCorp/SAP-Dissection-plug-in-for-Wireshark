@@ -1,7 +1,7 @@
 Changelog
 =========
 
-v0.5.1 - 2017-XX-XX
+v0.5.1 - 2017-10-24
 -------------------
 
 - Switched to Wireshark 2.4 branch. Ported the plugin to the use of new APIs.
