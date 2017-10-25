@@ -40,10 +40,11 @@ __pycache__/
 *.py[cod]
 
 # IDEs
+.autotools
 .project
+.cproject
 .pydevproject
 .settings
 
 # Vagrant files
 .vagrant
-
