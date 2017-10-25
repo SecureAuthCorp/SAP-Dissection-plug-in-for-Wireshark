@@ -75,4 +75,4 @@ deploy:
     on:
         tags: true
         repo: CoreSecurity/SAP-Dissection-plug-in-for-Wireshark
-        condition: "${BUILD_STANDALONE} == \"yes\""
+        condition: "${BUILD_STANDALONE} == \"yes\" || ${TRAVIS_OS_NAME} == \"osx\""
