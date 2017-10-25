@@ -59,10 +59,10 @@ script:
 
 before_deploy:
   - if [ ${BUILD_STANDALONE} == "no" ]; then
-        cp build/run/plugins/sap.so build/sap-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-x64.so;
+        cp build/run/plugins/sap.so build/sap-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-x86-64.so;
     fi
   - if [ ${BUILD_STANDALONE} == "yes" ]; then
-        cp build/sap.so build/sap-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-x64.so;
+        mv build/sap.so build/sap-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-x86-64.so;
     fi
 
 deploy:
