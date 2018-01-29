@@ -57,4 +57,4 @@ fi
 brew install --with-python libdnet
 brew install https://raw.githubusercontent.com/secdev/scapy/master/.travis/pylibpcap.rb
 
-sudo -H sh -c "CXX=g++ CC=gcc pip install pysap pyshark"
+sudo -H sh -c "CXX=g++ CC=gcc pip2 install pysap pyshark"
