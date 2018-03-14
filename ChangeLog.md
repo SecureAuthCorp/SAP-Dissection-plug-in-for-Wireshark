@@ -4,6 +4,7 @@ Changelog
 v0.5.2 - 2018-XX-XX
 -------------------
 
+- Added support for dissecting the IGS protocol. Thanks Yvan Genuer ([@iggy38](https://github.com/iggy38))! ([\#14](https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/issues/14))
 
 v0.5.1 - 2017-10-24
 -------------------

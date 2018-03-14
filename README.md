@@ -73,6 +73,10 @@ This plugin counts on several different dissectors:
 	dissector when SNC is used in authentication only or integrity protection
 	quality of protection levels.
 
+- SAP IGS (Internet Graphic Server) Protocol dissector
+
+  This dissector parses packets used by SAP's IGS services.
+
 - SAP RFC (Remote Function Call) Protocol dissector (experimental)
 
     This dissector perform some basic dissection on the main components of the
@@ -276,6 +280,7 @@ Contributions made by:
   * Dongha Shin
   * Luca Di Stefano
   * Alexis La Goutte ([@alagoutte](https://github.com/alagoutte))
+  * Yvan Genuer ([@iggy38](https://github.com/iggy38))
 
 
 References

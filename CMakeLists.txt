@@ -58,6 +58,7 @@ endif(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_
 set(DISSECTOR_SRC
 	src/packet-sapdiag.c
 	src/packet-sapenqueue.c
+	src/packet-sapigs.c
 	src/packet-saprouter.c
 	src/packet-sapprotocol.c
 	src/packet-saprfc.c
