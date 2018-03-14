@@ -33,6 +33,7 @@ PLUGIN_NAME = sap
 DISSECTOR_SRC = \
 	src/packet-sapdiag.c \
 	src/packet-sapenqueue.c \
+	src/packet-sapigs.c \
 	src/packet-saprouter.c \
 	src/packet-sapprotocol.c \
 	src/packet-saprfc.c \
