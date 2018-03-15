@@ -34,7 +34,7 @@
 
 
 /* Define default ports */
-#define SAP_PROTOCOL_PORT_RANGE "3200-3999"
+#define SAP_PROTOCOL_PORT_RANGE "3200-3999,40000-49999"
 
 /*
  * Length of the frame header
