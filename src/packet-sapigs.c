@@ -133,7 +133,7 @@ dissect_sapigs(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 	col_add_fstr(pinfo->cinfo, COL_INFO, " function: %s", tvb_get_string_enc(wmem_packet_scope(), tvb, 0, 32, ENC_ASCII));
 
 	if (tree) { /* we are being asked for details */
-	
+
 		guint32 offset = 0, err_val;
 		long data_offset = 0, data_length = 0;
 		guchar *sapigs_info_function = NULL, *illbeback_type = NULL, *is_table = NULL;
@@ -143,10 +143,10 @@ dissect_sapigs(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 		/* Add the main sapigs subtree */
 		ti = proto_tree_add_item(tree, proto_sapigs, tvb, 0, -1, ENC_NA);
 		sapigs_tree = proto_item_add_subtree(ti, ett_sapigs);
-	
+
 		/* Retreive function name */
 		sapigs_info_function = tvb_get_string_enc(wmem_packet_scope(), tvb, offset, 32, ENC_ASCII);
-		
+
 		/* Headers */
 		proto_tree_add_item(sapigs_tree, hf_sapigs_function, tvb, offset, 32, ENC_ASCII|ENC_NA); offset += 32;
 		proto_tree_add_item(sapigs_tree, hf_sapigs_listener, tvb, offset, 32, ENC_ASCII|ENC_NA); offset += 32;
@@ -182,7 +182,7 @@ dissect_sapigs(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 			}
 			case 6:{	/* ADM:ILLBEBACK */
 				illbeback_type = tvb_get_string_enc(wmem_packet_scope(), tvb, offset, 10, ENC_ASCII|ENC_NA);
-				if (strcmp("TransMagic", illbeback_type) == 0){
+				if (strncmp("TransMagic", illbeback_type, 10) == 0){
 					/* data is raw after eye_catcher */
 					proto_tree_add_item(sapigs_tree, hf_sapigs_eye_catcher, tvb, offset, 10, ENC_ASCII|ENC_NA); offset += 16;
 					proto_tree_add_item(sapigs_tree, hf_sapigs_data, tvb, offset, -1, ENC_ASCII|ENC_NA);
@@ -214,7 +214,7 @@ dissect_sapigs(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 		                /* Definition tables */
 				is_table = tvb_get_string_enc(wmem_packet_scope(), tvb, offset, 4, ENC_ASCII);
 				/* if the 4 next char is VERS, we are at the begining of one definition table */
-				while(strcmp("VERS", is_table) == 0){
+				while(strncmp("VERS", is_table, 4) == 0){
 					/* Build a tree for Tables */
 			                sapigs_tables = proto_tree_add_item(sapigs_tree, hf_sapigs_tables, tvb, offset, 336, ENC_NA);
 			                sapigs_tables_tree = proto_item_add_subtree(sapigs_tables, ett_sapigs);
