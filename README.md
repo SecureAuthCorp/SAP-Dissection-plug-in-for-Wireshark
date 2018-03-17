@@ -6,7 +6,7 @@ SAP Dissector Plugin for Wireshark
 
 Copyright (C) 2012-2018 by Martin Gallo, Core Security
 
-Version 0.5.2.dev (XXX 2017)
+Version 0.5.2 (March 2018)
 
 
 Overview
