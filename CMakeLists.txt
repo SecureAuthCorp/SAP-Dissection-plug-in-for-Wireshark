@@ -51,7 +51,7 @@ else(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_M
   MESSAGE(STATUS "Wireshark libraries not found, performing a Wireshark plug-in build.")
 
   include(WiresharkPlugin)
-  set_module_info(sap 0 5 2 0)
+  set_module_info(sap 0 5 3 0)
 
 endif(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 4)
 
