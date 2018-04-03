@@ -19,7 +19,7 @@ some of them are standard and well-known protocols, others are proprietaries
 and public information is not available.
 
 This [Wireshark](https://www.wireshark.org/) [2] plugin provides dissection
-of SAP's NI, Message Server, Router, Diag, Enqueue and SNC protocols. The
+of SAP's NI, Message Server, Router, Diag, Enqueue, IGS and SNC protocols. The
 dissectors are based on information acquired at researching the different
 protocols and services. Additional experimental support is included for SAP's
 RFC protocol. Detailed information about the research can be found at [3],
