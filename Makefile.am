@@ -24,7 +24,7 @@
 #
 
 include $(top_srcdir)/Makefile.am.inc
-include ../Makefile.am.inc
+include $(top_srcdir)/plugins/epan/Makefile.am.inc
 
 # the name of the plugin
 PLUGIN_NAME = sap

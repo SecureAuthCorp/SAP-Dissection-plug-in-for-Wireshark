@@ -1,82 +1,52 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 9e18a10..7d7f9a1 100644
+index 13aba3e..6f422d0 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -1278,6 +1278,7 @@ if(ENABLE_PLUGINS)
- 		plugins/mate
- 		plugins/opcua
- 		plugins/profinet
-+		plugins/sap
- 		plugins/stats_tree
- 		plugins/transum
- 		plugins/unistim
-diff --git a/Makefile.am b/Makefile.am
-index d9294b5..cae3660 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -360,6 +360,7 @@ plugin_ldadd = $(_CUSTOM_plugin_ldadd_) \
- 	-dlopen plugins/mate/mate.la \
- 	-dlopen plugins/opcua/opcua.la \
- 	-dlopen plugins/profinet/profinet.la \
-+	-dlopen plugins/sap/sap.la \
- 	-dlopen plugins/stats_tree/stats_tree.la \
- 	-dlopen plugins/unistim/unistim.la \
- 	-dlopen plugins/wimax/wimax.la \
+@@ -1403,6 +1403,7 @@ if(ENABLE_PLUGINS)
+ 		plugins/epan/mate
+ 		plugins/epan/opcua
+ 		plugins/epan/profinet
++		plugins/epan/sap
+ 		plugins/epan/stats_tree
+ 		plugins/epan/transum
+ 		plugins/epan/unistim
 diff --git a/configure.ac b/configure.ac
-index 91c965b..dbae35b 100644
+index c82ee29..5a7b89a 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -3018,6 +3018,7 @@ AC_CONFIG_FILES(
-   plugins/mate/Makefile
-   plugins/opcua/Makefile
-   plugins/profinet/Makefile
-+	plugins/sap/Makefile
-   plugins/stats_tree/Makefile
-   plugins/transum/Makefile
-   plugins/unistim/Makefile
-diff --git a/epan/Makefile.am b/epan/Makefile.am
-index 7124dc3..48ca1c5 100644
---- a/epan/Makefile.am
-+++ b/epan/Makefile.am
-@@ -523,6 +523,13 @@ plugin_src = \
- 	../plugins/profinet/plugin.c \
- 	../plugins/stats_tree/pinfo_stats_tree.c \
- 	../plugins/stats_tree/stats_tree_plugin.c \
-+	../plugins/sap/src/packet-sapdiag.c \
-+	../plugins/sap/src/packet-sapenqueue.c \
-+	../plugins/sap/src/packet-saprouter.c \
-+	../plugins/sap/src/packet-sapprotocol.c \
-+	../plugins/sap/src/packet-saprfc.c \
-+	../plugins/sap/src/packet-sapms.c \
-+	../plugins/sap/src/packet-sapsnc.c \
- 	../plugins/tpg/packet-http.c \
- 	../plugins/transum/decoders.c \
- 	../plugins/transum/extractors.c \
+@@ -2835,6 +2835,7 @@ AC_CONFIG_FILES(
+   plugins/epan/mate/Makefile
+   plugins/epan/opcua/Makefile
+   plugins/epan/profinet/Makefile
++	plugins/epan/sap/Makefile
+   plugins/epan/stats_tree/Makefile
+   plugins/epan/transum/Makefile
+   plugins/epan/unistim/Makefile
 diff --git a/packaging/nsis/wireshark.nsi b/packaging/nsis/wireshark.nsi
-index 4d9c4ea..5c1fb42 100644
+index e98f572..561c0fe 100644
 --- a/packaging/nsis/wireshark.nsi
 +++ b/packaging/nsis/wireshark.nsi
-@@ -1011,6 +1011,7 @@ File "${STAGING_DIR}\plugins\irda.dll"
- File "${STAGING_DIR}\plugins\m2m.dll"
- File "${STAGING_DIR}\plugins\opcua.dll"
- File "${STAGING_DIR}\plugins\profinet.dll"
-+File "${STAGING_DIR}\plugins\sap.dll"
- File "${STAGING_DIR}\plugins\unistim.dll"
- File "${STAGING_DIR}\plugins\wimax.dll"
- File "${STAGING_DIR}\plugins\wimaxasncp.dll"
+@@ -1005,6 +1005,7 @@ File "${STAGING_DIR}\plugins\${VERSION_MAJOR}.${VERSION_MINOR}\epan\gryphon.dll"
+ File "${STAGING_DIR}\plugins\${VERSION_MAJOR}.${VERSION_MINOR}\epan\irda.dll"
+ File "${STAGING_DIR}\plugins\${VERSION_MAJOR}.${VERSION_MINOR}\epan\opcua.dll"
+ File "${STAGING_DIR}\plugins\${VERSION_MAJOR}.${VERSION_MINOR}\epan\profinet.dll"
++File "${STAGING_DIR}\plugins\${VERSION_MAJOR}.${VERSION_MINOR}\epan\sap.dll"
+ File "${STAGING_DIR}\plugins\${VERSION_MAJOR}.${VERSION_MINOR}\epan\unistim.dll"
+ File "${STAGING_DIR}\plugins\${VERSION_MAJOR}.${VERSION_MINOR}\epan\wimax.dll"
+ File "${STAGING_DIR}\plugins\${VERSION_MAJOR}.${VERSION_MINOR}\epan\wimaxasncp.dll"
 diff --git a/plugins/Makefile.am b/plugins/Makefile.am
-index 2f8f7a0..025448b 100644
+index 2055eb1..77f8601 100644
 --- a/plugins/Makefile.am
 +++ b/plugins/Makefile.am
-@@ -31,6 +31,7 @@ SUBDIRS = $(_CUSTOM_SUBDIRS_) \
- 	mate \
- 	opcua \
- 	profinet \
-+	sap \
- 	stats_tree \
- 	transum \
- 	unistim \
-@@ -50,4 +51,3 @@ checkapi:
+@@ -29,6 +29,7 @@ SUBDIRS = \
+ 	epan/mate		\
+ 	epan/opcua		\
+ 	epan/profinet		\
++	epan/sap		\
+ 	epan/stats_tree		\
+ 	epan/transum		\
+ 	epan/unistim		\
+@@ -48,4 +49,3 @@ checkapi:
  	for i in $(SUBDIRS); do \
  		(cd "$$i"; $(MAKE) checkapi); \
  	done
