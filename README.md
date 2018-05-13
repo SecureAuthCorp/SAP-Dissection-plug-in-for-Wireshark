@@ -89,7 +89,7 @@ Installation & Build
 
 This Wireshark plugin is not distributed as part of the Wireshark source. It
 can be build as a standalone plugin, or as part of Wireshark, and is compatible
-with version 2.4.
+with version 2.6.
 
 ### Installing on Linux ###
 
@@ -112,12 +112,12 @@ To build and install the plugin on Debian/Ubuntu linux distributions:
 
 The following steps are required to build and install the plugin as part of Wireshark:
 
-1) Download and decompress the [Wireshark version 2.4 source](https://www.wireshark.org/download.html) [8]
+1) Download and decompress the [Wireshark version 2.6 source](https://www.wireshark.org/download.html) [8]
    or checkout the code from the [source repository](https://code.wireshark.org/review/wireshark) [9].
 
     git clone https://code.wireshark.org/review/wireshark
     cd wireshark
-    git checkout master-2.4
+    git checkout master-2.6
 
 2) Copy the SAP Wireshark Plugin to a new `plugins/sap` directory.
 
@@ -126,7 +126,7 @@ The following steps are required to build and install the plugin as part of Wire
 3) Configure the plugin to be included in the build process. This step can be
    performed using the patch file provided. At the root directory run:
 
-    git apply plugins/sap/wireshark-master-2.4.patch
+    git apply plugins/sap/wireshark-master-2.6.patch
 
 4) Perform a new build including the plugin. At the root directory run:
 
@@ -181,7 +181,7 @@ for building Wireshark on Windows.
 3) Configure the plugin to be included in the build process. This step can be
    performed using the patch file provided. At the root directory run:
 
-    git apply plugins/sap/wireshark-master-2.4.patch
+    git apply plugins/sap/wireshark-master-2.6.patch
 
 4) Perform a new build including the plugin.
 
@@ -304,7 +304,7 @@ References
 
 [9] https://code.wireshark.org/review/wireshark
 
-[10] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-2.4
+[10] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-2.6
 
 [11] https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html
 
