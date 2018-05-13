@@ -1532,12 +1532,12 @@ proto_register_sapms(void)
 /**
  * Helpers for dealing with the port range
  */
-static void range_delete_callback (guint32 port)
+static void range_delete_callback (guint32 port, gpointer ptr _U_)
 {
 	dissector_delete_uint("sapni.port", port, sapms_handle);
 }
 
-static void range_add_callback (guint32 port)
+static void range_add_callback (guint32 port, gpointer ptr _U_)
 {
 	dissector_add_uint("sapni.port", port, sapms_handle);
 }
@@ -1555,12 +1555,12 @@ proto_reg_handoff_sapms(void)
 		sapms_handle = create_dissector_handle(dissect_sapms, proto_sapms);
 		initialized = TRUE;
 	} else {
-		range_foreach(sapms_port_range, range_delete_callback);
+		range_foreach(sapms_port_range, range_delete_callback, NULL);
 		wmem_free(wmem_epan_scope(), sapms_port_range);
 	}
 
 	sapms_port_range = range_copy(wmem_epan_scope(), global_sapms_port_range);
-	range_foreach(sapms_port_range, range_add_callback);
+	range_foreach(sapms_port_range, range_add_callback, NULL);
 }
 
 /*

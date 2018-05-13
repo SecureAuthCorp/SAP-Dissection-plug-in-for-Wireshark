@@ -851,12 +851,12 @@ proto_register_saprouter(void)
 /**
  * Helpers for dealing with the port range
  */
-static void range_delete_callback (guint32 port)
+static void range_delete_callback (guint32 port, gpointer ptr _U_)
 {
 	dissector_delete_uint("sapni.port", port, saprouter_handle);
 }
 
-static void range_add_callback (guint32 port)
+static void range_add_callback (guint32 port, gpointer ptr _U_)
 {
 	dissector_add_uint("sapni.port", port, saprouter_handle);
 }
@@ -872,12 +872,12 @@ proto_reg_handoff_saprouter(void)
 		saprouter_handle = create_dissector_handle(dissect_saprouter, proto_saprouter);
 		initialized = TRUE;
 	} else {
-		range_foreach(saprouter_port_range, range_delete_callback);
+		range_foreach(saprouter_port_range, range_delete_callback, NULL);
 		wmem_free(wmem_epan_scope(), saprouter_port_range);
 	}
 
 	saprouter_port_range = range_copy(wmem_epan_scope(), global_saprouter_port_range);
-	range_foreach(saprouter_port_range, range_add_callback);
+	range_foreach(saprouter_port_range, range_add_callback, NULL);
 
 }
 
