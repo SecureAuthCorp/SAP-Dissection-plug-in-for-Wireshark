@@ -119,14 +119,14 @@ The following steps are required to build and install the plugin as part of Wire
     cd wireshark
     git checkout master-2.6
 
-2) Copy the SAP Wireshark Plugin to a new `plugins/sap` directory.
+2) Copy the SAP Wireshark Plugin to a new `plugins/epan/sap` directory.
 
-    git clone https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/ plugins/sap
+    git clone https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/ plugins/epan/sap
 
 3) Configure the plugin to be included in the build process. This step can be
    performed using the patch file provided. At the root directory run:
 
-    git apply plugins/sap/wireshark-master-2.6.patch
+    git apply plugins/epan/sap/wireshark-master-2.6.patch
 
 4) Perform a new build including the plugin. At the root directory run:
 
@@ -176,12 +176,12 @@ following steps are required to compile the plugin on Windows:
 1) Follow the [step-to-step guide](https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html) [10]
 for building Wireshark on Windows.
 
-2) Copy the SAP Wireshark Plugin to a new `plugins/sap` directory.
+2) Copy the SAP Wireshark Plugin to a new `plugins/epan/sap` directory.
 
 3) Configure the plugin to be included in the build process. This step can be
    performed using the patch file provided. At the root directory run:
 
-    git apply plugins/sap/wireshark-master-2.6.patch
+    git apply plugins/epan/sap/wireshark-master-2.6.patch
 
 4) Perform a new build including the plugin.
 

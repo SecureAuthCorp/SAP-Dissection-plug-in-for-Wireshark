@@ -44,8 +44,8 @@ fi
 git checkout $WIRESHARK_BRANCH
 
 # Link the plugin to the plugins directory if required
-if [ ! -e plugins/sap ]; then
-  ln -s $PLUGIN_DIR plugins/sap
+if [ ! -e plugins/epan/sap ]; then
+  ln -s $PLUGIN_DIR plugins/epan/sap
 fi
 
 # Apply the patch if required

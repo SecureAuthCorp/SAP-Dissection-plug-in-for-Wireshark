@@ -34,10 +34,10 @@ before_build:
   - if "%platform%"=="x64" (set WIRESHARK_TARGET_PLATFORM=win64)
   - set QT5_BASE_DIR=c:\Qt\5.6\msvc2013
   # insert our plugin files to wireshark
-  - mkdir C:\projects\wireshark\plugins\sap
-  - xcopy /E c:\projects\sap C:\projects\wireshark\plugins\sap
+  - mkdir C:\projects\wireshark\plugins\epan\sap
+  - xcopy /E c:\projects\sap C:\projects\wireshark\plugins\epan\sap
   # run the adjustment scripts
-  - git apply plugins/sap/wireshark-master-2.6.patch
+  - git apply plugins/epan/sap/wireshark-master-2.6.patch
   - ps: Invoke-WebRequest -Uri https://cygwin.com/setup-x86_64.exe -OutFile c:\projects\cygwin-setup.exe
   - mkdir c:\projects\cyg-packages
   - c:\projects\cygwin-setup.exe -q -n -N -d -R C:\cygwin64 -s http://mirrors.kernel.org/sourceware/cygwin/ -l c:\projects\cyg-packages -P flex -P bison
@@ -48,10 +48,10 @@ build_script:
   - cd c:\projects\sap\build
   - if "%platform%"=="x86" (cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 12" c:\projects\wireshark)
   - if "%platform%"=="x64" (cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 12 Win64" c:\projects\wireshark)
-  - msbuild /m /p:Configuration=%configuration% /logger:"C:\\Program Files\\AppVeyor\\BuildAgent\\Appveyor.MSBuildLogger.dll" plugins\sap\sap.vcxproj
+  - msbuild /m /p:Configuration=%configuration% /logger:"C:\\Program Files\\AppVeyor\\BuildAgent\\Appveyor.MSBuildLogger.dll" plugins\epan\sap\sap.vcxproj
 
 after_build:
-  - copy c:\projects\sap\build\run\%configuration%\plugins\sap.dll c:\projects\sap\sap-%APPVEYOR_BUILD_VERSION%-%WIRESHARK_TARGET_PLATFORM%.dll
+  - copy c:\projects\sap\build\run\%configuration%\plugins\epan\sap.dll c:\projects\sap\sap-%APPVEYOR_BUILD_VERSION%-%WIRESHARK_TARGET_PLATFORM%.dll
 
 artifacts:
   - path: "sap-*.dll"
