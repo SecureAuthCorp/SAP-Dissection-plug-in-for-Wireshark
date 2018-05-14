@@ -25,7 +25,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 find_package(Wireshark)
 
-if(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 4)
+if(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 6)
 
   MESSAGE(STATUS "Wireshark libraries found, performing a stand-alone plug-in build.")
 
@@ -46,14 +46,16 @@ if(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MIN
   set(LINK_MODE_LIB SHARED)
   set(LINK_MODE_MODULE MODULE)
 
-else(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 4)
+else(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 6)
 
   MESSAGE(STATUS "Wireshark libraries not found, performing a Wireshark plug-in build.")
 
   include(WiresharkPlugin)
+
+  # Plugin name and version info (major minor micro extra)
   set_module_info(sap 0 5 3 0)
 
-endif(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 4)
+endif(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 6)
 
 set(DISSECTOR_SRC
 	src/packet-sapdiag.c
@@ -92,13 +94,13 @@ set_source_files_properties(
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-register_dissector_files(plugin.c
+register_plugin_files(plugin.c
 	plugin
 	${DISSECTOR_SRC}
-        ${DISSECTOR_SUPPORT_SRC}
+  ${DISSECTOR_SUPPORT_SRC}
 )
 
-if(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 4)
+if(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 6)
 
   add_library(sap ${LINK_MODE_MODULE}
                   ${PLUGIN_FILES}
@@ -115,15 +117,13 @@ if(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MIN
           ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   )
 
-else(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 4)
+else(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 6)
 
-  add_plugin_library(sap)
+  add_plugin_library(sap epan)
 
-  install(TARGETS sap
-          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/${CPACK_PACKAGE_NAME}/plugins/${CPACK_PACKAGE_VERSION} NAMELINK_SKIP
-          RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}/${CPACK_PACKAGE_NAME}/plugins/${CPACK_PACKAGE_VERSION}
-          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/${CPACK_PACKAGE_NAME}/plugins/${CPACK_PACKAGE_VERSION}
-  )
+  target_link_libraries(sap epan)
+
+  install_plugin(sap epan)
 
   file(GLOB DISSECTOR_HEADERS RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "*.h")
   CHECKAPI(
@@ -136,7 +136,7 @@ else(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_M
   	  ${DISSECTOR_HEADERS}
   )
 
-endif(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 4)
+endif(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 6)
 
 #
 # Editor modelines  -  http://www.wireshark.org/tools/modelines.html
