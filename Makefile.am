@@ -2,8 +2,6 @@
 #
 # Automake file for SAP Dissector Plugin for Wireshark
 #
-# $Id$
-#
 # Wireshark - Network traffic analyzer
 # By Gerald Combs <gerald@wireshark.org>
 # Copyright 1998 Gerald Combs
@@ -20,14 +18,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-#
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
 
 include $(top_srcdir)/Makefile.am.inc
 include $(top_srcdir)/plugins/epan/Makefile.am.inc
 
 # the name of the plugin
 PLUGIN_NAME = sap
+
+PLUGIN_VERSION = 0.6.1
 
 # the dissector sources (without any helpers)
 DISSECTOR_SRC = \
@@ -60,7 +60,7 @@ endif
 
 plugindir = @plugindir@
 
-plugin_LTLIBRARIES = sap.la
+epan_plugin_LTLIBRARIES = sap.la
 
 sap_la_SOURCES = \
 	plugin.c \
