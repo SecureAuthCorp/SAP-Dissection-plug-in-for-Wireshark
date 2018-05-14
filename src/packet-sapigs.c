@@ -134,7 +134,7 @@ dissect_sapigs(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 
 	if (tree) { /* we are being asked for details */
 
-		guint32 offset = 0, err_val;
+		guint32 offset = 0, err_val = 0;
 		long data_offset = 0, data_length = 0;
 		guchar *sapigs_info_function = NULL, *illbeback_type = NULL, *is_table = NULL;
 		proto_item *ti = NULL, *sapigs_tables = NULL;

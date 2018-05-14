@@ -189,8 +189,7 @@ dissect_sap_protocol_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree
 		/* We need to check if this is a keep-alive response, or it's part of
 		 * a SAP Router conversation and thus a route accepted message.
 		 */
-		conversation = find_conversation(pinfo->fd->num, &pinfo->src, &pinfo->dst,
-										 pinfo->ptype, pinfo->srcport, pinfo->destport, 0);
+		conversation = find_conversation_pinfo(pinfo, 0);
 		if (conversation == NULL){
 			col_append_str(pinfo->cinfo, COL_INFO, " (keep-alive response)");
 			proto_item_append_text(ti, " (keep-alive response)");
