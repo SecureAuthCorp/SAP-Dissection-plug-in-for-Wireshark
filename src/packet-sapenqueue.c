@@ -206,7 +206,7 @@ dissect_sapenqueue_server_admin(tvbuff_t *tvb, packet_info *pinfo, proto_tree *t
 	proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_rc, tvb, offset, 4, ENC_BIG_ENDIAN); offset += 4;
 	proto_tree_add_item(server_admin_tree, hf_sapenqueue_server_admin_eyecatcher, tvb, offset, 4, ENC_ASCII|ENC_NA); offset += 4;
 
-	if (tvb_captured_length_remaining(tvb, offset) > 0){
+	if (tvb_reported_length_remaining(tvb, offset) > 0){
 		switch(opcode){
 			case 0x06:{		/* EnAdmTraceRequest */
 				guint8 pattern_length = 0;
@@ -247,7 +247,7 @@ dissect_sapenqueue_server_admin(tvbuff_t *tvb, packet_info *pinfo, proto_tree *t
 
 					/* Set the max length to the remaining of the packet, just in case a malformed packet arrives */
 					if (!tvb_offset_exists(tvb, offset + pattern_length)) {
-						pattern_length = (guint8)tvb_captured_length_remaining(tvb, offset);
+						pattern_length = (guint8)tvb_reported_length_remaining(tvb, offset);
 						expert_add_info(pinfo, trace_request_pattern, &ei_sapenqueue_pattern_invalid_length);
 					}
 					proto_tree_add_item(trace_request_pattern_tree, hf_sapenqueue_server_admin_trace_pattern_value, tvb, offset, pattern_length, ENC_ASCII|ENC_NA); offset += pattern_length;
@@ -326,7 +326,7 @@ dissect_sapenqueue_conn_admin(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tre
 					proto_tree_add_item(param_tree, hf_sapenqueue_conn_admin_param_len, tvb, offset, 4, ENC_BIG_ENDIAN); offset += 4;
 
 					/* If the reported length is not correct, use the remaining of the packet as length */
-					name_length_remaining = tvb_captured_length_remaining(tvb, offset);
+					name_length_remaining = tvb_reported_length_remaining(tvb, offset);
 					if (name_length_remaining < 0){
 						expert_add_info(pinfo, param, &ei_sapenqueue_support_invalid_offset);
 						break;
@@ -371,7 +371,7 @@ dissect_sapenqueue(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *da
 	/* If the packet has less than 20 bytes we can be sure that is not an
 	 * Enqueue server packet.
 	 */
-	if (tvb_captured_length(tvb) < 20){
+	if (tvb_reported_length(tvb) < 20){
 		return 0;
 	}
 
@@ -420,7 +420,7 @@ dissect_sapenqueue(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *da
 			}
 		}
 	}
-	return tvb_captured_length(tvb);
+	return tvb_reported_length(tvb);
 }
 
 

@@ -191,7 +191,7 @@ dissect_sapigs(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 					data_length = strtol(tvb_get_string_enc(wmem_packet_scope(), tvb, offset, 5, ENC_ASCII), NULL, 10);
 					proto_tree_add_item(sapigs_tree, hf_sapigs_data_size, tvb, offset, 5, ENC_ASCII|ENC_NA); offset += 5;
 					/* Data */
-					if ((data_length > 0) && (tvb_captured_length_remaining(tvb, offset) >= data_length)) {
+					if ((data_length > 0) && (tvb_reported_length_remaining(tvb, offset) >= data_length)) {
 						proto_tree_add_item(sapigs_tree, hf_sapigs_data, tvb, offset, data_length, ENC_ASCII|ENC_NA); offset += data_length;
 					}
 				}
@@ -228,7 +228,7 @@ dissect_sapigs(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 					is_table = tvb_get_string_enc(wmem_packet_scope(), tvb, offset, 4, ENC_ASCII);
 					}
 				/* Data */
-				if ((data_length > 0) && (tvb_captured_length_remaining(tvb, offset) >= data_length)) {
+				if ((data_length > 0) && (tvb_reported_length_remaining(tvb, offset) >= data_length)) {
 					proto_tree_add_item(sapigs_tree, hf_sapigs_data, tvb, data_offset, data_length, ENC_ASCII|ENC_NA); offset += data_length;
 				}
 				break;
@@ -241,7 +241,7 @@ dissect_sapigs(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 		}
 	}
 
-	return tvb_captured_length(tvb);
+	return tvb_reported_length(tvb);
 }
 
 void

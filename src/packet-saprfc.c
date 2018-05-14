@@ -459,7 +459,7 @@ dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 
 		/* Decompress the payload */
 		rt = decompress_packet(tvb_get_ptr(tvb, initial_offset, -1),
-				tvb_captured_length_remaining(tvb, initial_offset),
+				tvb_reported_length_remaining(tvb, initial_offset),
 				decompressed_buffer,
 				&uncompress_length);
 
@@ -709,7 +709,7 @@ dissect_saprfc_rfcheader(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
 		proto_tree_add_item(header_unicode_tree, hf_saprfc_ucheader_returncode, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 
 		/* Check the payload length */
-		if (tvb_captured_length_remaining(tvb, offset) > 0){
+		if (tvb_reported_length_remaining(tvb, offset) > 0){
 			/* Add the payload subtree */
 			payload = proto_tree_add_item(tree, hf_saprfc_payload, tvb, offset, -1, ENC_NA);
 			payload_tree = proto_item_add_subtree(payload, ett_saprfc);
@@ -882,7 +882,7 @@ dissect_saprfc_internal(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, voi
 
 	dissect_saprfc_rfcheader(tvb, pinfo, saprfc_tree, offset);
 
-	return tvb_captured_length(tvb);
+	return tvb_reported_length(tvb);
 }
 
 static int
@@ -913,7 +913,7 @@ dissect_saprfc(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 			saprfc_tree = proto_item_add_subtree(saprfc, ett_saprfc);
 		}
 		dissect_saprfc_header(tvb, pinfo, saprfc_tree, offset);
-		return tvb_captured_length(tvb);
+		return tvb_reported_length(tvb);
 	}
 
 	col_append_fstr(pinfo->cinfo, COL_INFO, "Version=%d, Request Type=%s", version, val_to_str(req_type, saprfc_reqtype_values, "Unknown"));
@@ -975,7 +975,7 @@ dissect_saprfc(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 		}
 	};
 
-	return tvb_captured_length(tvb);
+	return tvb_reported_length(tvb);
 }
 
 void

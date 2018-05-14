@@ -148,9 +148,9 @@ dissect_sapsnc_frame(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
 		if (header_length < 14){
 			expert_add_info_format(pinfo, sapsnc_frame, &ei_sapsnc_invalid_header_length, "Invalid header length %d", header_length);
 			header_length = 14;
-		} else if (tvb_captured_length_remaining(tvb, offset) < header_length) {
-			expert_add_info_format(pinfo, sapsnc_frame, &ei_sapsnc_invalid_header_length, "Invalid captured length %d", tvb_captured_length_remaining(tvb, offset));
-			header_length = tvb_captured_length_remaining(tvb, offset);
+		} else if (tvb_reported_length_remaining(tvb, offset) < header_length) {
+			expert_add_info_format(pinfo, sapsnc_frame, &ei_sapsnc_invalid_header_length, "Invalid captured length %d", tvb_reported_length_remaining(tvb, offset));
+			header_length = tvb_reported_length_remaining(tvb, offset);
 		}
 		proto_tree_add_item(sapsnc_frame_tree, hf_sapsnc_header_length, tvb, offset, 2, ENC_BIG_ENDIAN);
 		offset+=2; header_length-=2;
@@ -183,7 +183,7 @@ dissect_sapsnc_frame(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
 		offset+=1; header_length-=1;
 
 		/* If there's header remaining, we add the extra flags, length and fields */
-		if ((header_length >= 6) && (tvb_captured_length_remaining(tvb, offset) >= 6)) {
+		if ((header_length >= 6) && (tvb_reported_length_remaining(tvb, offset) >= 6)) {
 			/* Get the extra flags */
 			proto_tree_add_item(sapsnc_frame_tree, hf_sapsnc_ext_flags, tvb, offset, 4, ENC_NA); offset+=4;
 
@@ -192,19 +192,19 @@ dissect_sapsnc_frame(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
 			proto_tree_add_item(sapsnc_frame_tree, hf_sapsnc_ext_field_length, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2;
 
 			/* If the extra field length is valid extract those */
-			if ((ext_field_length > 0) && (tvb_captured_length_remaining(tvb, offset) >= ext_field_length)) {
+			if ((ext_field_length > 0) && (tvb_reported_length_remaining(tvb, offset) >= ext_field_length)) {
 				proto_tree_add_item(sapsnc_frame_tree, hf_sapsnc_ext_field, tvb, offset, ext_field_length, ENC_BIG_ENDIAN);
 				offset+=ext_field_length;
 			}
 		}
 
 		/* Token */
-		if ((token_length > 0) && (tvb_captured_length_remaining(tvb, offset) >= token_length)) {
+		if ((token_length > 0) && (tvb_reported_length_remaining(tvb, offset) >= token_length)) {
 			proto_tree_add_item(sapsnc_frame_tree, hf_sapsnc_token, tvb, offset, token_length, ENC_BIG_ENDIAN); offset+=token_length;
 		}
 
 		/* Data */
-		if ((data_length > 0) && (tvb_captured_length_remaining(tvb, offset) >= data_length)) {
+		if ((data_length > 0) && (tvb_reported_length_remaining(tvb, offset) >= data_length)) {
 			proto_tree_add_item(sapsnc_frame_tree, hf_sapsnc_data, tvb, offset, data_length, ENC_BIG_ENDIAN);
 
 			/* If the frame contain data being wrapped or sealed, put it into a new tvb for
@@ -231,7 +231,7 @@ dissect_sapsnc(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 	/* Call the SNC frame dissection function */
 	dissect_sapsnc_frame(tvb, pinfo, tree, 0);
 
-	return tvb_captured_length(tvb);
+	return tvb_reported_length(tvb);
 }
 
 void

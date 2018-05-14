@@ -436,13 +436,13 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 	eyecatcher_length = tvb_strsize(tvb, offset);
 
 	/* Niping message */
-	if (tvb_captured_length_remaining(tvb, offset) >= 10 && tvb_strneql(tvb, offset, SAPROUTER_TYPE_NIPING_STRING, 10) == 0) {
+	if (tvb_reported_length_remaining(tvb, offset) >= 10 && tvb_strneql(tvb, offset, SAPROUTER_TYPE_NIPING_STRING, 10) == 0) {
 		col_set_str(pinfo->cinfo, COL_INFO, "Niping message");
 
 		proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, offset, 10, ENC_ASCII|ENC_NA); offset += 10;
 		proto_item_append_text(ti, ", Niping message");
 
-		if (tvb_captured_length_remaining(tvb, offset))
+		if (tvb_reported_length_remaining(tvb, offset))
 			proto_tree_add_item(saprouter_tree, hf_saprouter_niping_message, tvb, offset, -1, ENC_ASCII|ENC_NA);
 
 	}
@@ -492,13 +492,13 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 				/* Parse the list of client IDs */
 				ci = proto_tree_add_item(saprouter_tree, hf_saprouter_admin_client_ids, tvb, offset, 4*client_count, ENC_NA);
 				clients_tree = proto_item_add_subtree(ci, ett_saprouter);
-				while (tvb_offset_exists(tvb, offset) && tvb_captured_length_remaining(tvb, offset)>=4){
+				while (tvb_offset_exists(tvb, offset) && tvb_reported_length_remaining(tvb, offset)>=4){
 					proto_tree_add_item(clients_tree, hf_saprouter_admin_client_id, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 					client_count_actual+=1;
 				}
 
 				/* Check if the actual count of IDs differes from the reported number */
-				if ((client_count_actual != client_count) || tvb_captured_length_remaining(tvb, offset)>0){
+				if ((client_count_actual != client_count) || tvb_reported_length_remaining(tvb, offset)>0){
 					expert_add_info(pinfo, clients_tree, &ei_saprouter_invalid_client_ids);
 				}
 
@@ -532,9 +532,9 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 			proto_tree_add_item(saprouter_tree, hf_saprouter_route_length, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 			proto_tree_add_item(saprouter_tree, hf_saprouter_route_offset, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 			/* Add the route tree */
-			if ((guint32)tvb_captured_length_remaining(tvb, offset) != route_length){
-				expert_add_info_format(pinfo, saprouter_tree, &ei_saprouter_route_invalid_length, "Route string length is invalid (remaining=%d, route_length=%d)", tvb_captured_length_remaining(tvb, offset), route_length);
-				route_length = (guint32)tvb_captured_length_remaining(tvb, offset);
+			if ((guint32)tvb_reported_length_remaining(tvb, offset) != route_length){
+				expert_add_info_format(pinfo, saprouter_tree, &ei_saprouter_route_invalid_length, "Route string length is invalid (remaining=%d, route_length=%d)", tvb_reported_length_remaining(tvb, offset), route_length);
+				route_length = (guint32)tvb_reported_length_remaining(tvb, offset);
 			}
 			ri = proto_tree_add_item(saprouter_tree, hf_saprouter_route, tvb, offset, route_length, ENC_NA);
 			route_tree = proto_item_add_subtree(ri, ett_saprouter);
@@ -697,7 +697,7 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 		}
 	}
 
-	return tvb_captured_length(tvb);
+	return tvb_reported_length(tvb);
 }
 
 void
