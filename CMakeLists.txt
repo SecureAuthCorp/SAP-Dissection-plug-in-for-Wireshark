@@ -34,7 +34,7 @@ if(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MIN
   endif(NOT CMAKE_INSTALL_LIBDIR )
   MESSAGE(STATUS "Plug-in will be installed in: ${CMAKE_INSTALL_LIBDIR}")
 
-  INCLUDE(UseMakeDissectorReg)
+  INCLUDE(UseMakePluginReg)
 
   set(GLIB2_MIN_VERSION 2.4.0)
 
