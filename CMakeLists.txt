@@ -53,7 +53,7 @@ else(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_M
   include(WiresharkPlugin)
 
   # Plugin name and version info (major minor micro extra)
-  set_module_info(sap 0 5 3 0)
+  set_module_info(sap 0 6 1 0)
 
 endif(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 6)
 

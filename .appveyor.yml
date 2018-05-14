@@ -1,5 +1,5 @@
 # AppVeyor configuration based on https://github.com/AMOS-ss16-proj3/amos-ss16-proj3/blob/master/appveyor.yml
-version: "v0.5.3.dev-{build}"
+version: "v0.6.1.dev-{build}"
 
 clone_folder: c:\projects\sap
 
@@ -51,7 +51,7 @@ build_script:
   - msbuild /m /p:Configuration=%configuration% /logger:"C:\\Program Files\\AppVeyor\\BuildAgent\\Appveyor.MSBuildLogger.dll" plugins\epan\sap\sap.vcxproj
 
 after_build:
-  - copy c:\projects\sap\build\run\%configuration%\plugins\epan\sap.dll c:\projects\sap\sap-%APPVEYOR_BUILD_VERSION%-%WIRESHARK_TARGET_PLATFORM%.dll
+  - copy c:\projects\sap\build\run\%configuration%\plugins\2.6\epan\sap.dll c:\projects\sap\sap-%APPVEYOR_BUILD_VERSION%-%WIRESHARK_TARGET_PLATFORM%.dll
 
 artifacts:
   - path: "sap-*.dll"

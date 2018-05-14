@@ -6,7 +6,7 @@ SAP Dissector Plugin for Wireshark
 
 Copyright (C) 2012-2018 by Martin Gallo, Core Security
 
-Version 0.5.3.dev (XXX 2018)
+Version 0.6.1.dev (XXX 2018)
 
 
 Overview
@@ -218,7 +218,7 @@ the `ptf` command-line, run:
 
 It's worth mentioning that compression libraries for SAP Diag/RFC protocol are
 originally written in C++, thus the entire plugin needs to be compiled for C++.
-See [Wireshark's portability notes](https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-2.4)
+See [Wireshark's portability notes](https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-2.6)
 for more information [11].
 
 
