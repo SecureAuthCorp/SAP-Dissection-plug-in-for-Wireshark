@@ -10,6 +10,8 @@ install:
   - cinst winflexbison
   - refreshenv
 
+image: Visual Studio 2015
+
 platform:
   - x86
   - x64
@@ -32,7 +34,9 @@ before_build:
   - set WIRESHARK_BASE_DIR=c:\projects
   - if "%platform%"=="x86" (set WIRESHARK_TARGET_PLATFORM=win32)
   - if "%platform%"=="x64" (set WIRESHARK_TARGET_PLATFORM=win64)
-  - set QT5_BASE_DIR=c:\Qt\5.6\msvc2013
+  # set proper QT environment
+  - if "%platform%"=="x86" (set QT5_BASE_DIR=C:\Qt\5.9.5\msvc2015)
+  - if "%platform%"=="x64" (set QT5_BASE_DIR=C:\Qt\5.9.5\msvc2015_64)
   # insert our plugin files to wireshark
   - mkdir C:\projects\wireshark\plugins\epan\sap
   - xcopy /E c:\projects\sap C:\projects\wireshark\plugins\epan\sap
@@ -46,8 +50,8 @@ before_build:
 build_script:
   - mkdir c:\projects\sap\build
   - cd c:\projects\sap\build
-  - if "%platform%"=="x86" (cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 12" c:\projects\wireshark)
-  - if "%platform%"=="x64" (cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 12 Win64" c:\projects\wireshark)
+  - if "%platform%"=="x86" (cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 14 2015" c:\projects\wireshark)
+  - if "%platform%"=="x64" (cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 14 2015 Win64" c:\projects\wireshark)
   - msbuild /m /p:Configuration=%configuration% /logger:"C:\\Program Files\\AppVeyor\\BuildAgent\\Appveyor.MSBuildLogger.dll" plugins\epan\sap\sap.vcxproj
 
 after_build:
