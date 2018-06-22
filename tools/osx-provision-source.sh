@@ -57,4 +57,9 @@ fi
 brew install --with-python libdnet
 brew install https://raw.githubusercontent.com/secdev/scapy/master/.travis/pylibpcap.rb
 
-sudo -H sh -c "CXX=g++ CC=gcc pip2 install pysap pyshark"
+# Fix Python path
+mkdir -p /Users/travis/Library/Python/2.7/lib/python/site-packages;
+echo 'import site; site.addsitedir("/usr/local/lib/python2.7/site-packages")' >> /Users/travis/Library/Python/2.7/lib/python/site-packages/homebrew.pth;
+
+# Install test libraries
+CXX=g++ CC=gcc pip2 install pysap pyshark
