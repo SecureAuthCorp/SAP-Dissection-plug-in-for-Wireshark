@@ -98,7 +98,6 @@ with version 2.6.
 To build and install the plugin on Debian/Ubuntu linux distributions:
 
     sudo add-apt-repository ppa:wireshark-dev/stable -y
-    sudo apt-get update
     sudo apt-get install wireshark wireshark-dev
     git clone https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/
     cd SAP-Dissection-plug-in-for-Wireshark/
@@ -144,7 +143,7 @@ that allows creating reproducible virtual machines. In order to make it easier
 to compile and test the plugin, a pre-configured Vagrantfile is provided for
 using it with Vagrant 1.8. The Vagrantfile provided with the plugin is configured
 to use [VirtualBox](https://www.virtualbox.org/) and perform a build of the
-plugin inside a Ubuntu 16.04 distribution.
+plugin inside a Ubuntu 18.04 distribution.
 
 Two machines are provided to build the plugin:
 
