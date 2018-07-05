@@ -48,4 +48,4 @@ fi
 
 # Install test requirements
 sudo apt-get install -yqq libxml2-dev libxslt-dev python-dev python-pip
-sudo -H sh -c "CXX=g++ CC=gcc pip install pysap pyshark"
+sudo -H sh -c "CXX=g++ CC=gcc pip install pysap pyshark-legacy"
