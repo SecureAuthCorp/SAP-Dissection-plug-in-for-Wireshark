@@ -2445,7 +2445,7 @@ dissect_sapdiag_payload(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, pro
 		/* Add the item value */
 		if (item_value_length > 0){
 			/* Check if the item length is valid */
-			item_value_remaining_length = tvb_captured_length_remaining(tvb, offset);
+			item_value_remaining_length = tvb_reported_length_remaining(tvb, offset);
 			if (item_value_remaining_length < 0){
 				expert_add_info(pinfo, il, &ei_sapdiag_item_offset_invalid);
 				return;
@@ -2467,7 +2467,7 @@ check_sapdiag_dp(tvbuff_t *tvb, guint32 offset)
 {
 	/* Since there's no SAP Diag mode 0xff, if the first byte is a 0xFF the
 	 * packet probably holds an initialization DP Header */
-	if ((tvb_captured_length_remaining(tvb, offset) >= 200 + 8) && tvb_get_guint8(tvb, offset) == 0xFF){
+	if ((tvb_reported_length_remaining(tvb, offset) >= 200 + 8) && tvb_get_guint8(tvb, offset) == 0xFF){
 		return (TRUE);
 	}
 	return (FALSE);
@@ -2477,7 +2477,7 @@ static int
 check_sapdiag_compression(tvbuff_t *tvb, guint32 offset)
 {
 	/* We check for the length, the algorithm value and the presence of magic bytes */
-	if ((tvb_captured_length_remaining(tvb, offset) >= 8) &&
+	if ((tvb_reported_length_remaining(tvb, offset) >= 8) &&
 		((tvb_get_guint8(tvb, offset+4) == 0x11) || (tvb_get_guint8(tvb, offset+4) == 0x12)) &&
 		(tvb_get_guint16(tvb, offset+5, ENC_LITTLE_ENDIAN) == 0x9d1f)){
 		return (TRUE);
@@ -2526,7 +2526,7 @@ dissect_sapdiag_compressed_payload(tvbuff_t *tvb, packet_info *pinfo, proto_tree
 
 		/* Decompress the payload */
 		rt = decompress_packet(tvb_get_ptr(tvb, payload_offset, -1),
-				tvb_captured_length_remaining(tvb, payload_offset),
+				tvb_reported_length_remaining(tvb, payload_offset),
 				decompressed_buffer,
 				&uncompress_length);
 
@@ -2660,22 +2660,22 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data 
 	proto_tree_add_item(header_tree, hf_sapdiag_compress, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
 
 	/* Check for error messages */
-	if ((error_no != 0x00) && (tvb_captured_length_remaining(tvb, offset) > 0)){
+	if ((error_no != 0x00) && (tvb_reported_length_remaining(tvb, offset) > 0)){
 		guint8 *error_message = NULL;
 		guint32 error_message_length = 0;
 
-		error_message_length = (guint32)tvb_captured_length_remaining(tvb, offset) - 1;
+		error_message_length = (guint32)tvb_reported_length_remaining(tvb, offset) - 1;
 		error_message = tvb_get_string_enc(wmem_packet_scope(), tvb, offset, error_message_length, ENC_LITTLE_ENDIAN|ENC_UTF_16);
 		proto_tree_add_string(sapdiag_tree, hf_sapdiag_error_message, tvb, offset, error_message_length, error_message);
 
 	/* If the message is compressed */
-	} else if ((compress == 0x01) && (tvb_captured_length_remaining(tvb, offset) >= 8)){
+	} else if ((compress == 0x01) && (tvb_reported_length_remaining(tvb, offset) >= 8)){
 
 		/* Dissect the compressed payload */
 		dissect_sapdiag_compressed_payload(tvb, pinfo, sapdiag_tree, sapdiag, offset);
 
 	/* Message wrapped with SNC */
-	} else if (((compress == 0x02) || (compress == 0x03)) && (tvb_captured_length_remaining(tvb, offset) > 0)){
+	} else if (((compress == 0x02) || (compress == 0x03)) && (tvb_reported_length_remaining(tvb, offset) > 0)){
 
 		/* Call the SNC dissector */
 		dissect_sapdiag_snc_frame(tvb, pinfo, sapdiag_tree, tree, offset);
@@ -2683,7 +2683,7 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data 
 	/* Uncompressed payload */
 	} else {
 		/* Check the payload length */
-		if (tvb_captured_length_remaining(tvb, offset) > 0){
+		if (tvb_reported_length_remaining(tvb, offset) > 0){
 			/* Add the payload subtree */
 			payload = proto_tree_add_item(sapdiag_tree, hf_sapdiag_payload, tvb, offset, -1, ENC_NA);
 			payload_tree = proto_item_add_subtree(payload, ett_sapdiag);
@@ -3630,12 +3630,12 @@ proto_register_sapdiag(void)
 /**
  * Helpers for dealing with the port range
  */
-static void range_delete_callback (guint32 port)
+static void range_delete_callback (guint32 port, gpointer ptr _U_)
 {
 	dissector_delete_uint("sapni.port", port, sapdiag_handle);
 }
 
-static void range_add_callback (guint32 port)
+static void range_add_callback (guint32 port, gpointer ptr _U_)
 {
 	dissector_add_uint("sapni.port", port, sapdiag_handle);
 }
@@ -3653,12 +3653,12 @@ proto_reg_handoff_sapdiag(void)
 		sapdiag_handle = create_dissector_handle(dissect_sapdiag, proto_sapdiag);
 		initialized = TRUE;
 	} else {
-		range_foreach(sapdiag_port_range, range_delete_callback);
+		range_foreach(sapdiag_port_range, range_delete_callback, NULL);
 		wmem_free(wmem_epan_scope(), sapdiag_port_range);
 	}
 
 	sapdiag_port_range = range_copy(wmem_epan_scope(), global_sapdiag_port_range);
-	range_foreach(sapdiag_port_range, range_add_callback);
+	range_foreach(sapdiag_port_range, range_add_callback, NULL);
 }
 
 /*

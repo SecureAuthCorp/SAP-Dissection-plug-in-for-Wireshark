@@ -134,7 +134,7 @@ dissect_sapigs(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 
 	if (tree) { /* we are being asked for details */
 
-		guint32 offset = 0, err_val;
+		guint32 offset = 0, err_val = 0;
 		long data_offset = 0, data_length = 0;
 		guchar *sapigs_info_function = NULL, *illbeback_type = NULL, *is_table = NULL;
 		proto_item *ti = NULL, *sapigs_tables = NULL;
@@ -191,7 +191,7 @@ dissect_sapigs(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 					data_length = strtol(tvb_get_string_enc(wmem_packet_scope(), tvb, offset, 5, ENC_ASCII), NULL, 10);
 					proto_tree_add_item(sapigs_tree, hf_sapigs_data_size, tvb, offset, 5, ENC_ASCII|ENC_NA); offset += 5;
 					/* Data */
-					if ((data_length > 0) && (tvb_captured_length_remaining(tvb, offset) >= data_length)) {
+					if ((data_length > 0) && (tvb_reported_length_remaining(tvb, offset) >= data_length)) {
 						proto_tree_add_item(sapigs_tree, hf_sapigs_data, tvb, offset, data_length, ENC_ASCII|ENC_NA); offset += data_length;
 					}
 				}
@@ -228,7 +228,7 @@ dissect_sapigs(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 					is_table = tvb_get_string_enc(wmem_packet_scope(), tvb, offset, 4, ENC_ASCII);
 					}
 				/* Data */
-				if ((data_length > 0) && (tvb_captured_length_remaining(tvb, offset) >= data_length)) {
+				if ((data_length > 0) && (tvb_reported_length_remaining(tvb, offset) >= data_length)) {
 					proto_tree_add_item(sapigs_tree, hf_sapigs_data, tvb, data_offset, data_length, ENC_ASCII|ENC_NA); offset += data_length;
 				}
 				break;
@@ -241,7 +241,7 @@ dissect_sapigs(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 		}
 	}
 
-	return tvb_captured_length(tvb);
+	return tvb_reported_length(tvb);
 }
 
 void
@@ -345,12 +345,12 @@ proto_register_sapigs(void)
 /**
  * Helpers for dealing with the port range
  */
-static void range_delete_callback (guint32 port)
+static void range_delete_callback (guint32 port, gpointer ptr _U_)
 {
         dissector_delete_uint("sapni.port", port, sapigs_handle);
 }
 
-static void range_add_callback (guint32 port)
+static void range_add_callback (guint32 port, gpointer ptr _U_)
 {
         dissector_add_uint("sapni.port", port, sapigs_handle);
 }
@@ -368,12 +368,12 @@ proto_reg_handoff_sapigs(void)
 		sapigs_handle = create_dissector_handle(dissect_sapigs, proto_sapigs);
 		initialized = TRUE;
 	} else {
-		range_foreach(sapigs_port_range, range_delete_callback);
+		range_foreach(sapigs_port_range, range_delete_callback, NULL);
 		wmem_free(wmem_epan_scope(), sapigs_port_range);
 	}
 
 	sapigs_port_range = range_copy(wmem_epan_scope(), global_sapigs_port_range);
-	range_foreach(sapigs_port_range, range_add_callback);
+	range_foreach(sapigs_port_range, range_add_callback, NULL);
 }
 
 /*

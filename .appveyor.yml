@@ -1,5 +1,5 @@
 # AppVeyor configuration based on https://github.com/AMOS-ss16-proj3/amos-ss16-proj3/blob/master/appveyor.yml
-version: "v0.5.3.dev-{build}"
+version: "v0.6.1.dev-{build}"
 
 clone_folder: c:\projects\sap
 
@@ -9,6 +9,8 @@ environment:
 install:
   - cinst winflexbison
   - refreshenv
+
+image: Visual Studio 2015
 
 platform:
   - x86
@@ -25,19 +27,21 @@ before_build:
   - mkdir c:\projects\wireshark
   - cd c:\projects\wireshark
   - git init
-  - git remote add -t master-2.4 -f origin https://github.com/wireshark/wireshark
-  - git checkout master-2.4
+  - git remote add -t master-2.6 -f origin https://github.com/wireshark/wireshark
+  - git checkout master-2.6
   # set necessary environment variables:
   - set CYGWIN=nodosfilewarning
   - set WIRESHARK_BASE_DIR=c:\projects
   - if "%platform%"=="x86" (set WIRESHARK_TARGET_PLATFORM=win32)
   - if "%platform%"=="x64" (set WIRESHARK_TARGET_PLATFORM=win64)
-  - set QT5_BASE_DIR=c:\Qt\5.6\msvc2013
+  # set proper QT environment
+  - if "%platform%"=="x86" (set QT5_BASE_DIR=C:\Qt\5.9.5\msvc2015)
+  - if "%platform%"=="x64" (set QT5_BASE_DIR=C:\Qt\5.9.5\msvc2015_64)
   # insert our plugin files to wireshark
-  - mkdir C:\projects\wireshark\plugins\sap
-  - xcopy /E c:\projects\sap C:\projects\wireshark\plugins\sap
+  - mkdir C:\projects\wireshark\plugins\epan\sap
+  - xcopy /E c:\projects\sap C:\projects\wireshark\plugins\epan\sap
   # run the adjustment scripts
-  - git apply plugins/sap/wireshark-master-2.4.patch
+  - git apply plugins/epan/sap/wireshark-master-2.6.patch
   - ps: Invoke-WebRequest -Uri https://cygwin.com/setup-x86_64.exe -OutFile c:\projects\cygwin-setup.exe
   - mkdir c:\projects\cyg-packages
   - c:\projects\cygwin-setup.exe -q -n -N -d -R C:\cygwin64 -s http://mirrors.kernel.org/sourceware/cygwin/ -l c:\projects\cyg-packages -P flex -P bison
@@ -46,12 +50,12 @@ before_build:
 build_script:
   - mkdir c:\projects\sap\build
   - cd c:\projects\sap\build
-  - if "%platform%"=="x86" (cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 12" c:\projects\wireshark)
-  - if "%platform%"=="x64" (cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 12 Win64" c:\projects\wireshark)
-  - msbuild /m /p:Configuration=%configuration% /logger:"C:\\Program Files\\AppVeyor\\BuildAgent\\Appveyor.MSBuildLogger.dll" plugins\sap\sap.vcxproj
+  - if "%platform%"=="x86" (cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 14 2015" c:\projects\wireshark)
+  - if "%platform%"=="x64" (cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 14 2015 Win64" c:\projects\wireshark)
+  - msbuild /m /p:Configuration=%configuration% /logger:"C:\\Program Files\\AppVeyor\\BuildAgent\\Appveyor.MSBuildLogger.dll" plugins\epan\sap\sap.vcxproj
 
 after_build:
-  - copy c:\projects\sap\build\run\%configuration%\plugins\sap.dll c:\projects\sap\sap-%APPVEYOR_BUILD_VERSION%-%WIRESHARK_TARGET_PLATFORM%.dll
+  - copy c:\projects\sap\build\run\%configuration%\plugins\2.6\epan\sap.dll c:\projects\sap\sap-%APPVEYOR_BUILD_VERSION%-%WIRESHARK_TARGET_PLATFORM%.dll
 
 artifacts:
   - path: "sap-*.dll"

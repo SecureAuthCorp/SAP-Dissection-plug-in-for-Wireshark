@@ -21,7 +21,7 @@ Vagrant.require_version ">= 1.8.0"
 
 Vagrant.configure(2) do |config|
 
-  config.vm.box = "ubuntu/xenial64"
+  config.vm.box = "ubuntu/bionic64"
 
   # Permit X11 forwarding so running the graphical Wireshark works
   config.ssh.forward_x11 = true
@@ -45,14 +45,14 @@ Vagrant.configure(2) do |config|
     source.vm.provision "shell",
       path: "tools/ubuntu-provision-source.sh",
       privileged: false,
-      env: {"WIRESHARK_BRANCH" => "master-2.4",
+      env: {"WIRESHARK_BRANCH" => "master-2.6",
             "PLUGIN_DIR" => "/vagrant/"}
 
     source.vm.provision "shell",
       path: "tools/ubuntu-build-source.sh",
       privileged: false,
       env: {"BUILD_WIRESHARK" => "yes",
-            "WIRESHARK_BRANCH" => "master-2.4",
+            "WIRESHARK_BRANCH" => "master-2.6",
             "PLUGIN_DIR" => "/vagrant/"}
 
     # Add some memory

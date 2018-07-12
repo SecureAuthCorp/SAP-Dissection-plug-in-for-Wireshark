@@ -739,7 +739,7 @@ dissect_sapms_client(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
 		}
 	}
 
-	client_length_remaining = tvb_captured_length_remaining(tvb, offset);
+	client_length_remaining = tvb_reported_length_remaining(tvb, offset);
 	if (client_length_remaining < 0){
 		expert_add_info(pinfo, tree, &ei_sapms_client_invalid_offset);
 		return (0);
@@ -872,7 +872,7 @@ dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
 		}
 		case 0x05:{			/* MS_SERVER_LST */
 			if (flag == 0x03){ /* If it's a reply (flag=MS_REPLY) */
-				while (tvb_captured_length_remaining(tvb, offset) > 0){
+				while (tvb_reported_length_remaining(tvb, offset) > 0){
 					client_length = dissect_sapms_client(tvb, pinfo, tree, offset, opcode_version); offset += client_length;
 				}
 			}
@@ -967,13 +967,13 @@ dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
 		case 0x27:			/* MS_COUNTER_DECREMENT */
 		case 0x28:			/* MS_COUNTER_REGISTER */
 		case 0x29:{			/* MS_COUNTER_GET */
-			if (tvb_captured_length_remaining(tvb, offset) >= 48){
+			if (tvb_reported_length_remaining(tvb, offset) >= 48){
 				dissect_sapms_counter(tvb, tree, offset); offset+=48;
 			}
 			break;
 		}
 		case 0x2a:{			/* MS_COUNTER_LST */
-			while (tvb_captured_length_remaining(tvb, offset) >= 48){
+			while (tvb_reported_length_remaining(tvb, offset) >= 48){
 				dissect_sapms_counter(tvb, tree, offset); offset+=48;
 			}
 			break;
@@ -1168,7 +1168,7 @@ dissect_sapms(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U
 					col_append_fstr(pinfo->cinfo, COL_INFO, ", Opcode=%s", val_to_str(opcode, sapms_opcode_vals, "Unknown"));
 
 					/* Add the opcode value subtree */
-					remaining_length = tvb_captured_length_remaining(tvb, offset);
+					remaining_length = tvb_reported_length_remaining(tvb, offset);
 					if (remaining_length > 0){
 						oi = proto_tree_add_item(sapms_tree, hf_sapms_opcode_value, tvb, offset, remaining_length, ENC_NA);
 						sapms_opcode_tree = proto_item_add_subtree(oi, ett_sapms);
@@ -1185,7 +1185,7 @@ dissect_sapms(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U
 					proto_tree_add_item(sapms_tree, hf_sapms_adm_recno, tvb, offset, 11, ENC_ASCII|ENC_NA); offset+=11;
 
 					/* Add the records subtree */
-					remaining_length = tvb_captured_length_remaining(tvb, offset);
+					remaining_length = tvb_reported_length_remaining(tvb, offset);
 					if (remaining_length > 0){
 						dissect_sapms_adm_record(tvb, pinfo, sapms_tree, offset, remaining_length);
 					}
@@ -1197,7 +1197,7 @@ dissect_sapms(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U
 		}
 	}
 
-	return tvb_captured_length(tvb);
+	return tvb_reported_length(tvb);
 }
 
 void
@@ -1532,12 +1532,12 @@ proto_register_sapms(void)
 /**
  * Helpers for dealing with the port range
  */
-static void range_delete_callback (guint32 port)
+static void range_delete_callback (guint32 port, gpointer ptr _U_)
 {
 	dissector_delete_uint("sapni.port", port, sapms_handle);
 }
 
-static void range_add_callback (guint32 port)
+static void range_add_callback (guint32 port, gpointer ptr _U_)
 {
 	dissector_add_uint("sapni.port", port, sapms_handle);
 }
@@ -1555,12 +1555,12 @@ proto_reg_handoff_sapms(void)
 		sapms_handle = create_dissector_handle(dissect_sapms, proto_sapms);
 		initialized = TRUE;
 	} else {
-		range_foreach(sapms_port_range, range_delete_callback);
+		range_foreach(sapms_port_range, range_delete_callback, NULL);
 		wmem_free(wmem_epan_scope(), sapms_port_range);
 	}
 
 	sapms_port_range = range_copy(wmem_epan_scope(), global_sapms_port_range);
-	range_foreach(sapms_port_range, range_add_callback);
+	range_foreach(sapms_port_range, range_add_callback, NULL);
 }
 
 /*

@@ -1,8 +1,12 @@
 Changelog
 =========
 
-v0.5.3 - 2018-XX-XX
+v0.6.1 - 2018-XX-XX
 -------------------
+
+- Switched to Wireshark 2.6 branch. Ported the plugin to the use of new APIs. ([\#16](https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/issues/16))
+- Building with Visual Studio 2015 and QT 5.9 in AppVeyor builds.
+- Dropped support for automake-based builds.
 
 
 v0.5.2 - 2018-03-17

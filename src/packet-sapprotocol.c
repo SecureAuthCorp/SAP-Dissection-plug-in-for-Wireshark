@@ -189,8 +189,7 @@ dissect_sap_protocol_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree
 		/* We need to check if this is a keep-alive response, or it's part of
 		 * a SAP Router conversation and thus a route accepted message.
 		 */
-		conversation = find_conversation(pinfo->fd->num, &pinfo->src, &pinfo->dst,
-										 pinfo->ptype, pinfo->srcport, pinfo->destport, 0);
+		conversation = find_conversation_pinfo(pinfo, 0);
 		if (conversation == NULL){
 			col_append_str(pinfo->cinfo, COL_INFO, " (keep-alive response)");
 			proto_item_append_text(ti, " (keep-alive response)");
@@ -283,12 +282,12 @@ proto_register_sap_protocol(void)
 /**
  * Helpers for dealing with the port range
  */
-static void range_delete_callback (guint32 port)
+static void range_delete_callback (guint32 port, gpointer ptr _U_)
 {
 	dissector_delete_uint("tcp.port", port, sap_protocol_handle);
 }
 
-static void range_add_callback (guint32 port)
+static void range_add_callback (guint32 port, gpointer ptr _U_)
 {
 	dissector_add_uint("tcp.port", port, sap_protocol_handle);
 }
@@ -306,12 +305,12 @@ proto_reg_handoff_sap_protocol(void)
 		sap_protocol_handle = find_dissector("sapni");
 		initialized = TRUE;
 	} else {
-		range_foreach(sap_protocol_port_range, range_delete_callback);
+		range_foreach(sap_protocol_port_range, range_delete_callback, NULL);
 		wmem_free(wmem_epan_scope(), sap_protocol_port_range);
 	}
 
 	sap_protocol_port_range = range_copy(wmem_epan_scope(), global_sap_protocol_port_range);
-	range_foreach(sap_protocol_port_range, range_add_callback);
+	range_foreach(sap_protocol_port_range, range_add_callback, NULL);
 }
 
 /*
