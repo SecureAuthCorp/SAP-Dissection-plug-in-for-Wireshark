@@ -1,7 +1,7 @@
 Changelog
 =========
 
-v0.6.1 - 2018-XX-XX
+v0.6.1 - 2018-07-12
 -------------------
 
 - Switched to Wireshark 2.6 branch. Ported the plugin to the use of new APIs. ([\#16](https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/issues/16))
