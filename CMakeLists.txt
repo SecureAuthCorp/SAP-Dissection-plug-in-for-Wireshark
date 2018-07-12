@@ -30,7 +30,7 @@ if(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MIN
   MESSAGE(STATUS "Wireshark 2.6 libraries found, performing a stand-alone plug-in build.")
 
   if(NOT CMAKE_INSTALL_LIBDIR )
-    set(CMAKE_INSTALL_LIBDIR ~/.wireshark/plugins)
+    set(CMAKE_INSTALL_LIBDIR ~/.local/lib/wireshark/plugins/${Wireshark_VERSION_MAJOR}.${Wireshark_VERSION_MINOR}/epan)
   endif(NOT CMAKE_INSTALL_LIBDIR )
   MESSAGE(STATUS "Plug-in will be installed in: ${CMAKE_INSTALL_LIBDIR}")
 
@@ -45,6 +45,10 @@ if(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MIN
 
   set(LINK_MODE_LIB SHARED)
   set(LINK_MODE_MODULE MODULE)
+
+  # Plugin name and version info (major minor micro)
+  set(PLUGIN_VERSION "0.6.1")
+  add_definitions(-DPLUGIN_VERSION=\"${PLUGIN_VERSION}\")
 
 else(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 6)
 
@@ -104,10 +108,14 @@ if(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MIN
 
   add_library(sap ${LINK_MODE_MODULE}
                   ${PLUGIN_FILES}
+                  ${PLUGIN_RC_FILE}
   )
 
-  set_target_properties(sap PROPERTIES PREFIX "")
-  set_target_properties(sap PROPERTIES LINK_FLAGS "${WS_LINK_FLAGS}")
+  set_target_properties(sap PROPERTIES
+          PREFIX ""
+          LINK_FLAGS "${WS_LINK_FLAGS}"
+          FOLDER "Plugins"
+  )
 
   target_link_libraries(sap wireshark)
 
