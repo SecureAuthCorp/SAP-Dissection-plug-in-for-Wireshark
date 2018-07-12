@@ -27,7 +27,7 @@ find_package(Wireshark)
 
 if(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 6)
 
-  MESSAGE(STATUS "Wireshark libraries found, performing a stand-alone plug-in build.")
+  MESSAGE(STATUS "Wireshark 2.6 libraries found, performing a stand-alone plug-in build.")
 
   if(NOT CMAKE_INSTALL_LIBDIR )
     set(CMAKE_INSTALL_LIBDIR ~/.wireshark/plugins)
@@ -48,7 +48,7 @@ if(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MIN
 
 else(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 2 AND Wireshark_VERSION_MINOR EQUAL 6)
 
-  MESSAGE(STATUS "Wireshark libraries not found, performing a Wireshark plug-in build.")
+  MESSAGE(STATUS "Wireshark 2.6 libraries not found, performing an in-tree Wireshark plug-in build.")
 
   include(WiresharkPlugin)
 
