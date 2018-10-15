@@ -8,7 +8,7 @@ v0.6.2 - 2018-XX-XX
 v0.6.1 - 2018-07-12
 -------------------
 
-- Switched to Wireshark 2.6 branch. Ported the plugin to the use of new APIs. ([\#16](https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/issues/16))
+- Switched to Wireshark 2.6 branch. Ported the plugin to the use of new APIs. ([\#16](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/issues/16))
 - Building with Visual Studio 2015 and QT 5.9 in AppVeyor builds.
 - Dropped support for automake-based builds.
 
@@ -17,7 +17,7 @@ v0.5.2 - 2018-03-17
 -------------------
 
 - Version released at Troopers'18
-- Added support for dissecting the IGS protocol. Thanks Yvan Genuer ([@iggy38](https://github.com/iggy38))! ([\#14](https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/issues/14))
+- Added support for dissecting the IGS protocol. Thanks Yvan Genuer ([@iggy38](https://github.com/iggy38))! ([\#14](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/issues/14))
 
 
 v0.5.1 - 2017-10-24
@@ -48,14 +48,14 @@ v0.4.1 - 2016-12-30
 - Added provision and build scripts to use in both Travis and Vagrant build
   process.
 - Building in Windows with Appveyor.
-- `src/sapdecompress.cpp`: Removed use of value_string for decompression return code ([\#10](https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/issues/10)).
+- `src/sapdecompress.cpp`: Removed use of value_string for decompression return code ([\#10](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/issues/10)).
 
 
 v0.3.2 - 2016-10-21
 -------------------
 
 - ChangeLog file in Markdown format for better documentation.
-- Improvements over the code, indent, removed warnings, etc. ([\#4](https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/pull/4), [\#5](https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/pull/5) and [\#6](https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/pull/4)).
+- Improvements over the code, indent, removed warnings, etc. ([\#4](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/pull/4), [\#5](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/pull/5) and [\#6](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/pull/4)).
   Thanks [Alexis La Goutte](https://github.com/alagoutte)!
 - `src/packet-sapdiag.c`: Partially dissecting `Info flag` Diag item.
 - `src/packet-sapdiag.c`: Splitted `SBA`/`SFE`/`SLC` fields.

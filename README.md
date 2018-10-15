@@ -4,7 +4,7 @@ SAP Dissector Plugin for Wireshark
 [![Build Status](https://travis-ci.org/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark.svg?branch=master)](https://travis-ci.org/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark)
 [![Build status](https://ci.appveyor.com/api/projects/status/x6emndcoufys3iro?svg=true)](https://ci.appveyor.com/project/CoreSecurity/sap-dissection-plug-in-for-wireshark)
 
-Copyright (C) 2012-2018 by Martin Gallo, Core Security
+Copyright (C) 2012-2018 by Martin Gallo, SecureAuth Corporation
 
 Version 0.6.2.dev (XXX 2018)
 
@@ -100,7 +100,7 @@ To build and install the plugin on Debian/Ubuntu linux distributions:
     sudo add-apt-repository ppa:wireshark-dev/stable -y
     sudo apt-get update
     sudo apt-get install wireshark wireshark-dev
-    git clone https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/
+    git clone https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/
     cd SAP-Dissection-plug-in-for-Wireshark/
     mkdir build
     cd build
@@ -121,7 +121,7 @@ The following steps are required to build and install the plugin as part of Wire
 
 2) Copy the SAP Wireshark Plugin to a new `plugins/epan/sap` directory.
 
-    git clone https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/ plugins/epan/sap
+    git clone https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/ plugins/epan/sap
 
 3) Configure the plugin to be included in the build process. This step can be
    performed using the patch file provided. At the root directory run:
@@ -231,9 +231,9 @@ After the plugin is installed, it will automatically dissect SAP protocols'
 traffic if using default ports. If required, ports can be modified on SAP NI
 protocol as well as sub-dissectors' preferences.
 
-![SAP NI preferences](https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/raw/master/docs/sapni_preferences.png "SAP NI preferences")
+![SAP NI preferences](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/raw/master/docs/sapni_preferences.png "SAP NI preferences")
 
-![SAP Diag preferences](https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/raw/master/docs/sapdiag_preferences.png "SAP Diag preferences")
+![SAP Diag preferences](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/raw/master/docs/sapdiag_preferences.png "SAP Diag preferences")
 
 
 ### SAP Diag Gui Logon Password filter ###
@@ -250,7 +250,7 @@ The same results can be achieved also using expert info (security group):
 
 	sapdiag.item.value.dyntatom.item.password
 
-![SAP Diag login password](https://github.com/CoreSecurity/SAP-Dissection-plug-in-for-Wireshark/raw/master/docs/sapdiag_login_password.png "SAP Diag login password")
+![SAP Diag login password](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/raw/master/docs/sapdiag_login_password.png "SAP Diag login password")
 
 
 License
@@ -264,7 +264,7 @@ Authors
 -------
 
 The library was designed and developed by Martin Gallo from
-Core Security's CoreLabs team.
+SecureAuth Corporation's SecureAuth Labs team.
 
 ### Contributors ###
 
@@ -291,15 +291,15 @@ References
 
 [2] https://www.wireshark.org/
 
-[3] https://www.coresecurity.com/corelabs-research/open-source-tools/sap-dissection-plug-in-wireshark
+[3] https://www.secureauth.com/labs/open-source-tools/sap-dissection-plug-wireshark
 
-[4] https://www.coresecurity.com/content/sap-netweaver-dispatcher-multiple-vulnerabilities
+[4] https://www.secureauth.com/labs/advisories/sap-netweaver-dispatcher-multiple-vulnerabilities
 
-[5] https://www.coresecurity.com/content/SAP-netweaver-msg-srv-multiple-vulnerabilities
+[5] https://www.secureauth.com/labs/advisories/SAP-netweaver-msg-srv-multiple-vulnerabilities
 
-[6] https://www.coresecurity.com/corelabs-research/publications/uncovering-sap-vulnerabilities-reversing-and-breaking-diag-protocol-brucon2012
+[6] https://www.secureauth.com/labs/publications/uncovering-sap-vulnerabilities-reversing-and-breaking-diag-protocol
 
-[7] https://www.coresecurity.com/corelabs-research/publications/sap-network-protocols-revisited
+[7] https://www.secureauth.com/labs/publications/sap-network-protocols-revisited
 
 [8] https://www.wireshark.org/download.html
 
@@ -314,5 +314,5 @@ Contact
 -------
 
 Whether you want to report a bug or give some suggestions on this package, drop
-us a few lines at `oss@coresecurity.com` or contact the author email
-`mgallo@coresecurity.com`.
+us a few lines at `oss@secureauth.com` or contact the author email
+`mgallo@secureauth.com`.
