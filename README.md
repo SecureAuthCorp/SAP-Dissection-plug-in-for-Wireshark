@@ -12,18 +12,18 @@ Version 0.6.2.dev (XXX 2018)
 Overview
 --------
 
-[SAP Netweaver](https://www.sap.com/platform/netweaver/index.epx) [1] is a
-technology platform for building and integrating SAP business applications.
-Communication between components uses different network protocols. While
-some of them are standard and well-known protocols, others are proprietaries
-and public information is not available.
+[SAP Netweaver](https://www.sap.com/platform/netweaver/index.epx) [1] and
+[SAP HANA](https://www.sap.com/products/hana.html) [2] are technology platforms for
+building and integrating SAP business applications. Communication between components
+uses different network protocols. While some of them are standard and well-known
+protocols, others are proprietaries and public information is not available.
 
-This [Wireshark](https://www.wireshark.org/) [2] plugin provides dissection
+This [Wireshark](https://www.wireshark.org/) [3] plugin provides dissection
 of SAP's NI, Message Server, Router, Diag, Enqueue, IGS and SNC protocols. The
 dissectors are based on information acquired at researching the different
 protocols and services. Additional experimental support is included for SAP's
-RFC protocol. Detailed information about the research can be found at [3],
-[4], [5], [6] and [7].
+RFC protocol. Detailed information about the research can be found at [4],
+[5], [6], [7] and [8].
 
 
 Features
@@ -79,9 +79,9 @@ This plugin counts on several different dissectors:
 
 - SAP RFC (Remote Function Call) Protocol dissector (experimental)
 
-    This dissector perform some basic dissection on the main components of the
-    RFC protocol. It dissects general items and does some basic reassembling
-    and decompression of table contents.
+  This dissector perform some basic dissection on the main components of the
+  RFC protocol. It dissects general items and does some basic reassembling
+  and decompression of table contents.
 
 
 Installation & Build
@@ -112,8 +112,8 @@ To build and install the plugin on Debian/Ubuntu linux distributions:
 
 The following steps are required to build and install the plugin as part of Wireshark:
 
-1) Download and decompress the [Wireshark version 2.6 source](https://www.wireshark.org/download.html) [8]
-   or checkout the code from the [source repository](https://code.wireshark.org/review/wireshark) [9].
+1) Download and decompress the [Wireshark version 2.6 source](https://www.wireshark.org/download.html) [9]
+   or checkout the code from the [source repository](https://code.wireshark.org/review/wireshark) [10].
 
     git clone https://code.wireshark.org/review/wireshark
     cd wireshark
@@ -173,7 +173,7 @@ case `standalone`:
 Windows build can be only performed as part of the whole Wireshark. The
 following steps are required to compile the plugin on Windows:
 
-1) Follow the [step-to-step guide](https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html) [10]
+1) Follow the [step-to-step guide](https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html) [11]
 for building Wireshark on Windows.
 
 2) Copy the SAP Wireshark Plugin to a new `plugins/epan/sap` directory.
@@ -219,7 +219,7 @@ the `ptf` command-line, run:
 It's worth mentioning that compression libraries for SAP Diag/RFC protocol are
 originally written in C++, thus the entire plugin needs to be compiled for C++.
 See [Wireshark's portability notes](https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-2.6)
-for more information [11].
+for more information [12].
 
 
 Usage
@@ -264,7 +264,7 @@ Authors
 -------
 
 The library was designed and developed by Martin Gallo from
-SecureAuth Corporation's SecureAuth Labs team.
+SecureAuth Corporation's Labs team.
 
 ### Contributors ###
 
@@ -289,25 +289,27 @@ References
 
 [1] https://www.sap.com/platform/netweaver/index.epx
 
-[2] https://www.wireshark.org/
+[2] https://www.sap.com/products/hana.html
 
-[3] https://www.secureauth.com/labs/open-source-tools/sap-dissection-plug-wireshark
+[3] https://www.wireshark.org/
 
-[4] https://www.secureauth.com/labs/advisories/sap-netweaver-dispatcher-multiple-vulnerabilities
+[4] https://www.secureauth.com/labs/open-source-tools/sap-dissection-plug-wireshark
 
-[5] https://www.secureauth.com/labs/advisories/SAP-netweaver-msg-srv-multiple-vulnerabilities
+[5] https://www.secureauth.com/labs/advisories/sap-netweaver-dispatcher-multiple-vulnerabilities
 
-[6] https://www.secureauth.com/labs/publications/uncovering-sap-vulnerabilities-reversing-and-breaking-diag-protocol
+[6] https://www.secureauth.com/labs/advisories/SAP-netweaver-msg-srv-multiple-vulnerabilities
 
-[7] https://www.secureauth.com/labs/publications/sap-network-protocols-revisited
+[7] https://www.secureauth.com/labs/publications/uncovering-sap-vulnerabilities-reversing-and-breaking-diag-protocol
 
-[8] https://www.wireshark.org/download.html
+[8] https://www.secureauth.com/labs/publications/sap-network-protocols-revisited
 
-[9] https://code.wireshark.org/review/wireshark
+[9] https://www.wireshark.org/download.html
 
-[10] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-2.6
+[10] https://code.wireshark.org/review/wireshark
 
-[11] https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html
+[11] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-2.6
+
+[12] https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html
 
 
 Contact
