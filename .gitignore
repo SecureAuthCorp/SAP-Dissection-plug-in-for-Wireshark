@@ -49,3 +49,6 @@ tests/.idea
 
 # Vagrant files
 .vagrant
+
+# Build folder
+build
