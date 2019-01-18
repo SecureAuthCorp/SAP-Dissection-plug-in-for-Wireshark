@@ -20,7 +20,7 @@ BEGIN
             VALUE "FileDescription", "@PACKAGE@ dissector\0"
             VALUE "FileVersion", "@MODULE_VERSION@\0"
             VALUE "InternalName", "@PACKAGE@ @MODULE_VERSION@\0"
-            VALUE "LegalCopyright", "Copyright � 2012-2018 by Martin Gallo <mgallo@secureauth.com>, SecureAuth Corporation\0"
+            VALUE "LegalCopyright", "SECUREAUTH LABS. Copyright (C) 2018 SecureAuth Corporation. All rights reserved.\0"
             VALUE "OriginalFilename", "@PLUGIN_NAME@.dll\0"
             VALUE "ProductName", "SAP dissection plug-in for Wireshark\0"
             VALUE "ProductVersion", "@VERSION@\0"

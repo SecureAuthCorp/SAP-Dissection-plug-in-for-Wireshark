@@ -2,12 +2,12 @@
 # ===========
 # SAP Dissector Plugin for Wireshark
 #
-# Copyright (C) 2012-2018 by Martin Gallo, SecureAuth Corporation
+# SECUREAUTH LABS. Copyright (C) 2018 SecureAuth Corporation. All rights reserved.
 #
 # Layer added by Yvan GENUER, Devoteam
 #
 # The plugin was designed and developed by Martin Gallo from
-# SecureAuth Corporation's Labs team.
+# SecureAuth Labs team.
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
