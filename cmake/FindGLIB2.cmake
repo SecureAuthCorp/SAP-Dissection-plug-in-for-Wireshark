@@ -66,24 +66,6 @@ find_library( GLIB2_LIBRARY
 		/usr/lib
 )
 
-find_library(GOBJECT_LIBRARY
-	NAMES
-		gobject-2.0
-		gobject-2.0-0
-	HINTS
-		"${GLIB2_LIBDIR}"
-		"${GLIB2_HINTS}/lib"
-	PATHS
-		/opt/gnome/lib64
-		/opt/gnome/lib
-		/opt/lib/
-		/opt/local/lib
-		/sw/lib/
-		/usr/lib64
-		/usr/lib
-)
-
-
 # search the glibconfig.h include dir under the same root where the library is found
 get_filename_component( glib2LibDir "${GLIB2_LIBRARY}" PATH)
 
@@ -105,12 +87,11 @@ include( FindPackageHandleStandardArgs )
 find_package_handle_standard_args( GLIB2
 	DEFAULT_MSG
 	GLIB2_LIBRARY
-	GOBJECT_LIBRARY
 	GLIB2_MAIN_INCLUDE_DIR
 )
 
 if( GLIB2_FOUND )
-	set( GLIB2_LIBRARIES ${GLIB2_LIBRARY} ${GOBJECT_LIBRARY} )
+	set( GLIB2_LIBRARIES ${GLIB2_LIBRARY} )
 	# Include transitive dependencies for static linking.
 	if(UNIX AND CMAKE_FIND_LIBRARY_SUFFIXES STREQUAL ".a")
 		find_library(PCRE_LIBRARY pcre)
@@ -121,13 +102,17 @@ if( GLIB2_FOUND )
 		set ( GLIB2_DLL_DIR "${GLIB2_HINTS}/bin"
 			CACHE PATH "Path to GLib 2 DLLs"
 		)
+		# XXX Are GIO and GObject really necessary?
+		# libglib and libgio in glib2-2.52.2-1.34-win32ws depend on
+		# libgcc_s_sjlj-1.dll, now included with gnutls-3.6.3-1-win32ws.
+		# (64-bit GLib does not depend on libgcc_s).
 		file( GLOB _glib2_dlls RELATIVE "${GLIB2_DLL_DIR}"
 			"${GLIB2_DLL_DIR}/libglib-*.dll"
 			"${GLIB2_DLL_DIR}/libgio-*.dll"
 			"${GLIB2_DLL_DIR}/libgmodule-*.dll"
 			"${GLIB2_DLL_DIR}/libgobject-*.dll"
 			"${GLIB2_DLL_DIR}/libintl-*.dll"
-			"${GLIB2_DLL_DIR}/libgcc_s_*.dll"
+			#"${GLIB2_DLL_DIR}/libgcc_s_*.dll"
 		)
 		set ( GLIB2_DLLS ${_glib2_dlls}
 			# We're storing filenames only. Should we use STRING instead?
