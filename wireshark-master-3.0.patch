@@ -1,8 +1,8 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 13aba3e..6f422d0 100644
+index fb791ad574..96a9172973 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -1403,6 +1403,7 @@ if(ENABLE_PLUGINS)
+@@ -1408,6 +1408,7 @@ if(ENABLE_PLUGINS)
  		plugins/epan/mate
  		plugins/epan/opcua
  		plugins/epan/profinet
@@ -10,23 +10,11 @@ index 13aba3e..6f422d0 100644
  		plugins/epan/stats_tree
  		plugins/epan/transum
  		plugins/epan/unistim
-diff --git a/configure.ac b/configure.ac
-index c82ee29..5a7b89a 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -2835,6 +2835,7 @@ AC_CONFIG_FILES(
-   plugins/epan/mate/Makefile
-   plugins/epan/opcua/Makefile
-   plugins/epan/profinet/Makefile
-+	plugins/epan/sap/Makefile
-   plugins/epan/stats_tree/Makefile
-   plugins/epan/transum/Makefile
-   plugins/epan/unistim/Makefile
 diff --git a/packaging/nsis/wireshark.nsi b/packaging/nsis/wireshark.nsi
-index e98f572..561c0fe 100644
+index 3a5e27781e..2d4e46fc1f 100644
 --- a/packaging/nsis/wireshark.nsi
 +++ b/packaging/nsis/wireshark.nsi
-@@ -1005,6 +1005,7 @@ File "${STAGING_DIR}\plugins\${VERSION_MAJOR}.${VERSION_MINOR}\epan\gryphon.dll"
+@@ -992,6 +992,7 @@ File "${STAGING_DIR}\plugins\${VERSION_MAJOR}.${VERSION_MINOR}\epan\gryphon.dll"
  File "${STAGING_DIR}\plugins\${VERSION_MAJOR}.${VERSION_MINOR}\epan\irda.dll"
  File "${STAGING_DIR}\plugins\${VERSION_MAJOR}.${VERSION_MINOR}\epan\opcua.dll"
  File "${STAGING_DIR}\plugins\${VERSION_MAJOR}.${VERSION_MINOR}\epan\profinet.dll"
@@ -34,20 +22,3 @@ index e98f572..561c0fe 100644
  File "${STAGING_DIR}\plugins\${VERSION_MAJOR}.${VERSION_MINOR}\epan\unistim.dll"
  File "${STAGING_DIR}\plugins\${VERSION_MAJOR}.${VERSION_MINOR}\epan\wimax.dll"
  File "${STAGING_DIR}\plugins\${VERSION_MAJOR}.${VERSION_MINOR}\epan\wimaxasncp.dll"
-diff --git a/plugins/Makefile.am b/plugins/Makefile.am
-index 2055eb1..77f8601 100644
---- a/plugins/Makefile.am
-+++ b/plugins/Makefile.am
-@@ -29,6 +29,7 @@ SUBDIRS = \
- 	epan/mate		\
- 	epan/opcua		\
- 	epan/profinet		\
-+	epan/sap		\
- 	epan/stats_tree		\
- 	epan/transum		\
- 	epan/unistim		\
-@@ -48,4 +49,3 @@ checkapi:
- 	for i in $(SUBDIRS); do \
- 		(cd "$$i"; $(MAKE) checkapi); \
- 	done
--
