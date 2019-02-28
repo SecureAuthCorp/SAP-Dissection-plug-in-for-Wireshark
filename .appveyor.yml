@@ -1,20 +1,26 @@
 # AppVeyor configuration based on https://github.com/AMOS-ss16-proj3/amos-ss16-proj3/blob/master/appveyor.yml
 version: "v0.7.1.dev-{build}"
+image: Visual Studio 2015
 
 clone_folder: c:\projects\sap
 
 environment:
   CYG_ROOT: C:\cygwin64
+  CYGWIN=nodosfilewarning
+  WIRESHARK_BASE_DIR=c:\projects
+  matrix:
+    - platform: x86
+      WIRESHARK_TARGET_PLATFORM=win32
+      QT5_BASE_DIR=C:\Qt\5.11\msvc2015
+      CMAKE_GENERATOR: Visual Studio 14 2015
+    - platform: x64
+      WIRESHARK_TARGET_PLATFORM=win64
+      QT5_BASE_DIR=C:\Qt\5.11\msvc2015_64
+      CMAKE_GENERATOR: Visual Studio 14 2015 Win64
 
 install:
   - cinst winflexbison
   - refreshenv
-
-image: Visual Studio 2015
-
-platform:
-  - x86
-  - x64
 
 configuration:
   - RelWithDebInfo
@@ -29,14 +35,6 @@ before_build:
   - git init
   - git remote add -t master-3.0 -f origin https://github.com/wireshark/wireshark
   - git checkout master-3.0
-  # set necessary environment variables:
-  - set CYGWIN=nodosfilewarning
-  - set WIRESHARK_BASE_DIR=c:\projects
-  - if "%platform%"=="x86" (set WIRESHARK_TARGET_PLATFORM=win32)
-  - if "%platform%"=="x64" (set WIRESHARK_TARGET_PLATFORM=win64)
-  # set proper QT environment
-  - if "%platform%"=="x86" (set QT5_BASE_DIR=C:\Qt\5.9\msvc2015)
-  - if "%platform%"=="x64" (set QT5_BASE_DIR=C:\Qt\5.9\msvc2015_64)
   # insert our plugin files to wireshark
   - mkdir C:\projects\wireshark\plugins\epan\sap
   - xcopy /E c:\projects\sap C:\projects\wireshark\plugins\epan\sap
@@ -50,8 +48,7 @@ before_build:
 build_script:
   - mkdir c:\projects\sap\build
   - cd c:\projects\sap\build
-  - if "%platform%"=="x86" (cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 14 2015" c:\projects\wireshark)
-  - if "%platform%"=="x64" (cmake -DENABLE_CHM_GUIDES=on -G "Visual Studio 14 2015 Win64" c:\projects\wireshark)
+  - cmake -DENABLE_CHM_GUIDES=on -G "%CMAKE_GENERATOR%" c:\projects\wireshark
   - msbuild /m /p:Configuration=%configuration% /logger:"C:\\Program Files\\AppVeyor\\BuildAgent\\Appveyor.MSBuildLogger.dll" plugins\epan\sap\sap.vcxproj
 
 after_build:
