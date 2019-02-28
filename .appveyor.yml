@@ -1,5 +1,5 @@
 # AppVeyor configuration based on https://github.com/AMOS-ss16-proj3/amos-ss16-proj3/blob/master/appveyor.yml
-version: "v0.6.2.dev-{build}"
+version: "v0.7.1.dev-{build}"
 
 clone_folder: c:\projects\sap
 
