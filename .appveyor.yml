@@ -6,16 +6,16 @@ clone_folder: c:\projects\sap
 
 environment:
   CYG_ROOT: C:\cygwin64
-  CYGWIN=nodosfilewarning
-  WIRESHARK_BASE_DIR=c:\projects
+  CYGWIN: nodosfilewarning
+  WIRESHARK_BASE_DIR: c:\projects
   matrix:
     - platform: x86
-      WIRESHARK_TARGET_PLATFORM=win32
-      QT5_BASE_DIR=C:\Qt\5.11\msvc2015
+      WIRESHARK_TARGET_PLATFORM: win32
+      QT5_BASE_DIR: C:\Qt\5.11\msvc2015
       CMAKE_GENERATOR: Visual Studio 14 2015
     - platform: x64
-      WIRESHARK_TARGET_PLATFORM=win64
-      QT5_BASE_DIR=C:\Qt\5.11\msvc2015_64
+      WIRESHARK_TARGET_PLATFORM: win64
+      QT5_BASE_DIR: C:\Qt\5.11\msvc2015_64
       CMAKE_GENERATOR: Visual Studio 14 2015 Win64
 
 install:
