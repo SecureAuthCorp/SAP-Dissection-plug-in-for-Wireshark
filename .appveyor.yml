@@ -8,6 +8,7 @@ environment:
   CYG_ROOT: C:\cygwin64
   CYGWIN: nodosfilewarning
   WIRESHARK_BASE_DIR: c:\projects
+  WIRESHARK_BRANCH: master-3.0
   matrix:
     - platform: x86
       WIRESHARK_TARGET_PLATFORM: win32
@@ -33,13 +34,13 @@ before_build:
   - mkdir c:\projects\wireshark
   - cd c:\projects\wireshark
   - git init
-  - git remote add -t master-3.0 -f origin https://github.com/wireshark/wireshark
-  - git checkout master-3.0
+  - git remote add -t %WIRESHARK_BRANCH% -f origin https://github.com/wireshark/wireshark
+  - git checkout %WIRESHARK_BRANCH%
   # insert our plugin files to wireshark
   - mkdir C:\projects\wireshark\plugins\epan\sap
   - xcopy /E c:\projects\sap C:\projects\wireshark\plugins\epan\sap
   # run the adjustment scripts
-  - git apply plugins/epan/sap/wireshark-master-3.0.patch
+  - git apply plugins/epan/sap/wireshark-%WIRESHARK_BRANCH%.patch
   - ps: Invoke-WebRequest -Uri https://cygwin.com/setup-x86_64.exe -OutFile c:\projects\cygwin-setup.exe
   - mkdir c:\projects\cyg-packages
   - c:\projects\cygwin-setup.exe -q -n -N -d -R C:\cygwin64 -s http://mirrors.kernel.org/sourceware/cygwin/ -l c:\projects\cyg-packages -P flex -P bison
