@@ -1,4 +1,4 @@
-language: cpp
+language: minimal
 
 dist: xenial
 sudo: required
@@ -35,7 +35,7 @@ before_install:
     fi
 
   # See https://github.com/travis-ci/travis-ci/issues/5326
-  - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
+  #- export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
 
   - if [ "$TRAVIS_OS_NAME" == "linux" ] && [ ${BUILD_STANDALONE} == "no" ]; then
         ${PLUGIN_DIR}/tools/ubuntu-provision-source.sh;
