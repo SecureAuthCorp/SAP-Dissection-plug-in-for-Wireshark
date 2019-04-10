@@ -295,13 +295,13 @@ References
 
 [4] https://www.secureauth.com/labs/open-source-tools/sap-dissection-plug-wireshark
 
-[5] https://www.secureauth.com/labs/advisories/sap-netweaver-dispatcher-multiple-vulnerabilities
+[5] https://www.coresecurity.com/content/sap-netweaver-dispatcher-multiple-vulnerabilities
 
-[6] https://www.secureauth.com/labs/advisories/SAP-netweaver-msg-srv-multiple-vulnerabilities
+[6] https://www.coresecurity.com/content/SAP-netweaver-msg-srv-multiple-vulnerabilities
 
-[7] https://www.secureauth.com/labs/publications/uncovering-sap-vulnerabilities-reversing-and-breaking-diag-protocol
+[7] https://www.coresecurity.com/corelabs-research/publications/uncovering-sap-vulnerabilities-reversing-and-breaking-diag-protocol
 
-[8] https://www.secureauth.com/labs/publications/sap-network-protocols-revisited
+[8] https://www.coresecurity.com/corelabs-research/publications/sap-network-protocols-revisited
 
 [9] https://www.wireshark.org/download.html
 
