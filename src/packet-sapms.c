@@ -186,7 +186,12 @@ static const value_string sapms_adm_record_opcode_vals[] = {
 	{ 0x48, "AD_LOAD_INFO" },
 	{ 0x49, "AD_TEST" },
 	{ 0x4a, "AD_HANDLE_ACL" },
-	{ 0x4b, "AD_ENQ_LOG_RESET" },
+	{ 0x4b, "AD_PROFILE2" },
+	{ 0x4c, "AD_RSCP_ASYNC" },
+	{ 0x4d, "AD_BATCH_INFO" },
+	{ 0x4e, "AD_SOFT_CANCEL" },
+	{ 0x55, "AD_SYNC_LOAD_FMT" },
+	{ 0x56, "AD_GET_NILIST_PORT" },
 	/* NULL */
 	{ 0x00, NULL }
 };
@@ -220,6 +225,7 @@ static const value_string sapms_adm_rzl_strg_type_vals[] = {
 
 /* MS OP Code values */
 static const value_string sapms_opcode_vals[] = {
+	{  0, "MS_DP_ADM" },
 	{  1, "MS_SERVER_CHG" },
 	{  2, "MS_SERVER_ADD" },
 	{  3, "MS_SERVER_SUB" },
