@@ -1219,8 +1219,10 @@ dissect_sapms(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U
 			switch (iflag){
 
 				/* MS_SEND_NAME or unknown (forwarded messages) */
-				case 0x00:
-				case 0x01:{
+				case 0x00:      /* MS_UNKNOWN */
+				case 0x01:	    /* MS_SEND_NAME */
+				case 0x02:	 		/* MS_SEND_TYPE */
+				case 0x07:{     /* MS_SEND_TYPE_ONCE */
 					opcode = tvb_get_guint8(tvb, offset);
 					proto_tree_add_item(sapms_tree, hf_sapms_opcode, tvb, offset, 1, ENC_BIG_ENDIAN); offset+=1;
 					proto_tree_add_item(sapms_tree, hf_sapms_opcode_error, tvb, offset, 1, ENC_BIG_ENDIAN); offset+=1;
@@ -1240,8 +1242,7 @@ dissect_sapms(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U
 					}
 					break;
 
-				/* MS_ADM_OPCODES */
-				} case 0x05:{
+				} case 0x05:{   /* MS_ADM_OPCODES */
 					proto_tree_add_item(sapms_tree, hf_sapms_adm_eyecatcher, tvb, offset, 12, ENC_ASCII|ENC_NA); offset+=12;
 					proto_tree_add_item(sapms_tree, hf_sapms_adm_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset+=1;
 					proto_tree_add_item(sapms_tree, hf_sapms_adm_msgtype, tvb, offset, 1, ENC_BIG_ENDIAN); offset+=1;
