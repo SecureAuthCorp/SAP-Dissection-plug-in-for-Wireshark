@@ -546,7 +546,8 @@ static int hf_sapms_property_vhost_value = -1;
 static int hf_sapms_property_ip_address = -1;
 static int hf_sapms_property_ip_address6 = -1;
 
-static int hf_sapms_property_service = -1;
+static int hf_sapms_property_service_number = -1;
+static int hf_sapms_property_service_value = -1;
 
 static int hf_sapms_property_release = -1;
 static int hf_sapms_property_release_patchno = -1;
@@ -877,7 +878,8 @@ dissect_sapms_property(tvbuff_t *tvb, proto_tree *tree, guint32 offset){
 			break;
 		}
 		case 0x05:{			/* MS_PROPERTY_SERVICE */
-			proto_tree_add_item(value_tree, hf_sapms_property_service, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2;
+			proto_tree_add_item(value_tree, hf_sapms_property_service_number, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2;
+			proto_tree_add_item(value_tree, hf_sapms_property_service_value, tvb, offset, 1, ENC_BIG_ENDIAN); offset+=1;
 			break;
 		}
 		case 0x07:{			/* Release Information */
@@ -1370,8 +1372,10 @@ proto_register_sapms(void)
 			{ "Property IP Address v4", "sapms.property.ipaddr4", FT_IPv4, BASE_NONE, NULL, 0x0, "SAP MS Property IP Address IPv4", HFILL }},
 		{ &hf_sapms_property_ip_address6,
 			{ "Property IP Address v6", "sapms.property.ipaddr6", FT_IPv6, BASE_NONE, NULL, 0x0, "SAP MS Property IP Address IPv6", HFILL }},
-		{ &hf_sapms_property_service,
-			{ "Property Service Number", "sapms.property.servno", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP MS Property Service Number", HFILL }},
+		{ &hf_sapms_property_service_number,
+			{ "Property Service Number", "sapms.property.service.number", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP MS Property Service Number", HFILL }},
+		{ &hf_sapms_property_service_value,
+			{ "Property Service Value", "sapms.property.service.value", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP MS Property Service Value", HFILL }},
 		{ &hf_sapms_property_release,
 			{ "Property Release", "sapms.property.release", FT_STRINGZ, BASE_NONE, NULL, 0x0, "SAP MS Property Release", HFILL }},
 		{ &hf_sapms_property_release_patchno,
