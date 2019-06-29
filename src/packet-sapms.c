@@ -872,7 +872,7 @@ dissect_sapms_property(tvbuff_t *tvb, proto_tree *tree, guint32 offset){
 			proto_tree_add_item(value_tree, hf_sapms_property_vhost_length, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2;
 
 			if (vhost_length > 0) {
-				proto_tree_add_item(value_tree, hf_sapms_property_vhost_value, tvb, offset, vhost_length, ENC_BIG_ENDIAN); offset += vhost_length;
+				proto_tree_add_item(value_tree, hf_sapms_property_vhost_value, tvb, offset, vhost_length, ENC_ASCII|ENC_NA); offset += vhost_length;
 			}
 
 			offset =+ 2;  /* Padding */
@@ -890,7 +890,7 @@ dissect_sapms_property(tvbuff_t *tvb, proto_tree *tree, guint32 offset){
 			param_length = tvb_get_ntohl(tvb, offset);
 			proto_tree_add_item(value_tree, hf_sapms_property_param_name_length, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 			if (param_length > 0){
-				proto_tree_add_item(value_tree, hf_sapms_property_param_name_value, tvb, offset, param_length, ENC_BIG_ENDIAN); offset+=param_length;
+				proto_tree_add_item(value_tree, hf_sapms_property_param_name_value, tvb, offset, param_length, ENC_ASCII|ENC_NA); offset+=param_length;
 			}
 			offset += 100 - param_length;  /* Padding */
 			offset += 2;  /* Padding */
@@ -898,7 +898,7 @@ dissect_sapms_property(tvbuff_t *tvb, proto_tree *tree, guint32 offset){
 			value_length = tvb_get_ntohs(tvb, offset);
 			proto_tree_add_item(value_tree, hf_sapms_property_param_value_length, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2;
 			if (param_length > 0){
-				proto_tree_add_item(value_tree, hf_sapms_property_param_value_value, tvb, offset, value_length, ENC_BIG_ENDIAN); offset+=value_length;
+				proto_tree_add_item(value_tree, hf_sapms_property_param_value_value, tvb, offset, value_length, ENC_ASCII|ENC_NA); offset+=value_length;
 			}
 			break;
 		}
