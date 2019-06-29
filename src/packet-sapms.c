@@ -500,6 +500,7 @@ static int hf_sapms_key = -1;
 static int hf_sapms_flag = -1;
 static int hf_sapms_iflag = -1;
 static int hf_sapms_fromname = -1;
+static int hf_sapms_diagport = -1;
 static int hf_sapms_fromhost = -1;
 static int hf_sapms_fromserv = -1;
 static int hf_sapms_message = -1;
@@ -1204,7 +1205,11 @@ dissect_sapms(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U
 
 			proto_tree_add_item(sapms_tree, hf_sapms_fromname, tvb, offset, 40, ENC_ASCII|ENC_NA); offset+=40;
 
-			offset+=2; /* Skip 2 bytes */
+			if (flag == 0x00 && iflag == 0x00){  /* For MS_REQUEST+MS_LOGIN_2 it's the diag port */
+				proto_tree_add_item(sapms_tree, hf_sapms_diagport, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2;
+			} else {
+				offset+=2; /* Skip 2 bytes */
+			}
 
 			if (!tvb_offset_exists(tvb, offset)){
 				return 0;
@@ -1310,6 +1315,8 @@ proto_register_sapms(void)
 			{ "IFlag", "sapms.iflag", FT_UINT8, BASE_HEX, VALS(sapms_iflag_vals), 0x0, "SAP MS IFlag", HFILL }},
 		{ &hf_sapms_fromname,
 			{ "From Name", "sapms.fromname", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS From Name", HFILL }},
+		{ &hf_sapms_diagport,
+			{ "Diag Port", "sapms.diag_port", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP MS Diag Port", HFILL }},
 		{ &hf_sapms_fromhost,
 			{ "From Host", "sapms.fromhost", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS From Host", HFILL }},
 		{ &hf_sapms_fromserv,
