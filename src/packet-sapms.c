@@ -524,6 +524,10 @@ static int hf_sapms_adm_rzl_strg_type = -1;
 static int hf_sapms_adm_rzl_strg_name = -1;
 static int hf_sapms_adm_rzl_strg_value = -1;
 static int hf_sapms_adm_rzl_strg_value_integer = -1;
+static int hf_sapms_adm_rzl_strg_uptime = -1;
+static int hf_sapms_adm_rzl_strg_delay = -1;
+static int hf_sapms_adm_rzl_strg_users  = -1;
+static int hf_sapms_adm_rzl_strg_quality = -1;
 
 static int hf_sapms_opcode = -1;
 static int hf_sapms_opcode_error = -1;
@@ -687,12 +691,12 @@ dissect_sapms_adm_record(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
 					case 31:		/* STRG_TYPE_WRITE_I */
 					case 41:		/* STRG_TYPE_DEL_I */
 					case 51:{		/* STRG_TYPE_CREATE_I */
+						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_uptime, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
 						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_value_integer, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
+						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_delay, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
 						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_value_integer, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
-						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_value_integer, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
-						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_value_integer, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
-						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_value_integer, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
-						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_value_integer, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
+						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_users, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
+						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_quality, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
 						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_value_integer, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
 						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_value_integer, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
 						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_value_integer, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
@@ -1302,6 +1306,14 @@ proto_register_sapms(void)
 			{ "Adm RZL String Value", "sapms.adm.rzl_strg.value", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS Adm RZL String Value", HFILL }},
 		{ &hf_sapms_adm_rzl_strg_value_integer,
 			{ "Adm RZL String Integer Value", "sapms.adm.rzl_strg.value", FT_INT32, BASE_DEC, NULL, 0x0, "SAP MS Adm RZL String Integer Value", HFILL }},
+		{ &hf_sapms_adm_rzl_strg_uptime,
+			{ "Adm RZL String Uptime", "sapms.adm.rzl_strg.uptime", FT_INT32, BASE_DEC, NULL, 0x0, "SAP MS Adm RZL String Uptime", HFILL }},
+		{ &hf_sapms_adm_rzl_strg_delay,
+			{ "Adm RZL String Delay", "sapms.adm.rzl_strg.delay", FT_INT32, BASE_DEC, NULL, 0x0, "SAP MS Adm RZL String Delay", HFILL }},
+		{ &hf_sapms_adm_rzl_strg_users,
+			{ "Adm RZL String Users", "sapms.adm.rzl_strg.users", FT_INT32, BASE_DEC, NULL, 0x0, "SAP MS Adm RZL String Users", HFILL }},
+		{ &hf_sapms_adm_rzl_strg_quality,
+			{ "Adm RZL String Quality", "sapms.adm.rzl_strg.quality", FT_INT32, BASE_DEC, NULL, 0x0, "SAP MS Adm RZL String Quality", HFILL }},
 
 		/* OPCODE fields */
 		{ &hf_sapms_opcode,
