@@ -584,6 +584,7 @@ static int hf_sapms_logon_misc_length = -1;
 static int hf_sapms_logon_misc = -1;
 static int hf_sapms_logon_address6_length = -1;
 static int hf_sapms_logon_address6 = -1;
+static int hf_sapms_logon_end = -1;
 
 static int hf_sapms_shutdown_reason_length = -1;
 static int hf_sapms_shutdown_reason = -1;
@@ -1027,9 +1028,11 @@ dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
 
 			address6_length = tvb_get_ntohs(tvb, offset);
 			proto_tree_add_item(tree, hf_sapms_logon_address6_length, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2; length-=2;
-			if (address6_length==16 && length >= address6_length){
+			if (address6_length == 16 && length >= (address6_length + 4)){
 				tvb_get_ipv6(tvb, offset, &address_ipv6);
 				proto_tree_add_ipv6(tree, hf_sapms_logon_address6, tvb, offset, 16, &address_ipv6); offset+=16; length-=16;
+				proto_tree_add_item(tree, hf_sapms_logon_end, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
+
 			} else { /* Add expert info if wrong IPv6 address length */
 				expert_add_info_format(pinfo, tree, &ei_sapms_ip_invalid_length, "Invalid IPv6 address length (%d) or data", address6_length);
 			}
@@ -1479,9 +1482,11 @@ proto_register_sapms(void)
 		{ &hf_sapms_logon_misc,
 			{ "Logon Misc", "sapms.logon.misc", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS Logon Misc", HFILL }},
 		{ &hf_sapms_logon_address6_length,
-			{ "Logon Address IPv6 Length", "sapms.logon.addr6_length", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP MS Logon Address IPv6 Length", HFILL }},
+			{ "Logon Address IPv6 Length", "sapms.logon.addr6_length", FT_INT16, BASE_DEC, NULL, 0x0, "SAP MS Logon Address IPv6 Length", HFILL }},
 		{ &hf_sapms_logon_address6,
 			{ "Logon Address IPv6", "sapms.logon.address6", FT_IPv6, BASE_NONE, NULL, 0x0, "SAP MS Logon Address IPv6", HFILL }},
+		{ &hf_sapms_logon_end,
+			{ "Logon Address End", "sapms.logon.end", FT_INT32, BASE_DEC, NULL, 0x0, "SAP MS Logon End", HFILL }},
 
 		{ &hf_sapms_shutdown_reason_length,
 			{ "Shutdown Reason Length", "sapms.shutdown.reason_length", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP MS Shutdown Reason Length", HFILL }},
