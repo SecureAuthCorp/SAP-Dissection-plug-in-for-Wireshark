@@ -537,8 +537,11 @@ static int hf_sapms_opcode_value = -1;
 
 static int hf_sapms_property_client = -1;
 static int hf_sapms_property_id = -1;
-static int hf_sapms_property_length = -1;
 static int hf_sapms_property_value = -1;
+
+static int hf_sapms_property_vhost_logon = -1;
+static int hf_sapms_property_vhost_length = -1;
+static int hf_sapms_property_vhost_value = -1;
 
 static int hf_sapms_property_ip_address = -1;
 static int hf_sapms_property_ip_address6 = -1;
@@ -833,7 +836,7 @@ dissect_sapms_counter(tvbuff_t *tvb, proto_tree *tree, guint32 offset){
 static void
 dissect_sapms_property(tvbuff_t *tvb, proto_tree *tree, guint32 offset){
 	guint32 property_id = 0;
-	proto_item *value= NULL;
+	proto_item *value = NULL;
 	proto_tree *value_tree = NULL;
 
 	proto_tree_add_item(tree, hf_sapms_property_client, tvb, offset, 40, ENC_ASCII|ENC_NA); offset+=40;
@@ -851,6 +854,23 @@ dissect_sapms_property(tvbuff_t *tvb, proto_tree *tree, guint32 offset){
 
 	switch (property_id){
 
+		case 0x02:{			/* MS_PROPERTY_VHOST */
+			guint16 vhost_length = 0;
+
+			proto_tree_add_item(value_tree, hf_sapms_property_vhost_logon, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2;
+
+			offset =+ 12;  /* Padding */
+
+			vhost_length = tvb_get_ntohs(tvb, offset);
+			proto_tree_add_item(value_tree, hf_sapms_property_vhost_length, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2;
+
+			if (vhost_length > 0) {
+				proto_tree_add_item(value_tree, hf_sapms_property_vhost_value, tvb, offset, vhost_length, ENC_BIG_ENDIAN); offset += vhost_length;
+			}
+
+			offset =+ 2;  /* Padding */
+			break;
+		}
 		case 0x03:{			/* MS_PROPERTY_IPADR */
 			proto_tree_add_item(value_tree, hf_sapms_property_ip_address, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 			proto_tree_add_item(value_tree, hf_sapms_property_ip_address6, tvb, offset, 16, ENC_NA); offset+=16;
@@ -1334,11 +1354,18 @@ proto_register_sapms(void)
 		{ &hf_sapms_property_client,
 			{ "Property Client", "sapms.property.client", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS Property Client", HFILL }},
 		{ &hf_sapms_property_id,
-			{ "Property ID", "sapms.property.id", FT_UINT32, BASE_HEX, VALS(sapms_property_id_vals), 0x0, "SAP MS Property ID", HFILL }},
-		{ &hf_sapms_property_length,
-			{ "Property Length", "sapms.property.length", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP MS Property Length", HFILL }},
+			{ "Property ID", "sapms.property.id", FT_UINT32, BASE_DEC, VALS(sapms_property_id_vals), 0x0, "SAP MS Property ID", HFILL }},
+
 		{ &hf_sapms_property_value,
-			{ "Property", "sapms.property.value", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS Property Value", HFILL }},
+			{ "Property", "sapms.property.value", FT_NONE, BASE_NONE, NULL, 0x0, "SAP MS Property Value", HFILL }},
+
+		{ &hf_sapms_property_vhost_logon,
+			{ "Property VHost Logon", "sapms.property.vhost.logon", FT_UINT16, BASE_DEC, VALS(sapms_logon_type_vals), 0x0, "SAP MS Property VHost Logon", HFILL }},
+		{ &hf_sapms_property_vhost_length,
+			{ "Property VHost Length", "sapms.property.vhost.length", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP MS Property VHost Length", HFILL }},
+		{ &hf_sapms_property_vhost_value,
+			{ "Property VHost Value", "sapms.property.vhost.value", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS Property VHost Value", HFILL }},
+
 		{ &hf_sapms_property_ip_address,
 			{ "Property IP Address v4", "sapms.property.ipaddr4", FT_IPv4, BASE_NONE, NULL, 0x0, "SAP MS Property IP Address IPv4", HFILL }},
 		{ &hf_sapms_property_ip_address6,
