@@ -505,6 +505,8 @@ static int hf_sapms_fromhost = -1;
 static int hf_sapms_fromserv = -1;
 static int hf_sapms_message = -1;
 
+static int hf_sapms_dp_adm_dp_version = -1;
+
 static int hf_sapms_adm_eyecatcher = -1;
 static int hf_sapms_adm_version = -1;
 static int hf_sapms_adm_msgtype = -1;
@@ -920,8 +922,14 @@ dissect_sapms_property(tvbuff_t *tvb, proto_tree *tree, guint32 offset){
 static void
 dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset, guint8 flag, guint8 opcode, guint8 opcode_version, guint32 length){
 	gint client_length = 0;
+	guint8 dp_version = 0;
 
 	switch (opcode){
+		case 0x00:{     /* MS_DP_ADM */
+			dp_version = tvb_get_guint8(tvb, offset);
+			proto_tree_add_item(tree, hf_sapms_dp_adm_dp_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset+=1; length-=1;
+			break;
+		}
 		case 0x02:			/* MS_SERVER_ADD */
 		case 0x03:			/* MS_SERVER_SUB */
 		case 0x04:{			/* MS_SERVER_MOD */
@@ -1325,6 +1333,10 @@ proto_register_sapms(void)
 		{ &hf_sapms_message,
 			{ "Message", "sapms.message", FT_NONE, BASE_NONE, NULL, 0x0, "SAP MS Message", HFILL }},
 
+		/* MS_DP_ADM fiels */
+		{ &hf_sapms_dp_adm_dp_version,
+			{ "Dispatcher Version", "sapms.dp_adm.version", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP MS Dispatcher Version", HFILL }},
+		
 		/* ADM Message fields */
 		{ &hf_sapms_adm_eyecatcher,
 			{ "Adm Eye Catcher", "sapms.adm.eyecatcher", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS Adm Eye Catcher", HFILL }},
