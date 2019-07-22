@@ -4,6 +4,8 @@ Changelog
 v0.6.2 - 2019-XX-XX
 -------------------
 
+- `src/packet-sapdiag.c`: Added support bits for SAP Gui 7.50.
+
 
 v0.6.1 - 2018-07-12
 -------------------
