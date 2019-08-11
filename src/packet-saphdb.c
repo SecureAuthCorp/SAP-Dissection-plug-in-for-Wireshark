@@ -58,6 +58,15 @@ void proto_reg_handoff_saphdb(void);
 
 
 static int
+dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_, guint32 offset)
+{
+	guint32 length = 0;
+
+	return length;
+}
+
+
+static int
 dissect_saphdb(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_)
 {
 	/* Add the protocol to the column */
@@ -65,9 +74,12 @@ dissect_saphdb(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 	/* Clear out stuff in the info column */
 	col_clear(pinfo->cinfo,COL_INFO);
 
-	if (tree) { /* we are being asked for details */
+  /* we are being asked for details and the length is sufficient at least for the header */
+	if (tree && tvb_reported_length(tvb) >= 32) {
 
+		guint16 noofsegm = 0, segm = 0;  // This should be gint16
 		guint32 offset = 0;
+		guint32 varpartlength = 0, varpartsize = 0;  // This should be gint32
 		proto_item *ti = NULL, *saphdb_message_header = NULL;
 		proto_tree *saphdb_tree = NULL, *saphdb_message_header_tree = NULL;
 
@@ -82,13 +94,29 @@ dissect_saphdb(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 		/* Add the Message Header fields */
 		proto_tree_add_item(saphdb_message_header_tree, hf_saphdb_message_header_sessionid, tvb, offset, 8, ENC_LITTLE_ENDIAN); offset += 8;
 		proto_tree_add_item(saphdb_message_header_tree, hf_saphdb_message_header_packetcount, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
+		varpartlength = tvb_get_guint32(tvb, offset, ENC_LITTLE_ENDIAN);
 		proto_tree_add_item(saphdb_message_header_tree, hf_saphdb_message_header_varpartlength, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
 		proto_tree_add_item(saphdb_message_header_tree, hf_saphdb_message_header_varpartsize, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
+		noofsegm = tvb_get_letohs(tvb, offset);
 		proto_tree_add_item(saphdb_message_header_tree, hf_saphdb_message_header_noofsegm, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2;
 		proto_tree_add_item(saphdb_message_header_tree, hf_saphdb_message_header_packetoptions, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1;
 		offset += 1;  /* Reserved1 field */
 		proto_tree_add_item(saphdb_message_header_tree, hf_saphdb_message_header_compressionvarpartlength, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
 		offset += 4;  /* Reserved2 field */
+
+		if (tvb_reported_length_remaining(tvb, offset) != varpartlength) {
+			/* TODO: Expert report as the length is incorrect */
+			varpartlength = tvb_reported_length_remaining(tvb, offset);
+		}
+
+		/* Iterate over the segments and dissect them */
+		for (segm = 0; segm < noofsegm && tvb_reported_length_remaining(tvb, offset) >= 13; segm++) {
+			guint32 segm_length = 0;
+
+			segm_length = dissect_saphdb_segment(tvb, pinfo, tree, NULL, offset);
+
+			offset += segm_length;
+		}
 
 	}
 
