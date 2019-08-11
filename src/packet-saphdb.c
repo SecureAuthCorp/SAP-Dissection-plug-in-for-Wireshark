@@ -28,7 +28,7 @@
 
 
 /* Define default ports */
-#define SAPHDB_PORT_RANGE "30015-39915,30013-39913"
+#define SAPHDB_PORT_RANGE "30013-39913,30015-39915"
 
 
 static int proto_saphdb = -1;
