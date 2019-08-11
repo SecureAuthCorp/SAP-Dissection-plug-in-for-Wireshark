@@ -33,6 +33,17 @@
 
 static int proto_saphdb = -1;
 
+/* SAP HDB Message Header items */
+static int hf_saphdb_message_header = -1;
+static int hf_saphdb_message_header_sessionid = -1;
+static int hf_saphdb_message_header_packetcount = -1;
+static int hf_saphdb_message_header_varpartlength = -1;
+static int hf_saphdb_message_header_varpartsize = -1;
+static int hf_saphdb_message_header_noofsegm = -1;
+static int hf_saphdb_message_header_packetoptions = -1;
+static int hf_saphdb_message_header_compressionvarpartlength = -1;
+
+
 static gint ett_saphdb = -1;
 
 
@@ -56,12 +67,28 @@ dissect_saphdb(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 
 	if (tree) { /* we are being asked for details */
 
-		proto_item *ti = NULL;
-		proto_tree *saphdb_tree = NULL;
+		guint32 offset = 0;
+		proto_item *ti = NULL, *saphdb_message_header = NULL;
+		proto_tree *saphdb_tree = NULL, *saphdb_message_header_tree = NULL;
 
 		/* Add the main saphdb subtree */
 		ti = proto_tree_add_item(tree, proto_saphdb, tvb, 0, -1, ENC_NA);
 		saphdb_tree = proto_item_add_subtree(ti, ett_saphdb);
+
+		/* Add the Message Header subtree */
+		saphdb_message_header = proto_tree_add_item(saphdb_tree, hf_saphdb_message_header, tvb, offset, 32, ENC_NA);
+		saphdb_message_header_tree = proto_item_add_subtree(saphdb_message_header, ett_saphdb);
+
+		/* Add the Message Header fields */
+		proto_tree_add_item(saphdb_message_header_tree, hf_saphdb_message_header_sessionid, tvb, offset, 8, ENC_LITTLE_ENDIAN); offset += 8;
+		proto_tree_add_item(saphdb_message_header_tree, hf_saphdb_message_header_packetcount, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
+		proto_tree_add_item(saphdb_message_header_tree, hf_saphdb_message_header_varpartlength, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
+		proto_tree_add_item(saphdb_message_header_tree, hf_saphdb_message_header_varpartsize, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
+		proto_tree_add_item(saphdb_message_header_tree, hf_saphdb_message_header_noofsegm, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2;
+		proto_tree_add_item(saphdb_message_header_tree, hf_saphdb_message_header_packetoptions, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1;
+		offset += 1;  /* Reserved1 field */
+		proto_tree_add_item(saphdb_message_header_tree, hf_saphdb_message_header_compressionvarpartlength, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
+		offset += 4;  /* Reserved2 field */
 
 	}
 
@@ -72,6 +99,23 @@ void
 proto_register_saphdb(void)
 {
 	static hf_register_info hf[] = {
+		/* Message Header items */
+		{ &hf_saphdb_message_header,
+			{ "Message Header", "saphdb.message_header", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Message Header", HFILL }},
+		{ &hf_saphdb_message_header_sessionid,
+			{ "Session ID", "saphdb.message_header.sessionid", FT_INT64, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Session ID", HFILL }},
+		{ &hf_saphdb_message_header_packetcount,
+			{ "Packet Count", "saphdb.message_header.packetcount", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Packet Count", HFILL }},
+		{ &hf_saphdb_message_header_varpartlength,
+			{ "Var Part Length", "saphdb.message_header.varpartlength", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Var Part Length", HFILL }},
+		{ &hf_saphdb_message_header_varpartsize,
+			{ "Var Part Size", "saphdb.message_header.varpartsize", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Var Part Size", HFILL }},
+		{ &hf_saphdb_message_header_noofsegm,
+			{ "Number of Segments", "saphdb.message_header.noofsegm", FT_INT16, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Number of Segments", HFILL }},
+		{ &hf_saphdb_message_header_packetoptions,
+			{ "Packet Options", "saphdb.message_header.packetoptions", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Packet Options", HFILL }},
+		{ &hf_saphdb_message_header_compressionvarpartlength,
+			{ "Compression Var Part Length", "saphdb.message_header.compressionvarpartlength", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Compression Var Part Length", HFILL }},
 	};
 
 	/* Setup protocol subtree array */
