@@ -31,6 +31,59 @@
 #define SAPHDB_PORT_RANGE "30013-39913,30015-39915"
 
 
+/* SAP HDB Segment Kind values */
+static const value_string saphdb_segment_segmentkind_vals[] = {
+	{ 0, "invalid" },
+	{ 1, "request" },
+	{ 2, "reply" },
+	{ 5, "error" },
+	/* NULL */
+	{ 0x00, NULL }
+};
+
+/* SAP HDB Segment Message Type values */
+static const value_string saphdb_segment_messagetype_vals[] = {
+	{ 0, "NIL" },
+	{ 2, "EXECUTEDIRECT" },
+	{ 3, "PREPARE" },
+	{ 4, "ABAPSTREAM" },
+	{ 5, "XA_START" },
+	{ 6, "XA_JOIN" },
+	{ 7, "XA_COMMIT" },
+	{ 13, "EXECUTE" },
+	{ 16, "READLOB" },
+	{ 17, "WRITELOB" },
+	{ 18, "FINDLOB" },
+	{ 25, "PING" },
+	{ 65, "AUTHENTICATE" },
+	{ 66, "CONNECT" },
+	{ 67, "COMMIT" },
+	{ 68, "ROLLBACK" },
+	{ 69, "CLOSERESULTSET" },
+	{ 70, "DROPSTATEMENTID" },
+	{ 71, "FETCHNEXT" },
+	{ 72, "FETCHABSOLUTE" },
+	{ 73, "FETCHRELATIVE" },
+	{ 74, "FETCHFIRST" },
+	{ 75, "FETCHLAST" },
+	{ 77, "DISCONNECT" },
+	{ 78, "EXECUTEITAB" },
+	{ 79, "FETCHNEXTITAB" },
+	{ 80, "INSERTNEXTITAB" },
+	{ 81, "BATCHPREPARE" },
+	{ 82, "DBCONNECTINFO" },
+	{ 83, "XOPEN_XASTART" },
+	{ 84, "XOPEN_XAEND" },
+	{ 85, "XOPEN_XAPREPARE" },
+	{ 86, "XOPEN_XACOMMIT" },
+	{ 87, "XOPEN_XAROLLBACK" },
+	{ 88, "XOPEN_XARECOVER" },
+	{ 89, "XOPEN_XAFORGET" },
+	/* NULL */
+	{ 0x00, NULL }
+};
+
+
 static int proto_saphdb = -1;
 
 /* SAP HDB Message Header items */
@@ -96,14 +149,15 @@ dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 	/* Add additional fields according to the segment kind*/
 	switch (segmentkind) {
 		case 1: /* Request */
-			break;
-		case 2: /* Reply */
 			proto_tree_add_item(segment_tree, hf_saphdb_segment_messagetype, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
 			proto_tree_add_item(segment_tree, hf_saphdb_segment_commit, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
 			proto_tree_add_item(segment_tree, hf_saphdb_segment_commandoptions, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
-			offset += 9; length += 9;
+			offset += 8; length += 8; // Reserved1 field
+			break;
+		case 2: /* Reply */
+			offset += 1; length += 1; // Reserved2 field
 			proto_tree_add_item(segment_tree, hf_saphdb_segment_functioncode, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; length += 2;
-			offset += 8; length += 8;
+			offset += 8; length += 8; // Reserved3 field
 			break;
 	}
 
@@ -201,9 +255,9 @@ proto_register_saphdb(void)
 		{ &hf_saphdb_segment_segmentno,
 			{ "Segment Number", "saphdb.segment.segmentno", FT_INT16, BASE_DEC, NULL, 0x0, "SAP HDB Segment Number", HFILL }},
 		{ &hf_saphdb_segment_segmentkind,
-			{ "Segment Kind", "saphdb.segment.kind", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Segment Kind", HFILL }},
+			{ "Segment Kind", "saphdb.segment.kind", FT_INT8, BASE_DEC, VALS(saphdb_segment_segmentkind_vals), 0x0, "SAP HDB Segment Kind", HFILL }},
 		{ &hf_saphdb_segment_messagetype,
-			{ "Message Type", "saphdb.segment.messagetype", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Segment Message Type", HFILL }},
+			{ "Message Type", "saphdb.segment.messagetype", FT_INT8, BASE_DEC, VALS(saphdb_segment_messagetype_vals), 0x0, "SAP HDB Segment Message Type", HFILL }},
 		{ &hf_saphdb_segment_commit,
 			{ "Commit", "saphdb.segment.commit", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Segment Commit", HFILL }},
 		{ &hf_saphdb_segment_commandoptions,
