@@ -33,10 +33,10 @@
 
 /* SAP HDB Segment Kind values */
 static const value_string saphdb_segment_segmentkind_vals[] = {
-	{ 0, "invalid" },
-	{ 1, "request" },
-	{ 2, "reply" },
-	{ 5, "error" },
+	{ 0, "Invalid" },
+	{ 1, "Request" },
+	{ 2, "Reply" },
+	{ 5, "Error" },
 	/* NULL */
 	{ 0x00, NULL }
 };
@@ -79,6 +79,40 @@ static const value_string saphdb_segment_messagetype_vals[] = {
 	{ 87, "XOPEN_XAROLLBACK" },
 	{ 88, "XOPEN_XARECOVER" },
 	{ 89, "XOPEN_XAFORGET" },
+	/* NULL */
+	{ 0x00, NULL }
+};
+
+/* SAP HDB Segment Function Code values */
+static const value_string saphdb_segment_functioncode_vals[] = {
+	{ 0, "NIL" },
+	{ 1, "DDL" },
+	{ 2, "INSERT" },
+	{ 3, "UPDATE" },
+	{ 4, "DELETE" },
+	{ 5, "SELECT" },
+	{ 6, "SELECTFORUPDATE" },
+	{ 7, "EXPLAIN" },
+	{ 8, "DBPROCEDURECALL" },
+	{ 9, "DBPROCEDURECALLWITHRESULT" },
+	{ 10, "FETCH" },
+	{ 11, "COMMIT" },
+	{ 12, "ROLLBACK" },
+	{ 13, "SAVEPOINT" },
+	{ 14, "CONNECT" },
+	{ 15, "WRITELOB" },
+	{ 16, "READLOB" },
+	{ 17, "PING" },
+	{ 18, "DISCONNECT" },
+	{ 19, "CLOSECURSOR" },
+	{ 20, "FINDLOB" },
+	{ 21, "ABAPSTREAM" },
+	{ 22, "XASTART" },
+	{ 23, "XAJOIN" },
+	{ 24, "ITABWRITE" },
+	{ 25, "XOPEN_XACONTROL" },
+	{ 26, "XOPEN_XAPREPARE" },
+	{ 27, "XOPEN_XARECOVER" },
 	/* NULL */
 	{ 0x00, NULL }
 };
@@ -282,7 +316,7 @@ proto_register_saphdb(void)
 		{ &hf_saphdb_segment_commandoptions,
 			{ "Command Options", "saphdb.message_buffer.segment.commandoptions", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Segment Command Options", HFILL }},
 		{ &hf_saphdb_segment_functioncode,
-			{ "Function Code", "saphdb.message_buffer.segment.functioncode", FT_INT16, BASE_DEC, NULL, 0x0, "SAP HDB Segment Function Code", HFILL }},
+			{ "Function Code", "saphdb.message_buffer.segment.functioncode", FT_INT16, BASE_DEC, VALS(saphdb_segment_functioncode_vals), 0x0, "SAP HDB Segment Function Code", HFILL }},
 	};
 
 	/* Setup protocol subtree array */
