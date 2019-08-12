@@ -22,8 +22,8 @@
 import sys
 import unittest
 # External imports
-from pysap.SAPHDB import SAPHDB
 from scapy.all import Ether, IP, TCP
+from pysap.SAPHDB import SAPHDB, SAPHDBSegment
 # Custom imports
 from basetestcase import WiresharkTestCase
 
@@ -32,7 +32,9 @@ class WiresharkSAPHDBTestCase(WiresharkTestCase):
 
     def test_saphdb_dissection(self):
         """Test dissection of a basic SAP HDB packet. """
-        pkt = Ether()/IP()/TCP(dport=30013)/SAPHDB()
+        pkt = Ether()/IP()/TCP(dport=30013)
+        pkt /= SAPHDB(segments=[SAPHDBSegment(segmentkind=1),
+                                SAPHDBSegment(segmentkind=2)])
         pkt.show2()
 
         packet = self.get_capture(pkt)[0]
@@ -41,7 +43,7 @@ class WiresharkSAPHDBTestCase(WiresharkTestCase):
         self.assertIn('saphdb', packet)
         self.assertIn('message_header', dir(packet['saphdb']))
         print(packet["saphdb"].field_names)
-        self.assertEqual(packet["saphdb"].message_header_varpartlength, "0")
+        self.assertEqual(packet["saphdb"].message_header_varpartlength, "48")
 
 
 def suite():
