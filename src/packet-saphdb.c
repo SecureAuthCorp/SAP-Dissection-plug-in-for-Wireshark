@@ -42,6 +42,9 @@ static int hf_saphdb_message_header_varpartsize = -1;
 static int hf_saphdb_message_header_noofsegm = -1;
 static int hf_saphdb_message_header_packetoptions = -1;
 static int hf_saphdb_message_header_compressionvarpartlength = -1;
+/* SAP HDB Segment items */
+static int hf_saphdb_segment = -1;
+static int hf_saphdb_segment_header = -1;
 
 
 static gint ett_saphdb = -1;
@@ -61,6 +64,17 @@ static int
 dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_, guint32 offset)
 {
 	guint32 length = 0;
+	proto_item *segment = NULL;
+	proto_tree *segment_tree = NULL;
+
+	/* Add the Segment subtree */
+	segment = proto_tree_add_item(tree, hf_saphdb_segment, tvb, offset, 13, ENC_NA);
+	segment_tree = proto_item_add_subtree(segment, ett_saphdb);
+
+
+
+	/* TODO: Adjust the item tree length */
+	length = 13;
 
 	return length;
 }
@@ -77,31 +91,31 @@ dissect_saphdb(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
   /* we are being asked for details and the length is sufficient at least for the header */
 	if (tree && tvb_reported_length(tvb) >= 32) {
 
-		guint16 noofsegm = 0, segm = 0;  // This should be gint16
+		guint16 noofsegm = 0;  // This should be gint16
 		guint32 offset = 0;
 		guint32 varpartlength = 0, varpartsize = 0;  // This should be gint32
-		proto_item *ti = NULL, *saphdb_message_header = NULL;
-		proto_tree *saphdb_tree = NULL, *saphdb_message_header_tree = NULL;
+		proto_item *ti = NULL, *message_header = NULL;
+		proto_tree *saphdb_tree = NULL, *message_header_tree = NULL;
 
 		/* Add the main saphdb subtree */
 		ti = proto_tree_add_item(tree, proto_saphdb, tvb, 0, -1, ENC_NA);
 		saphdb_tree = proto_item_add_subtree(ti, ett_saphdb);
 
 		/* Add the Message Header subtree */
-		saphdb_message_header = proto_tree_add_item(saphdb_tree, hf_saphdb_message_header, tvb, offset, 32, ENC_NA);
-		saphdb_message_header_tree = proto_item_add_subtree(saphdb_message_header, ett_saphdb);
+		message_header = proto_tree_add_item(saphdb_tree, hf_saphdb_message_header, tvb, offset, 32, ENC_NA);
+		message_header_tree = proto_item_add_subtree(message_header, ett_saphdb);
 
 		/* Add the Message Header fields */
-		proto_tree_add_item(saphdb_message_header_tree, hf_saphdb_message_header_sessionid, tvb, offset, 8, ENC_LITTLE_ENDIAN); offset += 8;
-		proto_tree_add_item(saphdb_message_header_tree, hf_saphdb_message_header_packetcount, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
+		proto_tree_add_item(message_header_tree, hf_saphdb_message_header_sessionid, tvb, offset, 8, ENC_LITTLE_ENDIAN); offset += 8;
+		proto_tree_add_item(message_header_tree, hf_saphdb_message_header_packetcount, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
 		varpartlength = tvb_get_guint32(tvb, offset, ENC_LITTLE_ENDIAN);
-		proto_tree_add_item(saphdb_message_header_tree, hf_saphdb_message_header_varpartlength, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
-		proto_tree_add_item(saphdb_message_header_tree, hf_saphdb_message_header_varpartsize, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
+		proto_tree_add_item(message_header_tree, hf_saphdb_message_header_varpartlength, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
+		proto_tree_add_item(message_header_tree, hf_saphdb_message_header_varpartsize, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
 		noofsegm = tvb_get_letohs(tvb, offset);
-		proto_tree_add_item(saphdb_message_header_tree, hf_saphdb_message_header_noofsegm, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2;
-		proto_tree_add_item(saphdb_message_header_tree, hf_saphdb_message_header_packetoptions, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1;
+		proto_tree_add_item(message_header_tree, hf_saphdb_message_header_noofsegm, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2;
+		proto_tree_add_item(message_header_tree, hf_saphdb_message_header_packetoptions, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1;
 		offset += 1;  /* Reserved1 field */
-		proto_tree_add_item(saphdb_message_header_tree, hf_saphdb_message_header_compressionvarpartlength, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
+		proto_tree_add_item(message_header_tree, hf_saphdb_message_header_compressionvarpartlength, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
 		offset += 4;  /* Reserved2 field */
 
 		if (tvb_reported_length_remaining(tvb, offset) != varpartlength) {
@@ -110,12 +124,9 @@ dissect_saphdb(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 		}
 
 		/* Iterate over the segments and dissect them */
-		for (segm = 0; segm < noofsegm && tvb_reported_length_remaining(tvb, offset) >= 13; segm++) {
-			guint32 segm_length = 0;
-
-			segm_length = dissect_saphdb_segment(tvb, pinfo, tree, NULL, offset);
-
-			offset += segm_length;
+		while (noofsegm > 0 && tvb_reported_length_remaining(tvb, offset) >= 13) {
+			offset += dissect_saphdb_segment(tvb, pinfo, message_header_tree, NULL, offset);
+			noofsegm--;
 		}
 
 	}
@@ -144,6 +155,11 @@ proto_register_saphdb(void)
 			{ "Packet Options", "saphdb.message_header.packetoptions", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Packet Options", HFILL }},
 		{ &hf_saphdb_message_header_compressionvarpartlength,
 			{ "Compression Var Part Length", "saphdb.message_header.compressionvarpartlength", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Compression Var Part Length", HFILL }},
+		/* Segment items */
+		{ &hf_saphdb_segment,
+			{ "Segment", "saphdb.segment", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Segment", HFILL }},
+		{ &hf_saphdb_segment_header,
+			{ "Segment Header", "saphdb.segment.header", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Segment Header", HFILL }},
 	};
 
 	/* Setup protocol subtree array */
