@@ -44,7 +44,15 @@ static int hf_saphdb_message_header_packetoptions = -1;
 static int hf_saphdb_message_header_compressionvarpartlength = -1;
 /* SAP HDB Segment items */
 static int hf_saphdb_segment = -1;
-static int hf_saphdb_segment_header = -1;
+static int hf_saphdb_segment_segmentlength = -1;
+static int hf_saphdb_segment_segmentofs = -1;
+static int hf_saphdb_segment_noofparts = -1;
+static int hf_saphdb_segment_segmentno = -1;
+static int hf_saphdb_segment_segmentkind = -1;
+static int hf_saphdb_segment_messagetype = -1;
+static int hf_saphdb_segment_commit = -1;
+static int hf_saphdb_segment_commandoptions = -1;
+static int hf_saphdb_segment_functioncode = -1;
 
 
 static gint ett_saphdb = -1;
@@ -63,7 +71,10 @@ void proto_reg_handoff_saphdb(void);
 static int
 dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_, guint32 offset)
 {
+	guint8 segmentkind = 0;  // XXX: This should be a gint8
+	guint16 noofparts = 0, segmentno = 0;  // XXX: This should be a gint16
 	guint32 length = 0;
+	guint32 segmentlength = 0;  // XXX: This should be a gint32
 	proto_item *segment = NULL;
 	proto_tree *segment_tree = NULL;
 
@@ -71,10 +82,33 @@ dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 	segment = proto_tree_add_item(tree, hf_saphdb_segment, tvb, offset, 13, ENC_NA);
 	segment_tree = proto_item_add_subtree(segment, ett_saphdb);
 
+	/* Add the Segment fields */
+	segmentlength = tvb_get_guint32(tvb, offset, ENC_LITTLE_ENDIAN);
+	proto_tree_add_item(segment_tree, hf_saphdb_segment_segmentlength, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length += 4;
+	proto_tree_add_item(segment_tree, hf_saphdb_segment_segmentofs, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length += 4;
+	noofparts = tvb_get_letohs(tvb, offset);
+	proto_tree_add_item(segment_tree, hf_saphdb_segment_noofparts, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; length += 2;
+	segmentno = tvb_get_letohs(tvb, offset);
+	proto_tree_add_item(segment_tree, hf_saphdb_segment_segmentno, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; length += 2;
+	segmentkind = tvb_get_guint8(tvb, offset);
+	proto_tree_add_item(segment_tree, hf_saphdb_segment_segmentkind, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
 
+	/* Add additional fields according to the segment kind*/
+	switch (segmentkind) {
+		case 1: /* Request */
+			break;
+		case 2: /* Reply */
+			proto_tree_add_item(segment_tree, hf_saphdb_segment_messagetype, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
+			proto_tree_add_item(segment_tree, hf_saphdb_segment_commit, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
+			proto_tree_add_item(segment_tree, hf_saphdb_segment_commandoptions, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
+			offset += 9; length += 9;
+			proto_tree_add_item(segment_tree, hf_saphdb_segment_functioncode, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; length += 2;
+			offset += 8; length += 8;
+			break;
+	}
 
-	/* TODO: Adjust the item tree length */
-	length = 13;
+	/* Adjust the item tree length */
+	proto_item_set_len(segment_tree, length);
 
 	return length;
 }
@@ -91,9 +125,9 @@ dissect_saphdb(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
   /* we are being asked for details and the length is sufficient at least for the header */
 	if (tree && tvb_reported_length(tvb) >= 32) {
 
-		guint16 noofsegm = 0;  // This should be gint16
+		guint16 noofsegm = 0;  // XXX: This should be gint16
 		guint32 offset = 0;
-		guint32 varpartlength = 0, varpartsize = 0;  // This should be gint32
+		guint32 varpartlength = 0, varpartsize = 0;  // XXX: This should be gint32
 		proto_item *ti = NULL, *message_header = NULL;
 		proto_tree *saphdb_tree = NULL, *message_header_tree = NULL;
 
@@ -158,8 +192,24 @@ proto_register_saphdb(void)
 		/* Segment items */
 		{ &hf_saphdb_segment,
 			{ "Segment", "saphdb.segment", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Segment", HFILL }},
-		{ &hf_saphdb_segment_header,
-			{ "Segment Header", "saphdb.segment.header", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Segment Header", HFILL }},
+		{ &hf_saphdb_segment_segmentlength,
+			{ "Segment Length", "saphdb.segment.length", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Segment Length", HFILL }},
+		{ &hf_saphdb_segment_segmentofs,
+			{ "Segment Offset", "saphdb.segment.offset", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Segment Offset", HFILL }},
+		{ &hf_saphdb_segment_noofparts,
+			{ "Number of Parts", "saphdb.segment.noofparts", FT_INT16, BASE_DEC, NULL, 0x0, "SAP HDB Segment Number of Parts", HFILL }},
+		{ &hf_saphdb_segment_segmentno,
+			{ "Segment Number", "saphdb.segment.segmentno", FT_INT16, BASE_DEC, NULL, 0x0, "SAP HDB Segment Number", HFILL }},
+		{ &hf_saphdb_segment_segmentkind,
+			{ "Segment Kind", "saphdb.segment.kind", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Segment Kind", HFILL }},
+		{ &hf_saphdb_segment_messagetype,
+			{ "Message Type", "saphdb.segment.messagetype", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Segment Message Type", HFILL }},
+		{ &hf_saphdb_segment_commit,
+			{ "Commit", "saphdb.segment.commit", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Segment Commit", HFILL }},
+		{ &hf_saphdb_segment_commandoptions,
+			{ "Command Options", "saphdb.segment.commandoptions", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Segment Command Options", HFILL }},
+		{ &hf_saphdb_segment_functioncode,
+			{ "Function Code", "saphdb.segment.functioncode", FT_INT16, BASE_DEC, NULL, 0x0, "SAP HDB Segment Function Code", HFILL }},
 	};
 
 	/* Setup protocol subtree array */
