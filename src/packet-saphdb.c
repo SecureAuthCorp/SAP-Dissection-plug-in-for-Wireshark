@@ -118,6 +118,68 @@ static const value_string saphdb_segment_functioncode_vals[] = {
 };
 
 
+/* SAP HDB Part Kind values */
+static const value_string saphdb_part_partkind_vals[] = {
+	{ 0, "NIL" },
+	{ 3, "COMMAND" },
+	{ 5, "RESULTSET" },
+	{ 6, "ERROR" },
+	{ 10, "STATEMENTID" },
+	{ 11, "TRANSACTIONID" },
+	{ 12, "ROWSAFFECTED" },
+	{ 13, "RESULTSETID" },
+	{ 15, "TOPOLOGYINFORMATION" },
+	{ 16, "TABLELOCATION" },
+	{ 17, "READLOBREQUEST" },
+	{ 18, "READLOBREPLY" },
+	{ 25, "ABAPISTREAM" },
+	{ 26, "ABAPOSTREAM" },
+	{ 27, "COMMANDINFO" },
+	{ 28, "WRITELOBREQUEST" },
+	{ 29, "CLIENTCONTEXT" },
+	{ 30, "WRITELOBREPLY" },
+	{ 32, "PARAMETERS" },
+	{ 33, "AUTHENTICATION" },
+	{ 34, "SESSIONCONTEXT" },
+	{ 35, "CLIENTID" },
+	{ 38, "PROFILE" },
+	{ 39, "STATEMENTCONTEXT" },
+	{ 40, "PARTITIONINFORMATION" },
+	{ 41, "OUTPUTPARAMETERS" },
+	{ 42, "CONNECTOPTIONS" },
+	{ 43, "COMMITOPTIONS" },
+	{ 44, "FETCHOPTIONS" },
+	{ 45, "FETCHSIZE" },
+	{ 47, "PARAMETERMETADATA" },
+	{ 48, "RESULTSETMETADATA" },
+	{ 49, "FINDLOBREQUEST" },
+	{ 50, "FINDLOBREPLY" },
+	{ 51, "ITABSHM" },
+	{ 53, "ITABCHUNKMETADATA" },
+	{ 55, "ITABMETADATA" },
+	{ 56, "ITABRESULTCHUNK" },
+	{ 57, "CLIENTINFO" },
+	{ 58, "STREAMDATA" },
+	{ 59, "OSTREAMRESULT" },
+	{ 60, "FDAREQUESTMETADATA" },
+	{ 61, "FDAREPLYMETADATA" },
+	{ 62, "BATCHPREPARE" },
+	{ 63, "BATCHEXECUTE" },
+	{ 64, "TRANSACTIONFLAGS" },
+	{ 65, "ROWSLOTIMAGEPARAMMETADATA" },
+	{ 66, "ROWSLOTIMAGERESULTSET" },
+	{ 67, "DBCONNECTINFO" },
+	{ 68, "LOBFLAGS" },
+	{ 69, "RESULTSETOPTIONS" },
+	{ 70, "XATRANSACTIONINFO" },
+	{ 71, "SESSIONVARIABLE" },
+	{ 72, "WORKLOADREPLAYCONTEXT" },
+	{ 73, "SQLREPLYOTIONS" },
+	/* NULL */
+	{ 0x00, NULL }
+};
+
+
 static int proto_saphdb = -1;
 
 /* SAP HDB Message Header items */
@@ -143,6 +205,19 @@ static int hf_saphdb_segment_messagetype = -1;
 static int hf_saphdb_segment_commit = -1;
 static int hf_saphdb_segment_commandoptions = -1;
 static int hf_saphdb_segment_functioncode = -1;
+/* SAP HDB Segment Buffer items */
+static int hf_saphdb_segment_buffer = -1;
+
+/* SAP HDB Part items */
+static int hf_saphdb_part = -1;
+static int hf_saphdb_partkind = -1;
+static int hf_saphdb_partattributes = -1;
+static int hf_saphdb_argumentcount = -1;
+static int hf_saphdb_bigargumentcount = -1;
+static int hf_saphdb_bufferlength = -1;
+static int hf_saphdb_buffersize = -1;
+/* SAP HDB Part Buffer items */
+static int hf_saphdb_part_buffer = -1;
 
 
 static gint ett_saphdb = -1;
@@ -218,7 +293,7 @@ dissect_saphdb(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 	/* Clear out stuff in the info column */
 	col_clear(pinfo->cinfo,COL_INFO);
 
-  /* we are being asked for details and the length is sufficient at least for the header */
+	/* we are being asked for details and the length is sufficient at least for the header */
 	if (tree && tvb_reported_length(tvb) >= 32) {
 
 		guint16 noofsegm = 0, nosegment = 0;  // XXX: This should be gint16
@@ -278,45 +353,69 @@ proto_register_saphdb(void)
 		{ &hf_saphdb_message_header,
 			{ "Message Header", "saphdb.message_header", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Message Header", HFILL }},
 		{ &hf_saphdb_message_header_sessionid,
-			{ "Session ID", "saphdb.message_header.sessionid", FT_INT64, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Session ID", HFILL }},
+			{ "Session ID", "saphdb.sessionid", FT_INT64, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Session ID", HFILL }},
 		{ &hf_saphdb_message_header_packetcount,
-			{ "Packet Count", "saphdb.message_header.packetcount", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Packet Count", HFILL }},
+			{ "Packet Count", "saphdb.packetcount", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Packet Count", HFILL }},
 		{ &hf_saphdb_message_header_varpartlength,
-			{ "Var Part Length", "saphdb.message_header.varpartlength", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Var Part Length", HFILL }},
+			{ "Var Part Length", "saphdb.varpartlength", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Var Part Length", HFILL }},
 		{ &hf_saphdb_message_header_varpartsize,
-			{ "Var Part Size", "saphdb.message_header.varpartsize", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Var Part Size", HFILL }},
+			{ "Var Part Size", "saphdb.varpartsize", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Var Part Size", HFILL }},
 		{ &hf_saphdb_message_header_noofsegm,
-			{ "Number of Segments", "saphdb.message_header.noofsegm", FT_INT16, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Number of Segments", HFILL }},
+			{ "Number of Segments", "saphdb.noofsegm", FT_INT16, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Number of Segments", HFILL }},
 		{ &hf_saphdb_message_header_packetoptions,
-			{ "Packet Options", "saphdb.message_header.packetoptions", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Packet Options", HFILL }},
+			{ "Packet Options", "saphdb.packetoptions", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Packet Options", HFILL }},
 		{ &hf_saphdb_message_header_compressionvarpartlength,
-			{ "Compression Var Part Length", "saphdb.message_header.compressionvarpartlength", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Compression Var Part Length", HFILL }},
+			{ "Compression Var Part Length", "saphdb.compressionvarpartlength", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Compression Var Part Length", HFILL }},
 
 		/* Message Buffer items */
 		{ &hf_saphdb_message_buffer,
-			{ "Message Buffer", "saphdb.message_buffer", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Message Buffer", HFILL }},
+			{ "Message Buffer", "saphdb.buffer", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Message Buffer", HFILL }},
 
 		/* Segment items */
 		{ &hf_saphdb_segment,
-			{ "Segment", "saphdb.message_buffer.segment", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Segment", HFILL }},
+			{ "Segment", "saphdb.segment", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Segment", HFILL }},
 		{ &hf_saphdb_segment_segmentlength,
-			{ "Segment Length", "saphdb.message_buffer.segment.length", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Segment Length", HFILL }},
+			{ "Segment Length", "saphdb.segment.length", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Segment Length", HFILL }},
 		{ &hf_saphdb_segment_segmentofs,
-			{ "Segment Offset", "saphdb.message_buffer.segment.offset", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Segment Offset", HFILL }},
+			{ "Segment Offset", "saphdb.segment.offset", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Segment Offset", HFILL }},
 		{ &hf_saphdb_segment_noofparts,
-			{ "Number of Parts", "saphdb.message_buffer.segment.noofparts", FT_INT16, BASE_DEC, NULL, 0x0, "SAP HDB Segment Number of Parts", HFILL }},
+			{ "Number of Parts", "saphdb.segment.noofparts", FT_INT16, BASE_DEC, NULL, 0x0, "SAP HDB Segment Number of Parts", HFILL }},
 		{ &hf_saphdb_segment_segmentno,
-			{ "Segment Number", "saphdb.message_buffer.segment.segmentno", FT_INT16, BASE_DEC, NULL, 0x0, "SAP HDB Segment Number", HFILL }},
+			{ "Segment Number", "saphdb.segment.segmentno", FT_INT16, BASE_DEC, NULL, 0x0, "SAP HDB Segment Number", HFILL }},
 		{ &hf_saphdb_segment_segmentkind,
-			{ "Segment Kind", "saphdb.message_buffer.segment.kind", FT_INT8, BASE_DEC, VALS(saphdb_segment_segmentkind_vals), 0x0, "SAP HDB Segment Kind", HFILL }},
+			{ "Segment Kind", "saphdb.segment.kind", FT_INT8, BASE_DEC, VALS(saphdb_segment_segmentkind_vals), 0x0, "SAP HDB Segment Kind", HFILL }},
 		{ &hf_saphdb_segment_messagetype,
-			{ "Message Type", "saphdb.message_buffer.segment.messagetype", FT_INT8, BASE_DEC, VALS(saphdb_segment_messagetype_vals), 0x0, "SAP HDB Segment Message Type", HFILL }},
+			{ "Message Type", "saphdb.segment.messagetype", FT_INT8, BASE_DEC, VALS(saphdb_segment_messagetype_vals), 0x0, "SAP HDB Segment Message Type", HFILL }},
 		{ &hf_saphdb_segment_commit,
-			{ "Commit", "saphdb.message_buffer.segment.commit", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Segment Commit", HFILL }},
+			{ "Commit", "saphdb.segment.commit", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Segment Commit", HFILL }},
 		{ &hf_saphdb_segment_commandoptions,
-			{ "Command Options", "saphdb.message_buffer.segment.commandoptions", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Segment Command Options", HFILL }},
+			{ "Command Options", "saphdb.segment.commandoptions", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Segment Command Options", HFILL }},
 		{ &hf_saphdb_segment_functioncode,
-			{ "Function Code", "saphdb.message_buffer.segment.functioncode", FT_INT16, BASE_DEC, VALS(saphdb_segment_functioncode_vals), 0x0, "SAP HDB Segment Function Code", HFILL }},
+			{ "Function Code", "saphdb.segment.functioncode", FT_INT16, BASE_DEC, VALS(saphdb_segment_functioncode_vals), 0x0, "SAP HDB Segment Function Code", HFILL }},
+
+		/* Segment Buffer items */
+		{ &hf_saphdb_segment_buffer,
+			{ "Segment Buffer", "saphdb.segment.buffer", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Segment Buffer", HFILL }},
+
+		/* Part items */
+		{ &hf_saphdb_part,
+			{ "Part", "saphdb.segment.part", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Part", HFILL }},
+		{ &hf_saphdb_partkind,
+			{ "Part Kind", "saphdb.segment.part.partkind", FT_INT8, BASE_DEC, VALS(saphdb_part_partkind_vals), 0x0, "SAP HDB Part Kind", HFILL }},
+		{ &hf_saphdb_partattributes,
+			{ "Part Attributes", "saphdb.segment.part.partattributes", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Part Attributes", HFILL }},
+		{ &hf_saphdb_argumentcount,
+			{ "Argument Count", "saphdb.segment.part.argumentcount", FT_INT16, BASE_DEC, NULL, 0x0, "SAP HDB Part Argument Count", HFILL }},
+		{ &hf_saphdb_bigargumentcount,
+			{ "Big Argument Count", "saphdb.segment.part.bigargumentcount", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Part Big Argument Count", HFILL }},
+		{ &hf_saphdb_bufferlength,
+			{ "Buffer Length", "saphdb.segment.part.bufferlength", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Part Buffer Length", HFILL }},
+		{ &hf_saphdb_buffersize,
+			{ "Buffer Size", "saphdb.segment.part.buffersize", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Part Buffer Size", HFILL }},
+
+		/* Part Buffer items */
+		{ &hf_saphdb_part_buffer,
+			{ "Part Buffer", "saphdb.segment.part.buffer", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Part Buffer", HFILL }},
 	};
 
 	/* Setup protocol subtree array */
