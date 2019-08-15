@@ -210,12 +210,12 @@ static int hf_saphdb_segment_buffer = -1;
 
 /* SAP HDB Part items */
 static int hf_saphdb_part = -1;
-static int hf_saphdb_partkind = -1;
-static int hf_saphdb_partattributes = -1;
-static int hf_saphdb_argumentcount = -1;
-static int hf_saphdb_bigargumentcount = -1;
-static int hf_saphdb_bufferlength = -1;
-static int hf_saphdb_buffersize = -1;
+static int hf_saphdb_part_partkind = -1;
+static int hf_saphdb_part_partattributes = -1;
+static int hf_saphdb_part_argumentcount = -1;
+static int hf_saphdb_part_bigargumentcount = -1;
+static int hf_saphdb_part_bufferlength = -1;
+static int hf_saphdb_part_buffersize = -1;
 /* SAP HDB Part Buffer items */
 static int hf_saphdb_part_buffer = -1;
 
@@ -234,14 +234,52 @@ void proto_reg_handoff_saphdb(void);
 
 
 static int
+dissect_saphdb_part(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_, guint32 offset, guint16 noofparts, guint16 nopart)
+{
+	guint8 partkind = 0;
+	guint32 length = 0, bufferlength = 0;
+	proto_item *part = NULL, *part_buffer = NULL;
+	proto_tree *part_tree = NULL, *part_buffer_tree = NULL;
+
+	/* Add the Part subtree */
+	part = proto_tree_add_item(tree, hf_saphdb_part, tvb, offset, 16, ENC_NA);
+	part_tree = proto_item_add_subtree(part, ett_saphdb);
+	proto_item_append_text(part, " (%d/%d)", nopart, noofparts);
+
+	/* Add the Part fields */
+	partkind = tvb_get_guint8(tvb, offset);
+	proto_tree_add_item(part_tree, hf_saphdb_part_partkind, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
+	proto_tree_add_item(part_tree, hf_saphdb_part_partattributes, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
+	proto_tree_add_item(part_tree, hf_saphdb_part_argumentcount, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length += 4;
+	proto_tree_add_item(part_tree, hf_saphdb_part_bigargumentcount, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length += 4;
+	bufferlength = tvb_get_guint32(tvb, offset, ENC_LITTLE_ENDIAN);
+	proto_tree_add_item(part_tree, hf_saphdb_part_bufferlength, tvb, offset, 4, ENC_BIG_ENDIAN); offset += 4; length += 4;
+	proto_tree_add_item(part_tree, hf_saphdb_part_buffersize, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length += 4;
+
+	if (tvb_reported_length_remaining(tvb, offset) < bufferlength) {
+		/* TODO: Expert report as the part buffer length is invalid */
+		bufferlength = tvb_reported_length_remaining(tvb, offset);
+	}
+
+	proto_tree_add_item(part_tree, hf_saphdb_part_buffer, tvb, offset, bufferlength, ENC_NA);
+	offset += bufferlength; length += bufferlength;
+
+	/* Adjust the item tree length */
+	proto_item_set_len(part_tree, length);
+
+	return length;
+}
+
+
+static int
 dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_, guint32 offset, guint16 noofsegm, guint16 nosegment)
 {
 	guint8 segmentkind = 0;  // XXX: This should be a gint8
-	guint16 noofparts = 0, segmentno = 0;  // XXX: This should be a gint16
-	guint32 length = 0;
+	guint16 noofparts = 0, segmentno = 0, nopart = 0;  // XXX: This should be a gint16
+	guint32 length = 0, part_length = 0;
 	guint32 segmentlength = 0;  // XXX: This should be a gint32
-	proto_item *segment = NULL;
-	proto_tree *segment_tree = NULL;
+	proto_item *segment = NULL, *segment_buffer = NULL;
+	proto_tree *segment_tree = NULL, *segment_buffer_tree = NULL;
 
 	/* Add the Segment subtree */
 	segment = proto_tree_add_item(tree, hf_saphdb_segment, tvb, offset, 13, ENC_NA);
@@ -276,6 +314,20 @@ dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 			proto_tree_add_item(segment_tree, hf_saphdb_segment_functioncode, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; length += 2;
 			offset += 8; length += 8; // Reserved3 field
 			break;
+	}
+
+	if (noofparts < 0) {
+		/* TODO: Expert report as the number of parts is incorrect */
+	}
+
+	/* Add the Segment Buffer subtree */
+	segment_buffer = proto_tree_add_item(segment_tree, hf_saphdb_segment_buffer, tvb, offset, segmentlength - length, ENC_NA);
+	segment_buffer_tree = proto_item_add_subtree(segment_buffer, ett_saphdb);
+
+	/* Iterate over the parts and dissect them */
+	for (nopart = 1; nopart > 0 && nopart <= noofparts && tvb_reported_length_remaining(tvb, offset) >= 16; nopart++) {
+		part_length = dissect_saphdb_part(tvb, pinfo, segment_buffer_tree, NULL, offset, noofparts, nopart);
+		offset += part_length; length += part_length;
 	}
 
 	/* Adjust the item tree length */
@@ -400,17 +452,17 @@ proto_register_saphdb(void)
 		/* Part items */
 		{ &hf_saphdb_part,
 			{ "Part", "saphdb.segment.part", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Part", HFILL }},
-		{ &hf_saphdb_partkind,
+		{ &hf_saphdb_part_partkind,
 			{ "Part Kind", "saphdb.segment.part.partkind", FT_INT8, BASE_DEC, VALS(saphdb_part_partkind_vals), 0x0, "SAP HDB Part Kind", HFILL }},
-		{ &hf_saphdb_partattributes,
+		{ &hf_saphdb_part_partattributes,
 			{ "Part Attributes", "saphdb.segment.part.partattributes", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Part Attributes", HFILL }},
-		{ &hf_saphdb_argumentcount,
+		{ &hf_saphdb_part_argumentcount,
 			{ "Argument Count", "saphdb.segment.part.argumentcount", FT_INT16, BASE_DEC, NULL, 0x0, "SAP HDB Part Argument Count", HFILL }},
-		{ &hf_saphdb_bigargumentcount,
+		{ &hf_saphdb_part_bigargumentcount,
 			{ "Big Argument Count", "saphdb.segment.part.bigargumentcount", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Part Big Argument Count", HFILL }},
-		{ &hf_saphdb_bufferlength,
+		{ &hf_saphdb_part_bufferlength,
 			{ "Buffer Length", "saphdb.segment.part.bufferlength", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Part Buffer Length", HFILL }},
-		{ &hf_saphdb_buffersize,
+		{ &hf_saphdb_part_buffersize,
 			{ "Buffer Size", "saphdb.segment.part.buffersize", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Part Buffer Size", HFILL }},
 
 		/* Part Buffer items */
