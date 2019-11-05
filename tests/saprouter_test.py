@@ -19,6 +19,7 @@
 # ==============
 
 # Standard imports
+import sys
 import unittest
 # External imports
 from pysap.SAPNI import SAPNI
@@ -185,4 +186,6 @@ def suite():
 
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(suite())
+    test_runner = unittest.TextTestRunner(verbosity=2, resultclass=unittest.TextTestResult)
+    result = test_runner.run(suite())
+    sys.exit(not result.wasSuccessful())
