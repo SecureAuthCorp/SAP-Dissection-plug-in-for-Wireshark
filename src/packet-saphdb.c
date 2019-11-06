@@ -250,7 +250,7 @@ dissect_saphdb_part(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *d
 	partkind = tvb_get_guint8(tvb, offset);
 	proto_tree_add_item(part_tree, hf_saphdb_part_partkind, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
 	proto_tree_add_item(part_tree, hf_saphdb_part_partattributes, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
-	proto_tree_add_item(part_tree, hf_saphdb_part_argumentcount, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length += 4;
+	proto_tree_add_item(part_tree, hf_saphdb_part_argumentcount, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; length += 2;
 	proto_tree_add_item(part_tree, hf_saphdb_part_bigargumentcount, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length += 4;
 	bufferlength = tvb_get_guint32(tvb, offset, ENC_LITTLE_ENDIAN);
 	proto_tree_add_item(part_tree, hf_saphdb_part_bufferlength, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length += 4;
