@@ -182,6 +182,14 @@ static const value_string saphdb_part_partkind_vals[] = {
 
 static int proto_saphdb = -1;
 
+/* SAP HDB Initialization items */
+static int hf_saphdb_initialization_request = -1;
+static int hf_saphdb_initialization_reply = -1;
+static int hf_saphdb_initialization_reply_product_version_major = -1;
+static int hf_saphdb_initialization_reply_product_version_minor = -1;
+static int hf_saphdb_initialization_reply_protocol_version_major = -1;
+static int hf_saphdb_initialization_reply_protocol_version_minor = -1;
+
 /* SAP HDB Message Header items */
 static int hf_saphdb_message_header = -1;
 static int hf_saphdb_message_header_sessionid = -1;
@@ -346,7 +354,15 @@ dissect_saphdb(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 	col_clear(pinfo->cinfo,COL_INFO);
 
 	/* we are being asked for details */
-	if (tree) {
+	if (tree && (tvb_reported_length(tvb) == 8 || tvb_reported_length(tvb) == 14 || tvb_reported_length(tvb) >= 32)) {
+
+		proto_item *ti = NULL;
+		proto_tree *saphdb_tree = NULL;
+
+		/* Add the main saphdb subtree */
+		ti = proto_tree_add_item(tree, proto_saphdb, tvb, 0, -1, ENC_NA);
+		saphdb_tree = proto_item_add_subtree(ti, ett_saphdb);
+
 
 		/* Initialization Request message */
 		if (tvb_reported_length(tvb) == 14) {
@@ -362,12 +378,8 @@ dissect_saphdb(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 			guint16 noofsegm = 0, nosegment = 0;  // XXX: This should be gint16
 			guint32 offset = 0;
 			guint32 varpartlength = 0, varpartsize = 0;  // XXX: This should be gint32
-			proto_item *ti = NULL, *message_header = NULL, *message_buffer = NULL;
-			proto_tree *saphdb_tree = NULL, *message_header_tree = NULL, *message_buffer_tree = NULL;
-
-			/* Add the main saphdb subtree */
-			ti = proto_tree_add_item(tree, proto_saphdb, tvb, 0, -1, ENC_NA);
-			saphdb_tree = proto_item_add_subtree(ti, ett_saphdb);
+			proto_item *message_header = NULL, *message_buffer = NULL;
+			proto_tree *message_header_tree = NULL, *message_buffer_tree = NULL;
 
 			/* Add the Message Header subtree */
 			message_header = proto_tree_add_item(saphdb_tree, hf_saphdb_message_header, tvb, offset, 32, ENC_NA);
