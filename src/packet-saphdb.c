@@ -356,27 +356,37 @@ dissect_saphdb(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 	/* we are being asked for details */
 	if (tree && (tvb_reported_length(tvb) == 8 || tvb_reported_length(tvb) == 14 || tvb_reported_length(tvb) >= 32)) {
 
+		guint32 offset = 0;
 		proto_item *ti = NULL;
 		proto_tree *saphdb_tree = NULL;
 
 		/* Add the main saphdb subtree */
-		ti = proto_tree_add_item(tree, proto_saphdb, tvb, 0, -1, ENC_NA);
+		ti = proto_tree_add_item(tree, proto_saphdb, tvb, offset, -1, ENC_NA);
 		saphdb_tree = proto_item_add_subtree(ti, ett_saphdb);
 
 
 		/* Initialization Request message */
 		if (tvb_reported_length(tvb) == 14) {
-
+			proto_tree_add_item(saphdb_tree, hf_saphdb_initialization_request, tvb, offset, 14, ENC_NA); offset += 14;
 
 		/* Initialization Reply message */
 		} else if (tvb_reported_length(tvb) == 8) {
+			proto_item *initialization_reply = NULL;
+			proto_tree *initialization_reply_tree = NULL;
 
+			/* Add the Initialiation Reply subtree */
+			initialization_reply = proto_tree_add_item(saphdb_tree, hf_saphdb_initialization_reply, tvb, offset, 8, ENC_NA);
+			initialization_reply_tree = proto_item_add_subtree(initialization_reply, ett_saphdb);
+
+			proto_tree_add_item(initialization_reply_tree, hf_saphdb_initialization_reply_product_version_major, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1;
+			proto_tree_add_item(initialization_reply_tree, hf_saphdb_initialization_reply_product_version_minor, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2;
+			proto_tree_add_item(initialization_reply_tree, hf_saphdb_initialization_reply_protocol_version_major, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1;
+			proto_tree_add_item(initialization_reply_tree, hf_saphdb_initialization_reply_protocol_version_minor, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2;
 
 		/* All other message types */
 		} else if (tvb_reported_length(tvb) >= 32) {
 
 			guint16 noofsegm = 0, nosegment = 0;  // XXX: This should be gint16
-			guint32 offset = 0;
 			guint32 varpartlength = 0, varpartsize = 0;  // XXX: This should be gint32
 			proto_item *message_header = NULL, *message_buffer = NULL;
 			proto_tree *message_header_tree = NULL, *message_buffer_tree = NULL;
@@ -426,6 +436,21 @@ void
 proto_register_saphdb(void)
 {
 	static hf_register_info hf[] = {
+		/* Initialization items */
+		{ &hf_saphdb_initialization_request,
+			{ "Initialization Request", "saphdb.init_request", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Initialization Request", HFILL }},
+
+		{ &hf_saphdb_initialization_reply,
+			{ "Initialization Reply", "saphdb.init_reply", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Initialization Reply", HFILL }},
+		{ &hf_saphdb_initialization_reply_product_version_major,
+			{ "Product Version Major", "saphdb.init_reply.product_version.major", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Initialization Reply Product Version Major", HFILL }},
+		{ &hf_saphdb_initialization_reply_product_version_minor,
+			{ "Product Version Minor", "saphdb.init_reply.product_version.minor", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP HDB Initialization Reply Product Version Minor", HFILL }},
+		{ &hf_saphdb_initialization_reply_protocol_version_major,
+			{ "Protocol Version Major", "saphdb.init_reply.protocol_version.major", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Initialization Reply Protocol Version Major", HFILL }},
+		{ &hf_saphdb_initialization_reply_protocol_version_minor,
+			{ "Protocol Version Minor", "saphdb.init_reply.protocol_version.minor", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP HDB Initialization Reply Protocol Version Minor", HFILL }},
+
 		/* Message Header items */
 		{ &hf_saphdb_message_header,
 			{ "Message Header", "saphdb.message_header", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Message Header", HFILL }},
