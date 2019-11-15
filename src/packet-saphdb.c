@@ -227,6 +227,11 @@ static int hf_saphdb_part_buffersize = -1;
 /* SAP HDB Part Buffer items */
 static int hf_saphdb_part_buffer = -1;
 
+/* SAP HDB Part Buffer AUTHENTICATE items */
+static int hf_saphdb_part_authentication_field_count = -1;
+static int hf_saphdb_part_authentication_field_length = -1;
+static int hf_saphdb_part_authentication_field_value = -1;
+
 
 static gint ett_saphdb = -1;
 
@@ -239,6 +244,48 @@ static range_t *global_saphdb_port_range;
 static dissector_handle_t saphdb_handle;
 
 void proto_reg_handoff_saphdb(void);
+
+
+static int
+dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset, guint32 length, guint8 partkind)
+{
+	guint8 field_short_length = 0;
+	guint16 field_count = 0, field_length = 0;
+
+	switch (partkind) {
+		case 33:  // AUTHENTICATION
+
+			/* Parse the field count */
+			field_count = tvb_get_guint16(tvb, offset, ENC_LITTLE_ENDIAN);
+			proto_tree_add_item(tree, hf_saphdb_part_authentication_field_count, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; length -= 2;
+
+			for (guint16 field = 0; field < field_count; field++) {
+
+				/* Parse the field length. If the first byte is 0xFF, the length is contained in the next 2 bytes */
+				field_short_length = tvb_get_guint8(tvb, offset);
+				if (field_short_length == 0xff) {
+					offset += 1; length -= 1;
+					field_length = tvb_get_guint16(tvb, offset, ENC_LITTLE_ENDIAN);
+					proto_tree_add_item(tree, hf_saphdb_part_authentication_field_length, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; length -= 2;
+				} else {
+					proto_tree_add_item(tree, hf_saphdb_part_authentication_field_length, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length -= 1;
+					field_length = field_short_length;
+				}
+
+				/* Add the field value */
+				proto_tree_add_item(tree, hf_saphdb_part_authentication_field_value, tvb, offset, field_length, ENC_NA); offset += field_length; length -= field_length;
+
+			}
+
+			offset += length;
+			break;
+
+		default:
+			offset += length;
+	}
+
+	return length;
+}
 
 
 static int
@@ -269,7 +316,11 @@ dissect_saphdb_part(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *d
 		bufferlength = tvb_reported_length_remaining(tvb, offset);
 	}
 
-	proto_tree_add_item(part_tree, hf_saphdb_part_buffer, tvb, offset, bufferlength, ENC_NA);
+  /* Add the part buffer tree and dissect it */
+	part_buffer = proto_tree_add_item(part_tree, hf_saphdb_part_buffer, tvb, offset, bufferlength, ENC_NA);
+	part_buffer_tree = proto_item_add_subtree(part_buffer, ett_saphdb);
+
+	dissect_saphdb_part_buffer(tvb, pinfo, part_buffer_tree, offset, bufferlength, partkind);
 	offset += bufferlength; length += bufferlength;
 
 	/* Adjust the item tree length */
@@ -521,6 +572,14 @@ proto_register_saphdb(void)
 		/* Part Buffer items */
 		{ &hf_saphdb_part_buffer,
 			{ "Part Buffer", "saphdb.segment.part.buffer", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Part Buffer", HFILL }},
+
+		/* Part Buffer AUTHENTICATION items */
+		{ &hf_saphdb_part_authentication_field_count,
+			{ "Field Count", "saphdb.segment.part.buffer.authentication.fieldcount", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP HDB AUTHENTICATION Field Count", HFILL }},
+		{ &hf_saphdb_part_authentication_field_length,
+			{ "Field Length", "saphdb.segment.part.buffer.authentication.fieldlength", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP HDB AUTHENTICATION Field Length", HFILL }},
+		{ &hf_saphdb_part_authentication_field_value,
+			{ "Field Value", "saphdb.segment.part.buffer.authentication.fieldvalue", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB AUTHENTICATION Field Value", HFILL }},
 	};
 
 	/* Setup protocol subtree array */
