@@ -322,6 +322,9 @@ dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 			proto_tree_add_item(segment_tree, hf_saphdb_segment_functioncode, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; length += 2;
 			offset += 8; length += 8; // Reserved3 field
 			break;
+		default: /* Error and other types */
+			offset += 11; length += 11; // Reserved or unused fields
+			break;
 	}
 
 	if (noofparts < 0) {
