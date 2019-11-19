@@ -316,6 +316,11 @@ dissect_saphdb_part(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *d
 		bufferlength = tvb_reported_length_remaining(tvb, offset);
 	}
 
+	/* Align the buffer length to 8 */
+	if (bufferlength % 8 != 0) {
+		bufferlength += 8 - bufferlength % 8;
+	}
+
   /* Add the part buffer tree and dissect it */
 	part_buffer = proto_tree_add_item(part_tree, hf_saphdb_part_buffer, tvb, offset, bufferlength, ENC_NA);
 	part_buffer_tree = proto_item_add_subtree(part_buffer, ett_saphdb);
