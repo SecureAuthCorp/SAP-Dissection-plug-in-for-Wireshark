@@ -311,14 +311,14 @@ dissect_saphdb_part(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *d
 	proto_tree_add_item(part_tree, hf_saphdb_part_bufferlength, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length += 4;
 	proto_tree_add_item(part_tree, hf_saphdb_part_buffersize, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length += 4;
 
-	if (tvb_reported_length_remaining(tvb, offset) < bufferlength) {
-		/* TODO: Expert report as the part buffer length is invalid */
-		bufferlength = tvb_reported_length_remaining(tvb, offset);
-	}
-
 	/* Align the buffer length to 8 */
 	if (bufferlength % 8 != 0) {
 		bufferlength += 8 - bufferlength % 8;
+	}
+
+	if (tvb_reported_length_remaining(tvb, offset) < bufferlength) {
+		/* TODO: Expert report as the part buffer length is invalid */
+		bufferlength = tvb_reported_length_remaining(tvb, offset);
 	}
 
   /* Add the part buffer tree and dissect it */
