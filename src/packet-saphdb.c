@@ -253,6 +253,12 @@ dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, 
 	guint16 field_count = 0, field_length = 0;
 
 	switch (partkind) {
+		case 29:  // CLIENTCONTEXT
+
+			
+			offset += length;
+			break;
+
 		case 33:  // AUTHENTICATION
 
 			/* Parse the field count */
