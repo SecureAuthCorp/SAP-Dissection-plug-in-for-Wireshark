@@ -1,7 +1,7 @@
 Changelog
 =========
 
-v0.7.1 - 2019-XX-XX
+v0.7.1 - 2019-12-19
 -------------------
 
 - Switched to Wireshark 3.0 branch. Ported the plugin to the use of new APIs.
