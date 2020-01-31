@@ -1,5 +1,5 @@
 # AppVeyor configuration based on https://github.com/AMOS-ss16-proj3/amos-ss16-proj3/blob/master/appveyor.yml
-version: "v0.7.1-{build}"
+version: "v0.8.1-{build}"
 image: Visual Studio 2015
 
 clone_folder: c:\projects\sap
@@ -8,7 +8,7 @@ environment:
   CYG_ROOT: C:\cygwin64
   CYGWIN: nodosfilewarning
   WIRESHARK_BASE_DIR: c:\projects
-  WIRESHARK_BRANCH: master-3.0
+  WIRESHARK_BRANCH: master-3.2
   matrix:
     - platform: x86
       WIRESHARK_TARGET_PLATFORM: win32
@@ -53,7 +53,7 @@ build_script:
   - msbuild /m /p:Configuration=%configuration% /logger:"C:\\Program Files\\AppVeyor\\BuildAgent\\Appveyor.MSBuildLogger.dll" plugins\epan\sap\sap.vcxproj
 
 after_build:
-  - copy c:\projects\sap\build\run\%configuration%\plugins\3.0\epan\sap.dll c:\projects\sap\sap-%APPVEYOR_BUILD_VERSION%-%WIRESHARK_TARGET_PLATFORM%.dll
+  - copy c:\projects\sap\build\run\%configuration%\plugins\3.2\epan\sap.dll c:\projects\sap\sap-%APPVEYOR_BUILD_VERSION%-%WIRESHARK_TARGET_PLATFORM%.dll
 
 artifacts:
   - path: "sap-*.dll"
