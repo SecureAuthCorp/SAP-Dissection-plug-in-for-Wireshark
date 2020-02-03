@@ -147,7 +147,7 @@ else(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 3 AND Wireshark_VERSION_M
 endif(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 3 AND Wireshark_VERSION_MINOR EQUAL 2)
 
 #
-# Editor modelines  -  http://www.wireshark.org/tools/modelines.html
+# Editor modelines  -  https://www.wireshark.org/tools/modelines.html
 #
 # Local variables:
 # c-basic-offset: 8
