@@ -1,12 +1,12 @@
 SAP Dissector Plugin for Wireshark
 ==================================
 
-[![Build Status](https://travis-ci.org/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark.svg?branch=master)](https://travis-ci.org/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark)
+[![Build Status](https://travis-ci.org/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark.svg)](https://travis-ci.org/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark)
 [![Build status](https://ci.appveyor.com/api/projects/status/y52ophpdwb019glj?svg=true)](https://ci.appveyor.com/project/martingalloar/sap-dissection-plug-in-for-wireshark)
 
-SECUREAUTH LABS. Copyright (C) 2019 SecureAuth Corporation. All rights reserved.
+SECUREAUTH LABS. Copyright (C) 2020 SecureAuth Corporation. All rights reserved.
 
-Version 0.6.2.dev (XXX 2019)
+Version 0.7.2 (XXX 2020)
 
 
 Overview
@@ -89,7 +89,7 @@ Installation & Build
 
 This Wireshark plugin is not distributed as part of the Wireshark source. It
 can be build as a standalone plugin, or as part of Wireshark, and is compatible
-with version 2.6.
+with version 3.0.
 
 ### Installing on Linux ###
 
@@ -112,12 +112,12 @@ To build and install the plugin on Debian/Ubuntu linux distributions:
 
 The following steps are required to build and install the plugin as part of Wireshark:
 
-1) Download and decompress the [Wireshark version 2.6 source](https://www.wireshark.org/download.html) [9]
+1) Download and decompress the [Wireshark version 3.0 source](https://www.wireshark.org/download.html) [9]
    or checkout the code from the [source repository](https://code.wireshark.org/review/wireshark) [10].
 
     git clone https://code.wireshark.org/review/wireshark
     cd wireshark
-    git checkout master-2.6
+    git checkout master-3.0
 
 2) Copy the SAP Wireshark Plugin to a new `plugins/epan/sap` directory.
 
@@ -126,7 +126,7 @@ The following steps are required to build and install the plugin as part of Wire
 3) Configure the plugin to be included in the build process. This step can be
    performed using the patch file provided. At the root directory run:
 
-    git apply plugins/epan/sap/wireshark-master-2.6.patch
+    git apply plugins/epan/sap/wireshark-master-3.0.patch
 
 4) Perform a new build including the plugin. At the root directory run:
 
@@ -181,7 +181,7 @@ for building Wireshark on Windows.
 3) Configure the plugin to be included in the build process. This step can be
    performed using the patch file provided. At the root directory run:
 
-    git apply plugins/epan/sap/wireshark-master-2.6.patch
+    git apply plugins/epan/sap/wireshark-master-3.0.patch
 
 4) Perform a new build including the plugin.
 
@@ -218,7 +218,7 @@ the `ptf` command-line, run:
 
 It's worth mentioning that compression libraries for SAP Diag/RFC protocol are
 originally written in C++, thus the entire plugin needs to be compiled for C++.
-See [Wireshark's portability notes](https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-2.6)
+See [Wireshark's portability notes](https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-3.0)
 for more information [12].
 
 
@@ -307,7 +307,7 @@ References
 
 [10] https://code.wireshark.org/review/wireshark
 
-[11] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-2.6
+[11] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-3.0
 
 [12] https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html
 

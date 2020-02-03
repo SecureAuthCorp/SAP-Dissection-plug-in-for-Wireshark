@@ -1,9 +1,14 @@
 Changelog
 =========
 
-v0.6.2 - 2019-XX-XX
+v0.7.2 - 2020-XX-XX
 -------------------
 
+
+v0.7.1 - 2019-12-19
+-------------------
+
+- Switched to Wireshark 3.0 branch. Ported the plugin to the use of new APIs.
 - `src/packet-sapdiag.c`: Added support bits for SAP Gui 7.50.
 
 
