@@ -2,7 +2,7 @@
 # ===========
 # SAP Dissector Plugin for Wireshark
 #
-# SECUREAUTH LABS. Copyright (C) 2019 SecureAuth Corporation. All rights reserved.
+# SECUREAUTH LABS. Copyright (C) 2020 SecureAuth Corporation. All rights reserved.
 #
 # The plugin was designed and developed by Martin Gallo from
 # SecureAuth Labs team.
