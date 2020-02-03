@@ -1,7 +1,7 @@
 # ===========
 # SAP Dissector Plugin for Wireshark
 #
-# SECUREAUTH LABS. Copyright (C) 2019 SecureAuth Corporation. All rights reserved.
+# SECUREAUTH LABS. Copyright (C) 2020 SecureAuth Corporation. All rights reserved.
 #
 # The plugin was designed and developed by Martin Gallo from
 # SecureAuth Labs team.
@@ -47,7 +47,7 @@ if(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 3 AND Wireshark_VERSION_MIN
   set(LINK_MODE_MODULE MODULE)
 
   # Plugin name and version info (major minor micro)
-  set(PLUGIN_VERSION "0.7.1")
+  set(PLUGIN_VERSION "0.7.2")
   add_definitions(-DPLUGIN_VERSION=\"${PLUGIN_VERSION}\")
 
 else(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 3 AND Wireshark_VERSION_MINOR EQUAL 0)
@@ -57,7 +57,7 @@ else(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 3 AND Wireshark_VERSION_M
   include(WiresharkPlugin)
 
   # Plugin name and version info (major minor micro extra)
-  set_module_info(sap 0 7 1 0)
+  set_module_info(sap 0 7 2 0)
 
 endif(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 3 AND Wireshark_VERSION_MINOR EQUAL 0)
 
