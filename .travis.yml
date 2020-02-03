@@ -1,6 +1,6 @@
-language: cpp
+language: minimal
 
-dist: xenial
+dist: bionic
 sudo: required
 
 os:
@@ -12,8 +12,8 @@ compiler:
   - gcc
 
 env:
-  - WIRESHARK_BRANCH=master-2.6 PLUGIN_DIR=$TRAVIS_BUILD_DIR BUILD_STANDALONE=no
-  - WIRESHARK_BRANCH=master-2.6 PLUGIN_DIR=$TRAVIS_BUILD_DIR BUILD_STANDALONE=yes
+  - WIRESHARK_BRANCH=master-3.0 PLUGIN_DIR=$TRAVIS_BUILD_DIR BUILD_STANDALONE=no
+  - WIRESHARK_BRANCH=master-3.0 PLUGIN_DIR=$TRAVIS_BUILD_DIR BUILD_STANDALONE=yes
 
 matrix:
   exclude:
@@ -22,7 +22,7 @@ matrix:
       compiler: gcc
     # Exclude standalone build on OSX
     - os: osx
-      env: WIRESHARK_BRANCH=master-2.6 PLUGIN_DIR=$TRAVIS_BUILD_DIR BUILD_STANDALONE=yes
+      env: WIRESHARK_BRANCH=master-3.0 PLUGIN_DIR=$TRAVIS_BUILD_DIR BUILD_STANDALONE=yes
   allow_failures:
     - os: osx
 
@@ -35,7 +35,7 @@ before_install:
     fi
 
   # See https://github.com/travis-ci/travis-ci/issues/5326
-  - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
+  #- export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
 
   - if [ "$TRAVIS_OS_NAME" == "linux" ] && [ ${BUILD_STANDALONE} == "no" ]; then
         ${PLUGIN_DIR}/tools/ubuntu-provision-source.sh;
@@ -59,7 +59,7 @@ script:
 
 before_deploy:
   - if [ ${BUILD_STANDALONE} == "no" ]; then
-        cp build/run/plugins/2.6/epan/sap.so build/sap-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-x86-64.so;
+        cp build/run/plugins/3.0/epan/sap.so build/sap-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-x86-64.so;
     fi
   - if [ ${BUILD_STANDALONE} == "yes" ]; then
         mv build/sap.so build/sap-${TRAVIS_TAG}-${TRAVIS_OS_NAME}-x86-64.so;
