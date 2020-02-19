@@ -1,7 +1,6 @@
 language: minimal
 
 dist: bionic
-sudo: required
 
 os:
   - linux
@@ -23,8 +22,6 @@ matrix:
     # Exclude standalone build on OSX
     - os: osx
       env: WIRESHARK_BRANCH=master-3.2 PLUGIN_DIR=$TRAVIS_BUILD_DIR BUILD_STANDALONE=yes
-  allow_failures:
-    - os: osx
 
 before_install:
   - echo $TRAVIS_OS_NAME
@@ -67,11 +64,10 @@ before_deploy:
 
 deploy:
     provider: releases
-    api_key:
+    token:
         secure: "R+nmMCuHexC7Y7dZedEQ3mF2SE1kkfeazWHXtmWZFZF+v9wrtp+Er5SAKzvdf7NFpzj6ecF99f/Fpy6LLfdSmfQGzTiU9BRBodkx4ezEDEc0VVyS9V2I+UAYisenXfj7EtmX5N33tlj2ujogPt+RH0abrRmD1mxBqzzybPd7q6o="
     file: "build/*.so"
     file_glob: true
-    skip_cleanup: true
     on:
         tags: true
         repo: SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark
