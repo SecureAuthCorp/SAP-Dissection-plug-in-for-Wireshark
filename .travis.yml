@@ -22,8 +22,6 @@ matrix:
     # Exclude standalone build on OSX
     - os: osx
       env: WIRESHARK_BRANCH=master-3.0 PLUGIN_DIR=$TRAVIS_BUILD_DIR BUILD_STANDALONE=yes
-  allow_failures:
-    - os: osx
 
 before_install:
   - echo $TRAVIS_OS_NAME
