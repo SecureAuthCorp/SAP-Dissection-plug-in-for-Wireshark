@@ -297,8 +297,7 @@ dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, 
 static int
 dissect_saphdb_part(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_, guint32 offset, guint16 noofparts, guint16 nopart)
 {
-	guint8 partkind = 0;
-	guint32 length = 0, bufferlength = 0;
+	guint32 partkind = 0, length = 0, bufferlength = 0;
 	proto_item *part = NULL, *part_buffer = NULL;
 	proto_tree *part_tree = NULL, *part_buffer_tree = NULL;
 
@@ -308,13 +307,11 @@ dissect_saphdb_part(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *d
 	proto_item_append_text(part, " (%d/%d)", nopart, noofparts);
 
 	/* Add the Part fields */
-	partkind = tvb_get_guint8(tvb, offset);
-	proto_tree_add_item(part_tree, hf_saphdb_part_partkind, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
+	proto_tree_add_item_ret_uint(part_tree, hf_saphdb_part_partkind, tvb, offset, 1, ENC_LITTLE_ENDIAN, &partkind); offset += 1; length += 1;
 	proto_tree_add_item(part_tree, hf_saphdb_part_partattributes, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
 	proto_tree_add_item(part_tree, hf_saphdb_part_argumentcount, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; length += 2;
 	proto_tree_add_item(part_tree, hf_saphdb_part_bigargumentcount, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length += 4;
-	bufferlength = tvb_get_guint32(tvb, offset, ENC_LITTLE_ENDIAN);
-	proto_tree_add_item(part_tree, hf_saphdb_part_bufferlength, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length += 4;
+	proto_tree_add_item_ret_uint(part_tree, hf_saphdb_part_bufferlength, tvb, offset, 4, ENC_LITTLE_ENDIAN, &bufferlength); offset += 4; length += 4;
 	proto_tree_add_item(part_tree, hf_saphdb_part_buffersize, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length += 4;
 
 	/* Align the buffer length to 8 */
@@ -357,8 +354,7 @@ dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 	proto_item_append_text(segment, " (%d/%d)", nosegment, noofsegm);
 
 	/* Add the Segment fields */
-	segmentlength = tvb_get_guint32(tvb, offset, ENC_LITTLE_ENDIAN);
-	proto_tree_add_item(segment_tree, hf_saphdb_segment_segmentlength, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length += 4;
+	proto_tree_add_item_ret_uint(segment_tree, hf_saphdb_segment_segmentlength, tvb, offset, 4, ENC_LITTLE_ENDIAN, &segmentlength); offset += 4; length += 4;
 	proto_tree_add_item(segment_tree, hf_saphdb_segment_segmentofs, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length += 4;
 	noofparts = tvb_get_letohs(tvb, offset);
 	proto_tree_add_item(segment_tree, hf_saphdb_segment_noofparts, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; length += 2;
@@ -463,8 +459,7 @@ dissect_saphdb(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 			/* Add the Message Header fields */
 			proto_tree_add_item(message_header_tree, hf_saphdb_message_header_sessionid, tvb, offset, 8, ENC_LITTLE_ENDIAN); offset += 8;
 			proto_tree_add_item(message_header_tree, hf_saphdb_message_header_packetcount, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
-			varpartlength = tvb_get_guint32(tvb, offset, ENC_LITTLE_ENDIAN);
-			proto_tree_add_item(message_header_tree, hf_saphdb_message_header_varpartlength, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
+			proto_tree_add_item_ret_uint(message_header_tree, hf_saphdb_message_header_varpartlength, tvb, offset, 4, ENC_LITTLE_ENDIAN, &varpartlength); offset += 4;
 			proto_tree_add_item(message_header_tree, hf_saphdb_message_header_varpartsize, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
 			noofsegm = tvb_get_letohs(tvb, offset);
 			proto_tree_add_item(message_header_tree, hf_saphdb_message_header_noofsegm, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2;
