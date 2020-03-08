@@ -913,8 +913,9 @@ dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
 			break;
 		}
 		case 0x1C:{			/* MS_GET_CODEPAGE */
-			if (flag == 0x03)
+			if (flag == 0x03) {
 				proto_tree_add_item(tree, hf_sapms_codepage, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
+			}
 			break;
 		}
 		case 0x1E:{			/* MS_DUMP_INFO */
@@ -924,16 +925,17 @@ dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
 				proto_tree_add_item(tree, hf_sapms_dump_filler, tvb, offset, 3, ENC_NA); offset+=3;
 				proto_tree_add_item(tree, hf_sapms_dump_index, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2;
 				proto_tree_add_item(tree, hf_sapms_dump_command, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2;
-				if (length>=48)
+				if (length>=48) {
 					proto_tree_add_item(tree, hf_sapms_dump_name, tvb, offset, 40, ENC_ASCII|ENC_NA); offset+=40;
+				}
 
 			} else if (flag == 0x03) { /* If it's a reply (flag=MS_REPLY) */
 				guint32 string_length = 0;
 				length = tvb_strsize(tvb, offset);
 				/* Add each string in a different item */
-				while (length>1){
+				while (length>1) {
 					string_length = tvb_find_line_end(tvb, offset, -1, NULL, FALSE);
-					if (string_length>0){
+					if (string_length>0) {
 						proto_tree_add_none_format(tree, hf_sapms_opcode_value, tvb, offset, string_length, "%s", tvb_get_string_enc(wmem_packet_scope(), tvb, offset, string_length, ENC_ASCII));
 						offset+=string_length; length-=string_length;
 					}
