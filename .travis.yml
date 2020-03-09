@@ -14,7 +14,7 @@ env:
   - WIRESHARK_BRANCH=master-3.2 PLUGIN_DIR=$TRAVIS_BUILD_DIR BUILD_STANDALONE=no
   #- WIRESHARK_BRANCH=master-3.2 PLUGIN_DIR=$TRAVIS_BUILD_DIR BUILD_STANDALONE=yes
 
-matrix:
+jobs:
   exclude:
     # Exclude gcc build on OSX
     - os: osx
