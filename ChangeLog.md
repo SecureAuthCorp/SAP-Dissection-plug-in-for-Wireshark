@@ -4,6 +4,8 @@ Changelog
 v0.7.2 - 2020-XX-XX
 -------------------
 
+- `src/packet-saprouter.c`: Improved conversation handling for route request/accept packets.
+
 
 v0.7.1 - 2019-12-19
 -------------------
