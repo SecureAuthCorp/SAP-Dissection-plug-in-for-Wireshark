@@ -1,8 +1,8 @@
 SAP Dissector Plugin for Wireshark
 ==================================
 
-[![Build Status](https://travis-ci.org/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark.svg?branch=master-0.8)](https://travis-ci.org/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark)
-[![Build status](https://ci.appveyor.com/api/projects/status/y52ophpdwb019glj/branch/master-0.8?svg=true)](https://ci.appveyor.com/project/martingalloar/sap-dissection-plug-in-for-wireshark/branch/master-0.8)
+[![Build Status](https://travis-ci.org/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark.svg)](https://travis-ci.org/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark)
+[![Build status](https://ci.appveyor.com/api/projects/status/y52ophpdwb019glj?svg=true)](https://ci.appveyor.com/project/martingalloar/sap-dissection-plug-in-for-wireshark)
 
 SECUREAUTH LABS. Copyright (C) 2020 SecureAuth Corporation. All rights reserved.
 
