@@ -1,8 +1,8 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index fb791ad574..96a9172973 100644
+index 0a1f95830e..528eede3fe 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -1408,6 +1408,7 @@ if(ENABLE_PLUGINS)
+@@ -1445,6 +1445,7 @@ if(ENABLE_PLUGINS)
  		plugins/epan/mate
  		plugins/epan/opcua
  		plugins/epan/profinet
@@ -11,10 +11,10 @@ index fb791ad574..96a9172973 100644
  		plugins/epan/transum
  		plugins/epan/unistim
 diff --git a/packaging/nsis/wireshark.nsi b/packaging/nsis/wireshark.nsi
-index 3a5e27781e..2d4e46fc1f 100644
+index 710042b391..ad6851e35c 100644
 --- a/packaging/nsis/wireshark.nsi
 +++ b/packaging/nsis/wireshark.nsi
-@@ -992,6 +992,7 @@ File "${STAGING_DIR}\plugins\${VERSION_MAJOR}.${VERSION_MINOR}\epan\gryphon.dll"
+@@ -989,6 +989,7 @@ File "${STAGING_DIR}\plugins\${VERSION_MAJOR}.${VERSION_MINOR}\epan\gryphon.dll"
  File "${STAGING_DIR}\plugins\${VERSION_MAJOR}.${VERSION_MINOR}\epan\irda.dll"
  File "${STAGING_DIR}\plugins\${VERSION_MAJOR}.${VERSION_MINOR}\epan\opcua.dll"
  File "${STAGING_DIR}\plugins\${VERSION_MAJOR}.${VERSION_MINOR}\epan\profinet.dll"

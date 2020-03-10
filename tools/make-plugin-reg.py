@@ -117,7 +117,7 @@ if registertype == "plugin":
 if registertype == "plugin_wtap":
     reg_code += "#include \"wiretap/wtap.h\"\n\n"
 if registertype == "plugin_codec":
-    reg_code += "#include \"codecs/codecs.h\"\n\n"
+    reg_code += "#include \"wsutil/codecs.h\"\n\n"
 
 for symbol in regs['proto_reg']:
     reg_code += "void proto_register_%s(void);\n" % (symbol)
@@ -162,15 +162,15 @@ if registertype == "plugin_codec":
 reg_code += "}\n"
 
 try:
-    print(('Updating ' + final_filename))
     fh = open(final_filename, 'w')
     fh.write(reg_code)
     fh.close()
+    print('Generated {} for {}.'.format(final_filename, os.path.basename(srcdir)))
 except OSError:
     sys.exit('Unable to write ' + final_filename + '.\n')
 
 #
-# Editor modelines  -  http://www.wireshark.org/tools/modelines.html
+# Editor modelines  -  https://www.wireshark.org/tools/modelines.html
 #
 # Local variables:
 # c-basic-offset: 4

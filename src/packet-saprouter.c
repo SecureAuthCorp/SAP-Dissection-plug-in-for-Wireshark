@@ -558,7 +558,7 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 
 		if (session_state->route_accepted && session_state->route_accepted_in) {
 			gi = proto_tree_add_uint(saprouter_tree, hf_saprouter_route_accepted_in, tvb, 0, 0, session_state->route_accepted_in);
-			PROTO_ITEM_SET_GENERATED(gi);
+			proto_item_set_generated(gi);
 		}
 
 	/* Error Information/Control Message Type */
@@ -637,7 +637,7 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 
 			if (session_state->route_requested_in) {
 				gi = proto_tree_add_uint(saprouter_tree, hf_saprouter_route_requested_in, tvb, 0, 0, session_state->route_requested_in);
-				PROTO_ITEM_SET_GENERATED(gi);
+				proto_item_set_generated(gi);
 			}
 		}
 
@@ -671,11 +671,11 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 
 				if (session_state->route_requested_in) {
 					gi = proto_tree_add_uint(saprouter_tree, hf_saprouter_route_requested_in, tvb, 0, 0, session_state->route_requested_in);
-					PROTO_ITEM_SET_GENERATED(gi);
+					proto_item_set_generated(gi);
 				}
 				if (session_state->route_accepted_in) {
 					gi = proto_tree_add_uint(saprouter_tree, hf_saprouter_route_accepted_in, tvb, 0, 0, session_state->route_accepted_in);
-					PROTO_ITEM_SET_GENERATED(gi);
+					proto_item_set_generated(gi);
 				}
 
 			/* Route not accepted but some information available */
