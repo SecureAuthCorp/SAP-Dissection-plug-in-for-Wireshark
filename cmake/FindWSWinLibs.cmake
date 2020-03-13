@@ -16,7 +16,7 @@ function( FindWSWinLibs _WS_LIB_SEARCH_PATH _LIB_HINT_VAR )
         file( TO_CMAKE_PATH "$ENV{WIRESHARK_LIB_DIR}" _PROJECT_LIB_DIR )
       else()
         file( TO_CMAKE_PATH "$ENV{WIRESHARK_BASE_DIR}" _WS_BASE_DIR )
-        set( _PROJECT_LIB_DIR "${_WS_BASE_DIR}/wireshark-${WIRESHARK_TARGET_PLATFORM}-libs-3.0" )
+        set( _PROJECT_LIB_DIR "${_WS_BASE_DIR}/wireshark-${WIRESHARK_TARGET_PLATFORM}-libs-3.2" )
       endif()
     endif()
 
@@ -42,6 +42,7 @@ function( FindWSWinLibs _WS_LIB_SEARCH_PATH _LIB_HINT_VAR )
   endif()
 endfunction()
 
+# Add a single DLL
 function(AddWSWinDLL _PKG_NAME _PKG_HINTS _DLL_GLOB)
   if(WIN32 AND ${_PKG_NAME}_FOUND)
     string(TOUPPER ${_PKG_NAME} _PKG_VAR)
@@ -64,5 +65,41 @@ function(AddWSWinDLL _PKG_NAME _PKG_HINTS _DLL_GLOB)
   else()
     set( ${_PKG_VAR}_DLL_DIR )
     set( ${_PKG_VAR}_DLL )
+  endif()
+endfunction()
+
+# Add a list of DLLs
+function(AddWSWinDLLS _PKG_NAME _PKG_HINTS) # ...DLL globs
+  if(WIN32 AND ${_PKG_NAME}_FOUND)
+    string(TOUPPER ${_PKG_NAME} _PKG_VAR)
+    set ( ${_PKG_VAR}_DLL_DIR "${${_PKG_HINTS}}/bin"
+      CACHE PATH "Path to ${_PKG_NAME} DLLs"
+    )
+
+    set (_pkg_dlls)
+    set (_pkg_pdbs)
+    foreach(_dll_glob ${ARGN})
+      file( GLOB _pkg_dll RELATIVE "${${_PKG_VAR}_DLL_DIR}"
+        "${${_PKG_VAR}_DLL_DIR}/${_dll_glob}.dll"
+      )
+      list(APPEND _pkg_dlls "${_pkg_dll}")
+      file( GLOB _pkg_pdb RELATIVE "${${_PKG_VAR}_DLL_DIR}"
+        "${${_PKG_VAR}_DLL_DIR}/${_dll_glob}.pdb"
+      )
+      list(APPEND _pkg_pdbs "${_pkg_pdb}")
+    endforeach()
+
+    set ( ${_PKG_VAR}_DLLS ${_pkg_dlls}
+    CACHE FILEPATH "${_PKG_NAME} DLL list"
+    )
+    set ( ${_PKG_VAR}_PDBS ${_pkg_pdbs}
+      CACHE FILEPATH "${_PKG_NAME} PDB list"
+    )
+
+    mark_as_advanced( ${_PKG_VAR}_DLL_DIR ${_PKG_VAR}_DLLS ${_PKG_VAR}_PDBS )
+  else()
+    set( ${_PKG_VAR}_DLL_DIR )
+    set( ${_PKG_VAR}_DLLS )
+    set( ${_PKG_VAR}_PDBS )
   endif()
 endfunction()
