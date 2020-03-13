@@ -158,6 +158,9 @@ static int hf_saprouter_route_offset = -1;
 static int hf_saprouter_route = -1;
 static int hf_saprouter_route_string = -1;
 
+static int hf_saprouter_route_requested_in = -1;
+static int hf_saprouter_route_accepted_in = -1;
+
 /* Route strings */
 static int hf_saprouter_route_string_hostname = -1;
 static int hf_saprouter_route_string_service = -1;
@@ -225,14 +228,16 @@ static dissector_handle_t saprouter_handle;
 /* Session state information being tracked in a SAP Router conversation */
 typedef struct saprouter_session_state {
 	gboolean route_information;
+	guint	 route_requested_in;
 	gboolean route_accepted;
+	guint	 route_accepted_in;
 	gboolean route_snc_protected;
-	guchar *src_hostname;		/* Source hostname (first entry in the route string) */
-	guint32 src_port;		/* Source port number */
-	guchar *src_password;		/* Source password XXX: Check if possible */
-	guchar *dest_hostname;		/* Destination hostname (last entry in the route string) */
-	guint32 dest_port;		/* Destination port number */
-	guchar *dest_password;		/* Destination password */
+	guchar 	*src_hostname;			/* Source hostname (first entry in the route string) */
+	guint32  src_port;				/* Source port number */
+	guchar 	*src_password;			/* Source password XXX: Check if possible */
+	guchar 	*dest_hostname;			/* Destination hostname (last entry in the route string) */
+	guint32  dest_port;				/* Destination port number */
+	guchar 	*dest_password;			/* Destination password */
 } saprouter_session_state;
 
 /*
@@ -268,51 +273,41 @@ dissect_routestring(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32
 		route_offset = offset; hostname = port = password = NULL;
 
 		/* Create the subtree for this route hop */
-		if (tree){
-			route_hop = proto_tree_add_item(tree, hf_saprouter_route_string, tvb, offset, 0, ENC_NA);
-			route_hop_tree = proto_item_add_subtree(route_hop, ett_saprouter);
-			proto_item_append_text(route_hop, ", nro %d", hop);
-		}
+		route_hop = proto_tree_add_item(tree, hf_saprouter_route_string, tvb, offset, 0, ENC_NA);
+		route_hop_tree = proto_item_add_subtree(route_hop, ett_saprouter);
+		proto_item_append_text(route_hop, ", nro %d", hop);
 
 		/* Dissect the hostname string */
 		len = tvb_strsize(tvb, offset);
 		hostname = tvb_get_string_enc(wmem_file_scope(), tvb, offset, len - 1, ENC_ASCII);
-		if (tree){
-			proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_hostname, tvb, offset, len, ENC_ASCII|ENC_NA);
-		}
+		proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_hostname, tvb, offset, len, ENC_ASCII|ENC_NA);
 		offset += len;
 
 		/* Dissect the port string */
 		len = tvb_strsize(tvb, offset);
 		port = tvb_get_string_enc(wmem_packet_scope(), tvb, offset, len - 1, ENC_ASCII);
-		if (tree){
-			proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_service, tvb, offset, len, ENC_ASCII|ENC_NA);
-		}
+		proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_service, tvb, offset, len, ENC_ASCII|ENC_NA);
 		offset += len;
 
 		/* Dissect the password string */
 		len = tvb_strsize(tvb, offset);
 		password = tvb_get_string_enc(wmem_file_scope(), tvb, offset, len - 1, ENC_ASCII);
-		if (tree){
-			route_password = proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_password, tvb, offset, len, ENC_ASCII|ENC_NA);
+		route_password = proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_password, tvb, offset, len, ENC_ASCII|ENC_NA);
 
-			/* If a password was found, add a expert warning in the security category */
-			if (len > 1){
-				expert_add_info(pinfo, route_password, &ei_saprouter_route_password_found);
-			}
+		/* If a password was found, add a expert warning in the security category */
+		if (len > 1){
+			expert_add_info(pinfo, route_password, &ei_saprouter_route_password_found);
 		}
 		offset += len;
 
 		/* Adjust the size of the route hop item now that we know the size */
-		if (tree){
-			proto_item_set_len(route_hop, offset - route_offset);
-		}
+		proto_item_set_len(route_hop, offset - route_offset);
 
 		/* Get the service port in numeric format */
 		int_port = dissect_serviceport(port);
 
 		/* Add the first hostname/port as source in the conversation state*/
-		if ((hop==1) && session_state){
+		if ((hop==1) && !(pinfo->fd->visited)){
 			session_state->src_hostname = hostname;
 			session_state->src_port = int_port;
 			session_state->src_password = password;
@@ -320,17 +315,18 @@ dissect_routestring(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32
 		hop++;
 	}
 
-	/* Add the last hostname/port as destination */
-	if ((hop!=1) && session_state){
-		session_state->dest_hostname = hostname;
-		session_state->dest_port = int_port;
-		session_state->dest_password = password;
-	}
-	/* Save the status of the conversation state */
-	if (session_state){
+	if (!(pinfo->fd->visited)) {
+		/* Add the last hostname/port as destination */
+		if (hop!=1){
+			session_state->dest_hostname = hostname;
+			session_state->dest_port = int_port;
+			session_state->dest_password = password;
+		}
+		/* Save the status of the conversation state */
 		session_state->route_information = TRUE;
 		session_state->route_accepted = FALSE;
 	}
+
 }
 
 static void
@@ -405,7 +401,7 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 	guint32 offset = 0, eyecatcher_length = 0;
 	conversation_t *conversation = NULL;
 	saprouter_session_state *session_state = NULL;
-	proto_item *ti = NULL, *ri = NULL, *ei = NULL, *ci = NULL, *admin_password = NULL;
+	proto_item *ti = NULL, *ri = NULL, *ei = NULL, *ci = NULL, *gi = NULL, *admin_password = NULL;
 	proto_tree *saprouter_tree = NULL, *route_tree = NULL, *text_tree = NULL, *clients_tree = NULL;
 
 	/* Search for a conversation */
@@ -414,12 +410,15 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 	if (!session_state){
 		session_state = (saprouter_session_state *)wmem_alloc(wmem_file_scope(), sizeof(saprouter_session_state));
 		if (session_state){
-			session_state->route_information = FALSE;
-			session_state->route_accepted = FALSE;
+			session_state->route_information = FALSE; session_state->route_requested_in = 0;
+			session_state->route_accepted = FALSE; session_state->route_accepted_in = 0;
 			session_state->route_snc_protected = FALSE;
 			session_state->src_hostname = NULL; session_state->src_port = 0; session_state->src_password = NULL;
 			session_state->dest_hostname = NULL; session_state->dest_port = 0; session_state->dest_password = NULL;
 			conversation_add_proto_data(conversation, proto_saprouter, session_state);
+		} else {
+			/* Unable to establish a conversation, break dissection of the packet */
+			return 0;
 		}
 	}
 
@@ -427,10 +426,8 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 	col_add_str(pinfo->cinfo, COL_PROTOCOL, "SAPROUTER");
 
 	/* Add the main SAP Router subtree */
-	if (tree) {
-		ti = proto_tree_add_item(tree, proto_saprouter, tvb, offset, -1, ENC_NA);
-		saprouter_tree = proto_item_add_subtree(ti, ett_saprouter);
-	}
+	ti = proto_tree_add_item(tree, proto_saprouter, tvb, offset, -1, ENC_NA);
+	saprouter_tree = proto_item_add_subtree(ti, ett_saprouter);
 
 	/* Get the 'eye catcher' length */
 	eyecatcher_length = tvb_strsize(tvb, offset);
@@ -442,8 +439,9 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 		proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, offset, 10, ENC_ASCII|ENC_NA); offset += 10;
 		proto_item_append_text(ti, ", Niping message");
 
-		if (tvb_reported_length_remaining(tvb, offset))
+		if (tvb_reported_length_remaining(tvb, offset)) {
 			proto_tree_add_item(saprouter_tree, hf_saprouter_niping_message, tvb, offset, -1, ENC_ASCII|ENC_NA);
+		}
 
 	}
 	/* Admin Message Type */
@@ -520,39 +518,47 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 		route_length = tvb_get_ntohl(tvb, offset + SAPROUTER_ROUTE_LENGTH_OFFSET);
 		route_offset = offset + SAPROUTER_ROUTE_OFFSET_OFFSET + 4;
 
-		if (tree){
-			proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, 0, eyecatcher_length, ENC_ASCII|ENC_NA); offset += eyecatcher_length;
-			proto_item_append_text(ti, ", Route message");
-			/* Add the fields */
-			proto_tree_add_item(saprouter_tree, hf_saprouter_route_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
-			proto_tree_add_item(saprouter_tree, hf_saprouter_ni_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
-			proto_tree_add_item(saprouter_tree, hf_saprouter_entries, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
-			proto_tree_add_item(saprouter_tree, hf_saprouter_talk_mode, tvb, offset, 1, ENC_BIG_ENDIAN); offset+=3; /* There're two unused bytes there */
-			proto_tree_add_item(saprouter_tree, hf_saprouter_rest_nodes, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
-			proto_tree_add_item(saprouter_tree, hf_saprouter_route_length, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
-			proto_tree_add_item(saprouter_tree, hf_saprouter_route_offset, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
-			/* Add the route tree */
-			if ((guint32)tvb_reported_length_remaining(tvb, offset) != route_length){
-				expert_add_info_format(pinfo, saprouter_tree, &ei_saprouter_route_invalid_length, "Route string length is invalid (remaining=%d, route_length=%d)", tvb_reported_length_remaining(tvb, offset), route_length);
-				route_length = (guint32)tvb_reported_length_remaining(tvb, offset);
-			}
-			ri = proto_tree_add_item(saprouter_tree, hf_saprouter_route, tvb, offset, route_length, ENC_NA);
-			route_tree = proto_item_add_subtree(ri, ett_saprouter);
+		proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, 0, eyecatcher_length, ENC_ASCII|ENC_NA); offset += eyecatcher_length;
+		proto_item_append_text(ti, ", Route message");
+		/* Add the fields */
+		proto_tree_add_item(saprouter_tree, hf_saprouter_route_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
+		proto_tree_add_item(saprouter_tree, hf_saprouter_ni_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
+		proto_tree_add_item(saprouter_tree, hf_saprouter_entries, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
+		proto_tree_add_item(saprouter_tree, hf_saprouter_talk_mode, tvb, offset, 1, ENC_BIG_ENDIAN); offset+=3; /* There're two unused bytes there */
+		proto_tree_add_item(saprouter_tree, hf_saprouter_rest_nodes, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
+		proto_tree_add_item(saprouter_tree, hf_saprouter_route_length, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
+		proto_tree_add_item(saprouter_tree, hf_saprouter_route_offset, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
+		/* Add the route tree */
+		if ((guint32)tvb_reported_length_remaining(tvb, offset) != route_length){
+			expert_add_info_format(pinfo, saprouter_tree, &ei_saprouter_route_invalid_length, "Route string length is invalid (remaining=%d, route_length=%d)", tvb_reported_length_remaining(tvb, offset), route_length);
+			route_length = (guint32)tvb_reported_length_remaining(tvb, offset);
 		}
+		ri = proto_tree_add_item(saprouter_tree, hf_saprouter_route, tvb, offset, route_length, ENC_NA);
+		route_tree = proto_item_add_subtree(ri, ett_saprouter);
 
 		/* Dissect the route string */
 		dissect_routestring(tvb, pinfo, route_tree, route_offset, session_state);
 
+		/* If this is the first time we're seeing this packet, mark it as the one where the route was requested */
+		if (!pinfo->fd->visited) {
+			session_state->route_requested_in = pinfo->num;
+		}
+
 		/* Add the route to the colinfo*/
-		if (session_state && session_state->src_hostname){
+		if (session_state->src_hostname){
 			col_append_fstr(pinfo->cinfo, COL_INFO, ", Source: Hostname=%s Service Port=%d", session_state->src_hostname, session_state->src_port);
 			if (strlen(session_state->src_password)>0)
 				col_append_fstr(pinfo->cinfo, COL_INFO, " Password=%s", session_state->src_password);
 		}
-		if (session_state && session_state->dest_hostname){
+		if (session_state->dest_hostname){
 			col_append_fstr(pinfo->cinfo, COL_INFO, ", Destination: Hostname=%s Service Port=%d", session_state->dest_hostname, session_state->dest_port);
 			if (strlen(session_state->dest_password)>0)
 				col_append_fstr(pinfo->cinfo, COL_INFO, " Password=%s", session_state->dest_password);
+		}
+
+		if (session_state->route_accepted && session_state->route_accepted_in) {
+			gi = proto_tree_add_uint(saprouter_tree, hf_saprouter_route_accepted_in, tvb, 0, 0, session_state->route_accepted_in);
+			proto_item_set_generated(gi);
 		}
 
 	/* Error Information/Control Message Type */
@@ -567,57 +573,51 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 
 		col_set_str(pinfo->cinfo, COL_INFO, (opcode==0)? "Error information" : "Control message");
 
-		if (tree){
-			guint32 text_length = 0;
+		guint32 text_length = 0;
 
-			proto_item_append_text(ti, (opcode==0)? ", Error information" : ", Control message");
-			/* Add the fields */
-			proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, offset, eyecatcher_length, ENC_ASCII|ENC_NA); offset += eyecatcher_length;
-			proto_tree_add_item(saprouter_tree, hf_saprouter_ni_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
-			proto_tree_add_item(saprouter_tree, hf_saprouter_opcode, tvb, offset, 1, ENC_BIG_ENDIAN); offset+=2; /* There's a unused byte there */
-			proto_tree_add_item(saprouter_tree, hf_saprouter_return_code, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
+		proto_item_append_text(ti, (opcode==0)? ", Error information" : ", Control message");
+		/* Add the fields */
+		proto_tree_add_item(saprouter_tree, hf_saprouter_type, tvb, offset, eyecatcher_length, ENC_ASCII|ENC_NA); offset += eyecatcher_length;
+		proto_tree_add_item(saprouter_tree, hf_saprouter_ni_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset++;
+		proto_tree_add_item(saprouter_tree, hf_saprouter_opcode, tvb, offset, 1, ENC_BIG_ENDIAN); offset+=2; /* There's a unused byte there */
+		proto_tree_add_item(saprouter_tree, hf_saprouter_return_code, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 
-			text_length = tvb_get_ntohl(tvb, offset);
-			/* Error Information Message */
-			if (opcode == 0){
-				proto_tree_add_item(saprouter_tree, hf_saprouter_error_length, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
-				if ((text_length > 0) && tvb_offset_exists(tvb, offset+text_length)){
-					/* Add the error string tree */
-					ei = proto_tree_add_item(saprouter_tree, hf_saprouter_error_string, tvb, offset, text_length, ENC_NA);
-					text_tree = proto_item_add_subtree(ei, ett_saprouter);
-					dissect_errorstring(tvb, text_tree, offset);
-					offset += text_length;
-				}
+		text_length = tvb_get_ntohl(tvb, offset);
+		/* Error Information Message */
+		if (opcode == 0){
+			proto_tree_add_item(saprouter_tree, hf_saprouter_error_length, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
+			if ((text_length > 0) && tvb_offset_exists(tvb, offset+text_length)){
+				/* Add the error string tree */
+				ei = proto_tree_add_item(saprouter_tree, hf_saprouter_error_string, tvb, offset, text_length, ENC_NA);
+				text_tree = proto_item_add_subtree(ei, ett_saprouter);
+				dissect_errorstring(tvb, text_tree, offset);
+				offset += text_length;
+			}
 
-				/* Add an unknown int field */
-				proto_tree_add_item(saprouter_tree, hf_saprouter_unknown, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
+			/* Add an unknown int field */
+			proto_tree_add_item(saprouter_tree, hf_saprouter_unknown, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 
-			/* Control Message */
+		/* Control Message */
+		} else {
+			/* Add the opcode name */
+			proto_item_append_text(ti, ", opcode=%s", val_to_str(opcode, saprouter_opcode_vals, "Unknown"));
+			col_append_fstr(pinfo->cinfo, COL_INFO, ", opcode=%s", val_to_str(opcode, saprouter_opcode_vals, "Unknown"));
+
+			proto_tree_add_item(saprouter_tree, hf_saprouter_control_length, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
+			if ((text_length >0) && tvb_offset_exists(tvb, offset+text_length)){
+				/* Add the control string tree */
+				proto_tree_add_item(saprouter_tree, hf_saprouter_control_string, tvb, offset, text_length, ENC_ASCII|ENC_NA);
+				offset += text_length;
+			}
+
+			/* SNC request, mark the conversation as SNC protected and dissect the SNC frame */
+			if (opcode == 70 || opcode == 71){
+				session_state->route_snc_protected = TRUE;
+				dissect_saprouter_snc_frame(tvb, pinfo, tree, offset);
+
+			/* Other opcodes */
 			} else {
-				/* Add the opcode name */
-				proto_item_append_text(ti, ", opcode=%s", val_to_str(opcode, saprouter_opcode_vals, "Unknown"));
-				col_append_fstr(pinfo->cinfo, COL_INFO, ", opcode=%s", val_to_str(opcode, saprouter_opcode_vals, "Unknown"));
-
-				proto_tree_add_item(saprouter_tree, hf_saprouter_control_length, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
-				if ((text_length >0) && tvb_offset_exists(tvb, offset+text_length)){
-					/* Add the control string tree */
-					proto_tree_add_item(saprouter_tree, hf_saprouter_control_string, tvb, offset, text_length, ENC_ASCII|ENC_NA);
-					offset += text_length;
-				}
-
-				/* SNC request, mark the conversation as SNC protected and dissect the SNC frame */
-				if (opcode == 70 || opcode == 71){
-					if (session_state) {
-						session_state->route_snc_protected = TRUE;
-					}
-					dissect_saprouter_snc_frame(tvb, pinfo, tree, offset);
-
-				/* Other opcodes */
-				} else {
-
-					proto_tree_add_item(saprouter_tree, hf_saprouter_control_unknown, tvb, offset, 4, ENC_ASCII|ENC_NA); offset+=4;
-				}
-
+				proto_tree_add_item(saprouter_tree, hf_saprouter_control_unknown, tvb, offset, 4, ENC_ASCII|ENC_NA); offset+=4;
 			}
 
 		}
@@ -625,75 +625,75 @@ dissect_saprouter(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *dat
 	/* Route Acceptance (NI_PONG) Message Type */
 	} else if (tvb_strneql(tvb, offset, SAPROUTER_TYPE_ROUTE_ACCEPT, eyecatcher_length) == 0){
 		/* Route information available */
-		if (session_state && session_state->route_information){
-			session_state->route_accepted = TRUE;
+		if (session_state->route_information){
+			/* If this is the first time we're seen the packet, mark is as the one where the route was accepted */
+			if (!pinfo->fd->visited) {
+				session_state->route_accepted = TRUE;
+				session_state->route_accepted_in = pinfo->num;
+			}
+
 			col_append_fstr(pinfo->cinfo, COL_INFO, ", from %s:%d to %s:%d", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
-			if (tree){
-				proto_item_append_text(ti, ", from %s:%d to %s:%d", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
+			proto_item_append_text(ti, ", from %s:%d to %s:%d", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
+
+			if (session_state->route_requested_in) {
+				gi = proto_tree_add_uint(saprouter_tree, hf_saprouter_route_requested_in, tvb, 0, 0, session_state->route_requested_in);
+				proto_item_set_generated(gi);
 			}
 		}
 
 	/* Uknown Message Type */
 	} else {
 
-		/* Session state was established */
-		if (session_state) {
+		col_add_fstr(pinfo->cinfo, COL_INFO, "Routed message");
+		proto_item_append_text(ti, ", Routed message");
 
-			col_add_fstr(pinfo->cinfo, COL_INFO, "Routed message");
-			if (tree){
-				proto_item_append_text(ti, ", Routed message");
-			}
+		/* If the session is protected with SNC, first dissect the SNC frame
+		 * and save the content for further dissection.
+		 */
+		if (session_state->route_snc_protected) {
+			col_append_fstr(pinfo->cinfo, COL_INFO, ", SNC protected");
+			proto_item_append_text(ti, ", SNC protected");
+			next_tvb = dissect_saprouter_snc_frame(tvb, pinfo, tree, offset);
 
-			/* If the session is protected with SNC, first dissect the SNC frame
-			 * and save the content for further disscetion.
-			 */
-			if (session_state->route_snc_protected) {
-				col_append_fstr(pinfo->cinfo, COL_INFO, ", SNC protected");
-				if (tree){
-					proto_item_append_text(ti, ", SNC protected");
+		/* If the session is not protected dissect the entire payload */
+		} else {
+			next_tvb = tvb;
+		}
+
+		/* If the session has information about the route requested */
+		if (session_state->route_information){
+
+			/* Route accepted */
+			if (session_state->route_accepted){
+
+				col_append_fstr(pinfo->cinfo, COL_INFO, ", from %s:%d to %s:%d ", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
+				proto_item_append_text(ti, ", from %s:%d to %s:%d ", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
+
+				if (session_state->route_requested_in) {
+					gi = proto_tree_add_uint(saprouter_tree, hf_saprouter_route_requested_in, tvb, 0, 0, session_state->route_requested_in);
+					proto_item_set_generated(gi);
 				}
-				next_tvb = dissect_saprouter_snc_frame(tvb, pinfo, tree, offset);
+				if (session_state->route_accepted_in) {
+					gi = proto_tree_add_uint(saprouter_tree, hf_saprouter_route_accepted_in, tvb, 0, 0, session_state->route_accepted_in);
+					proto_item_set_generated(gi);
+				}
 
-			/* If the session is not protected dissect the entire payload */
+			/* Route not accepted but some information available */
 			} else {
-				next_tvb = tvb;
-			}
-
-			/* If the session has information about the route requested */
-			if (session_state->route_information){
-
-				/* TODO: Add a link to the packet were the route was requested
-				 * (like TCP reassembled packets).
-				 */
-				/* Route accepted */
-				if (session_state->route_accepted){
-
-					col_append_fstr(pinfo->cinfo, COL_INFO, ", from %s:%d to %s:%d ", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
-					if (tree){
-						proto_item_append_text(ti, ", from %s:%d to %s:%d ", session_state->src_hostname, session_state->src_port, session_state->dest_hostname, session_state->dest_port);
-					}
-
-				/* Route not accepted but some information available */
-				} else {
-					col_append_fstr(pinfo->cinfo, COL_INFO, ", to unknown destination");
-					if (tree){
-						proto_item_append_text(ti, ", to unknown destination");
-					}
-				}
-
-				/* Call the dissector in the NI protocol subdissectors table
-				 * according to the route destination port number. */
-				if (next_tvb) {
-					dissect_sap_protocol_payload(next_tvb, offset, pinfo, tree, 0, session_state->dest_port);
-				}
-
-			} else {
-				/* No route information available */
 				col_append_fstr(pinfo->cinfo, COL_INFO, ", to unknown destination");
-				if (tree){
-					proto_item_append_text(ti, ", to unknown destination");
-				}
+				proto_item_append_text(ti, ", to unknown destination");
 			}
+
+			/* Call the dissector in the NI protocol sub-dissectors table
+			 * according to the route destination port number. */
+			if (next_tvb) {
+				dissect_sap_protocol_payload(next_tvb, offset, pinfo, tree, 0, session_state->dest_port);
+			}
+
+		} else {
+			/* No route information available */
+			col_append_fstr(pinfo->cinfo, COL_INFO, ", to unknown destination");
+			proto_item_append_text(ti, ", to unknown destination");
 		}
 	}
 
@@ -736,6 +736,11 @@ proto_register_saprouter(void)
 			{ "Service", "saprouter.routestring.service", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Route Hop Service", HFILL }},
 		{ &hf_saprouter_route_string_password,
 			{ "Password", "saprouter.routestring.password", FT_STRING, BASE_NONE, NULL, 0x0, "SAP Router Route Hop Password", HFILL }},
+
+		{ &hf_saprouter_route_requested_in,
+			{ "Route Requested in", "saprouter.requested_in", FT_FRAMENUM, BASE_NONE, NULL, 0x0, "The route request for this packet is in this packet", HFILL }},
+		{ &hf_saprouter_route_accepted_in,
+			{ "Route Accepted in", "saprouter.accepted_in", FT_FRAMENUM, BASE_NONE, NULL, 0x0, "The route for this packet was accepted in this packet", HFILL }},
 
 		/* NI error information / Control messages */
 		{ &hf_saprouter_opcode,
