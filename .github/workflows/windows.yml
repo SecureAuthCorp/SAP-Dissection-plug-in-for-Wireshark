@@ -35,6 +35,8 @@ jobs:
               echo "##[add-path]C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin"
          - name: Install Qt
            uses: jurplel/install-qt-action@v2
+           with:
+              version: 5.12.3
          - name: Add msbuild to PATH
            uses: microsoft/setup-msbuild@v1.0.0
            with:
