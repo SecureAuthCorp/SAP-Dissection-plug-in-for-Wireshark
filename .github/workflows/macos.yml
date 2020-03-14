@@ -1,0 +1,41 @@
+# GitHub Action workflows to build and test the plug-in on MacOS
+#
+# Adapted from Wireshark's repository https://github.com/wireshark/wireshark/tree/master/.github/workflows
+
+name: Build MacOS plug-in
+
+on: [push]
+
+env:
+   WIRESHARK_BRANCH: master-3.2
+
+jobs:
+   intree:
+      name: Build in-tree plugin
+      runs-on: macos-latest
+      steps:
+         - name: Checkout Wireshark
+           uses: actions/checkout@v2
+           with:
+              repository: wireshark/wireshark
+              ref: ${{ env.WIRESHARK_BRANCH }}
+         - name: Checkout plug-in
+           uses: actions/checkout@v2
+           with:
+              path: plugins/epan/sap
+         - name: Apply patch
+           run: |
+              git apply plugins/epan/sap/wireshark-${{ env.WIRESHARK_BRANCH }}.patch
+         - name: Provision for a in-tree build
+           run: |
+              gem install asciidoctor
+              brew update
+              brew install c-ares glib libgcrypt gnutls lua@5.1 cmake python nghttp2 snappy lz4 libxml2 ninja libmaxminddb doxygen libsmi spandsp brotli minizip zstd
+              brew install qt5
+         - name: Build in-tree
+           run: |
+              mkdir build
+              cd build
+              cmake ..
+              make
+              
