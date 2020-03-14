@@ -26,6 +26,14 @@ jobs:
          - name: Apply patch
            run: |
               git apply plugins/epan/sap/wireshark-${{ env.WIRESHARK_BRANCH }}.patch
+         - name: Set up Python 3.8
+           uses: actions/setup-python@v1
+           with:
+              python-version: 3.8
+         - name: Set up Ruby 2.6
+           uses: actions/setup-ruby@v1
+           with:
+              ruby-version: '2.6'
          - name: Provision for a in-tree build
            run: |
               gem install asciidoctor
