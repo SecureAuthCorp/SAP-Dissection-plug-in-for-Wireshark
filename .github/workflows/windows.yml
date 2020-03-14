@@ -8,10 +8,11 @@ on: [push]
 
 env:
    WIRESHARK_BRANCH: master-3.2
+   WIRESHARK_BASE_DIR: C:/wireshark-libs
 
 jobs:
    windows:
-      name: Build
+      name: Build in-tree plugin
       runs-on: windows-latest
       steps:
          - name: Checkout Wireshark
@@ -46,7 +47,6 @@ jobs:
            run: cmake -A x64 ..
            env:
               PLATFORM: x64
-              WIRESHARK_BASE_DIR: C:/wireshark-libs
               QT5_BASE_DIR: C:/Qt/5.12.3/msvc2017_64
            working-directory: build
          - name: Build
@@ -62,6 +62,9 @@ jobs:
            run: |
               mkdir exe
               mv build/packaging/nsis/*exe exe/
+         - name: Move plugin dll
+           run: |
+              mv build/run/RelWithDebInfo/plugins/3.2/epan/sap.dll exe/
          - name: Upload Windows packages
            uses: actions/upload-artifact@v1
            with:
