@@ -22,7 +22,7 @@ jobs:
          - name: Checkout plug-in
            uses: actions/checkout@v2
            with:
-              path: plugin/epan/sap
+              path: plugins/epan/sap
          - name: Apply patch
            run: |
               git apply plugins/epan/sap/wireshark-${{ env.WIRESHARK_BRANCH }}.patch
