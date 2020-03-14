@@ -33,4 +33,6 @@ sudo apt-get install -yqq cmake wireshark wireshark-dev tshark
 
 # Install test requirements
 sudo apt-get install -yqq libxml2-dev libxslt-dev python-dev python-pip
+sudo -H sh -c "pip install pip -U"
+sudo -H sh -c "pip install setuptools -U"
 sudo -H sh -c "CXX=g++ CC=gcc pip install pysap pyshark-legacy"
