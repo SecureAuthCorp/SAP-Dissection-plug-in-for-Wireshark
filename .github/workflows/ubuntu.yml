@@ -37,8 +37,7 @@ jobs:
            uses: actions/checkout@v2
          - name: Provision for a in-tree build
            run: sudo tools/ubuntu-provision-source.sh
-           with:
-              env:
-                 PLUGIN_DIR: ${{ env.GITHUB_GITHUB_WORKSPACE }}/${{ env.GITHUB_REPOSITORY }}
+           env:
+              PLUGIN_DIR: ${{ env.GITHUB_GITHUB_WORKSPACE }}/${{ env.GITHUB_REPOSITORY }}
          - name: Build in-tree
            run: sudo tools/ubuntu-build-source.sh
