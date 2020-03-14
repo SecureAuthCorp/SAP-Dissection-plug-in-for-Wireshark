@@ -26,8 +26,7 @@ sudo apt-get update -qq
 # Install build requirements
 sudo gem install asciidoctor
 sudo apt-get build-dep -yqq wireshark
-sudo apt-get install -yqq cmake libgcrypt20-dev qt5-default libqt5multimedia5 libqt5svg5-dev qtmultimedia5-dev qttools5-dev qttools5-dev-tools
-sudo apt-get install -yqq python3 python3-pip
+sudo apt-get install -yqq cmake libglib2.0-dev qttools5-dev qttools5-dev-tools libqt5svg5-dev qtmultimedia5-dev qt5-default libpcap-dev bison flex make python3 python3-pip perl libgcrypt-dev
 
 # Check out source
 mkdir -p ${HOME}/wireshark-$WIRESHARK_BRANCH
