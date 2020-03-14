@@ -20,7 +20,15 @@ jobs:
            run: sudo tools/ubuntu-provision-standalone.sh
          - name: Build standalone
            run: sudo tools/ubuntu-build-standalone.sh
-
+         - name: Move plugin so
+           run: |
+              mkdir exe
+              mv build/sap.so exe/sap-${{ env.GITHUB_REF }}-${{ env.GITHUB_SHA }}.so
+         - name: Upload Ubuntu packages
+           uses: actions/upload-artifact@v1
+           with:
+              name: packages
+              path: exe
    intree:
       name: Build in-tree plugin
       runs-on: ubuntu-latest

@@ -64,7 +64,7 @@ jobs:
               mv build/packaging/nsis/*exe exe/
          - name: Move plugin dll
            run: |
-              mv build/run/RelWithDebInfo/plugins/3.2/epan/sap.dll exe/
+              mv build/run/RelWithDebInfo/plugins/3.2/epan/sap.dll exe/sap-${{ env.GITHUB_REF }}-${{ env.GITHUB_SHA }}.dll
          - name: Upload Windows packages
            uses: actions/upload-artifact@v1
            with:
