@@ -14,18 +14,18 @@ jobs:
       name: Build
       runs-on: windows-latest
       steps:
-         - name: Checkout
+         - name: Checkout Wireshark
            uses: actions/checkout@v2
            with:
               repository: wireshark/wireshark
               ref: ${{ env.WIRESHARK_BRANCH }}
-         - name: Checkout
+         - name: Checkout plug-in
            uses: actions/checkout@v2
            with:
               path: plugin/epan/sap
          - name: Apply patch
            run: |
-              git apply plugins/epan/sap/wireshark-$WIRESHARK_BRANCH.patch
+              git apply plugins/epan/sap/wireshark-${{ env.WIRESHARK_BRANCH }}.patch
          - name: Choco install
            run: cinst -y --force --no-progress asciidoctorj xsltproc docbook-bundle winflexbison3 cmake nsis
          - name: Install strawberryperl
