@@ -20,24 +20,39 @@ jobs:
            run: sudo tools/ubuntu-provision-standalone.sh
          - name: Build standalone
            run: sudo tools/ubuntu-build-standalone.sh
-         - name: Move plugin so
+         - name: Copy plugin so
            run: |
               mkdir exe
-              mv build/sap.so exe/sap-${{ env.GITHUB_REF }}-${{ env.GITHUB_SHA }}.so
+              cp build/sap.so exe/sap.so
          - name: Upload Ubuntu packages
            uses: actions/upload-artifact@v1
            with:
               name: packages
               path: exe
+
    intree:
       name: Build in-tree plugin
       runs-on: ubuntu-latest
       steps:
+         - name: Checkout Wireshark
+           uses: actions/checkout@v2
+           with:
+              repository: wireshark/wireshark
+              ref: ${{ env.WIRESHARK_BRANCH }}
          - name: Checkout plug-in
            uses: actions/checkout@v2
+           with:
+              path: plugins/epan/sap
+         - name: Apply patch
+           run: |
+              git apply plugins/epan/sap/wireshark-${{ env.WIRESHARK_BRANCH }}.patch
          - name: Provision for a in-tree build
-           run: sudo tools/ubuntu-provision-source.sh
-           env:
-              PLUGIN_DIR: ${{ env.GITHUB_GITHUB_WORKSPACE }}/${{ env.GITHUB_REPOSITORY }}
+           run: |
+              sudo gem install asciidoctor
+              sudo apt-get install -yqq cmake libglib2.0-dev qttools5-dev qttools5-dev-tools libqt5svg5-dev qtmultimedia5-dev qt5-default libpcap-dev bison flex make python3 python3-pip perl libgcrypt-dev
          - name: Build in-tree
-           run: sudo tools/ubuntu-build-source.sh
+           run: |
+              mkdir build
+              cd build
+              cmake -GNinja ..
+              ninja
