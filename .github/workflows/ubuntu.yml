@@ -20,10 +20,11 @@ jobs:
            run: sudo tools/ubuntu-provision-standalone.sh
          - name: Build standalone
            run: sudo tools/ubuntu-build-standalone.sh
+
          - name: Copy plugin so
            run: |
               mkdir exe
-              cp build/sap.so exe/sap.so
+              cp build/sap.so exe/sap-standalone.so
          - name: Upload Ubuntu packages
            uses: actions/upload-artifact@v1
            with:
@@ -56,3 +57,14 @@ jobs:
               cd build
               cmake ..
               make
+
+         - name: Copy plugin so
+           run: |
+              mkdir exe
+              cp build/run/plugins/3.2/epan/sap/sap.so exe/sap-source.so
+         - name: Upload Ubuntu packages
+           uses: actions/upload-artifact@v1
+           with:
+              name: packages
+              path: exe
+              
