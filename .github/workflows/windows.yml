@@ -11,7 +11,7 @@ env:
    WIRESHARK_BASE_DIR: C:/wireshark-libs
 
 jobs:
-   windows:
+   intree:
       name: Build in-tree plugin
       runs-on: windows-latest
       steps:
