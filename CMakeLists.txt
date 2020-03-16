@@ -27,7 +27,7 @@ find_package(Wireshark 3.2)
 
 if(Wireshark_FOUND)
 
-  MESSAGE(STATUS "Wireshark 3.2 libraries found in ${Wireshark_LIBRARY}, performing a stand-alone plug-in build.")
+  MESSAGE(STATUS "Wireshark 3.2 libraries found in ${Wireshark_LIB_DIR}, performing a stand-alone plug-in build.")
 
   if(NOT CMAKE_INSTALL_LIBDIR )
     set(CMAKE_INSTALL_LIBDIR ~/.local/lib/wireshark/plugins/${Wireshark_VERSION_MAJOR}.${Wireshark_VERSION_MINOR}/epan)
