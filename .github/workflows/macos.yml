@@ -38,7 +38,8 @@ jobs:
          - name: Update brew packages
            run: brew update
          - name: Install dependencies for a in-tree build
-           run: brew install c-ares glib libgcrypt gnutls lua@5.1 cmake nghttp2 snappy lz4 libxml2 ninja libmaxminddb doxygen libsmi spandsp brotli minizip zstd
+           run: |
+              brew install c-ares glib libgcrypt gnutls lua@5.1 cmake nghttp2 snappy lz4 libxml2 ninja libmaxminddb doxygen libsmi spandsp brotli minizip zstd || 1
          - name: Install Qt
            uses: jurplel/install-qt-action@v2
            with:
