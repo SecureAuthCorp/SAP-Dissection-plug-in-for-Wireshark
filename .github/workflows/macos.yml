@@ -13,7 +13,7 @@ env:
 jobs:
    standalone:
       name: Build standalone plugin
-      runs-on: ubuntu-latest
+      runs-on: macos-latest
       steps:
          - name: Checkout plug-in
            uses: actions/checkout@v2
