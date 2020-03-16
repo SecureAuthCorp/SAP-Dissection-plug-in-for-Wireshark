@@ -11,6 +11,24 @@ env:
    WIRESHARK_QT_VERSION: 5.12.3
 
 jobs:
+   standalone:
+      name: Build standalone plugin
+      runs-on: ubuntu-latest
+      steps:
+         - name: Checkout plug-in
+           uses: actions/checkout@v2
+         - name: Update brew packages
+           run: brew update
+         - name: Install dependencies for a standalone build
+           run: |
+              brew install wireshark cmake
+         - name: Build standalone
+           run: |
+              mkdir build
+              cd build
+              cmake ..
+              make
+
    intree:
       name: Build in-tree plugin
       runs-on: macos-latest
@@ -39,7 +57,7 @@ jobs:
            run: brew update
          - name: Install dependencies for a in-tree build
            run: |
-              brew install c-ares glib libgcrypt gnutls lua@5.1 cmake nghttp2 snappy lz4 libxml2 ninja libmaxminddb doxygen libsmi spandsp brotli minizip zstd || 1
+              brew install c-ares glib libgcrypt gnutls lua@5.1 cmake nghttp2 snappy lz4 libxml2 ninja libmaxminddb doxygen libsmi spandsp brotli minizip zstd || true
          - name: Install Qt
            uses: jurplel/install-qt-action@v2
            with:
