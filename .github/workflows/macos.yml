@@ -38,7 +38,7 @@ jobs:
            run: |
               gem install asciidoctor
               brew update
-              brew install c-ares glib libgcrypt gnutls lua@5.1 cmake python nghttp2 snappy lz4 libxml2 ninja libmaxminddb doxygen libsmi spandsp brotli minizip zstd qt5
+              brew install c-ares glib libgcrypt gnutls lua@5.1 cmake python nghttp2 snappy lz4 libxml2 ninja libmaxminddb doxygen libsmi spandsp brotli minizip zstd
          - name: Build in-tree
            run: |
               mkdir build
