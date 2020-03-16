@@ -8,6 +8,7 @@ on: [push]
 
 env:
    WIRESHARK_BRANCH: master-3.2
+   WIRESHARK_QT_VERSION: 5.12.3
 
 jobs:
    intree:
@@ -34,11 +35,17 @@ jobs:
            uses: actions/setup-ruby@v1
            with:
               ruby-version: '2.6'
-         - name: Provision for a in-tree build
-           run: |
-              gem install asciidoctor
-              brew update
-              brew install c-ares glib libgcrypt gnutls lua@5.1 cmake python nghttp2 snappy lz4 libxml2 ninja libmaxminddb doxygen libsmi spandsp brotli minizip zstd
+         - name: Update brew packages
+           run: brew update
+         - name: Install asciidoctor
+           run: gem install asciidoctor
+         - name: Install dependencies for a in-tree build
+           run: brew install c-ares glib libgcrypt gnutls lua@5.1 cmake python nghttp2 snappy lz4 libxml2 ninja libmaxminddb doxygen libsmi spandsp brotli minizip zstd
+         - name: Install Qt
+           uses: jurplel/install-qt-action@v2
+           with:
+              version: ${{ env.WIRESHARK_QT_VERSION }}
+
          - name: Build in-tree
            run: |
               mkdir build

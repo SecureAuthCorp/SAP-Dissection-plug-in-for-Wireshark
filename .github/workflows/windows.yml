@@ -9,6 +9,7 @@ on: [push]
 env:
    WIRESHARK_BRANCH: master-3.2
    WIRESHARK_BASE_DIR: C:/wireshark-libs
+   WIRESHARK_QT_VERSION: 5.12.3
 
 jobs:
    intree:
@@ -36,7 +37,7 @@ jobs:
          - name: Install Qt
            uses: jurplel/install-qt-action@v2
            with:
-              version: 5.12.3
+              version: ${{ env.WIRESHARK_QT_VERSION }}
          - name: Add msbuild to PATH
            uses: microsoft/setup-msbuild@v1.0.0
            with:
@@ -49,7 +50,7 @@ jobs:
            run: cmake -A x64 ..
            env:
               PLATFORM: x64
-              QT5_BASE_DIR: C:/Qt/5.12.3/msvc2017_64
+              QT5_BASE_DIR: C:/Qt/${{ env.WIRESHARK_QT_VERSION }}/msvc2017_64
            working-directory: build
          - name: Build
            run: cmake --build . --config RelWithDebInfo
