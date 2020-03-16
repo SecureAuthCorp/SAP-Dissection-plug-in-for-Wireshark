@@ -117,6 +117,8 @@ if(Wireshark_FOUND)
           FOLDER "Plugins"
   )
 
+  link_directories(${Wireshark_LIB_DIR})
+  
   target_link_libraries(sap wireshark)
 
   install(TARGETS sap
