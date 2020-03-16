@@ -23,9 +23,9 @@ cmake_minimum_required(VERSION 2.6)
 set(CMAKE_BACKWARDS_COMPATIBILITY 2.6)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-find_package(Wireshark)
+find_package(Wireshark 3.2)
 
-if(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 3 AND Wireshark_VERSION_MINOR EQUAL 2)
+if(Wireshark_FOUND)
 
   MESSAGE(STATUS "Wireshark 3.2 libraries found in ${Wireshark_LIBRARY}, performing a stand-alone plug-in build.")
 
@@ -50,7 +50,7 @@ if(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 3 AND Wireshark_VERSION_MIN
   set(PLUGIN_VERSION "0.8.1.dev")
   add_definitions(-DPLUGIN_VERSION=\"${PLUGIN_VERSION}\")
 
-else(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 3 AND Wireshark_VERSION_MINOR EQUAL 2)
+else(Wireshark_FOUND)
 
   MESSAGE(STATUS "Wireshark 3.2 libraries not found, performing an in-tree Wireshark plug-in build.")
 
@@ -59,7 +59,7 @@ else(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 3 AND Wireshark_VERSION_M
   # Plugin name and version info (major minor micro extra)
   set_module_info(sap 0 8 1 0)
 
-endif(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 3 AND Wireshark_VERSION_MINOR EQUAL 2)
+endif(Wireshark_FOUND)
 
 set(DISSECTOR_SRC
 	src/packet-sapdiag.c
@@ -104,7 +104,7 @@ register_plugin_files(plugin.c
   ${DISSECTOR_SUPPORT_SRC}
 )
 
-if(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 3 AND Wireshark_VERSION_MINOR EQUAL 2)
+if(Wireshark_FOUND)
 
   add_library(sap ${LINK_MODE_MODULE}
                   ${PLUGIN_FILES}
@@ -125,7 +125,7 @@ if(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 3 AND Wireshark_VERSION_MIN
           ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   )
 
-else(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 3 AND Wireshark_VERSION_MINOR EQUAL 2)
+else(Wireshark_FOUND)
 
   add_plugin_library(sap epan)
 
@@ -144,7 +144,7 @@ else(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 3 AND Wireshark_VERSION_M
   	  ${DISSECTOR_HEADERS}
   )
 
-endif(Wireshark_FOUND AND Wireshark_VERSION_MAJOR EQUAL 3 AND Wireshark_VERSION_MINOR EQUAL 2)
+endif(Wireshark_FOUND)
 
 #
 # Editor modelines  -  https://www.wireshark.org/tools/modelines.html
