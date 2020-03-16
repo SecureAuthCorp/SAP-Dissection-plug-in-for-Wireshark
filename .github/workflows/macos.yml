@@ -21,7 +21,7 @@ jobs:
            run: brew update
          - name: Install dependencies for a standalone build
            run: |
-              brew install wireshark cmake
+              brew install wireshark -v
          - name: Build standalone
            run: |
               mkdir build
