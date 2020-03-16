@@ -19,7 +19,11 @@ jobs:
          - name: Provision for standalone build
            run: sudo tools/ubuntu-provision-standalone.sh
          - name: Build standalone
-           run: sudo tools/ubuntu-build-standalone.sh
+           run: |
+              mkdir build
+              cd build
+              cmake ..
+              make
 
          - name: Copy plugin so
            run: |
@@ -61,7 +65,7 @@ jobs:
          - name: Copy plugin so
            run: |
               mkdir exe
-              cp build/run/plugins/3.2/epan/sap/sap.so exe/sap-source.so
+              cp build/run/plugins/3.2/epan/sap.so exe/sap-source.so
          - name: Upload Ubuntu packages
            uses: actions/upload-artifact@v1
            with:
