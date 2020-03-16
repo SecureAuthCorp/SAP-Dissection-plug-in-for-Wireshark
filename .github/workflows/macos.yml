@@ -37,14 +37,14 @@ jobs:
               ruby-version: '2.6'
          - name: Update brew packages
            run: brew update
-         - name: Install asciidoctor
-           run: gem install asciidoctor
          - name: Install dependencies for a in-tree build
-           run: brew install c-ares glib libgcrypt gnutls lua@5.1 cmake python nghttp2 snappy lz4 libxml2 ninja libmaxminddb doxygen libsmi spandsp brotli minizip zstd
+           run: brew install c-ares glib libgcrypt gnutls lua@5.1 cmake nghttp2 snappy lz4 libxml2 ninja libmaxminddb doxygen libsmi spandsp brotli minizip zstd
          - name: Install Qt
            uses: jurplel/install-qt-action@v2
            with:
               version: ${{ env.WIRESHARK_QT_VERSION }}
+         - name: Install asciidoctor
+           run: gem install asciidoctor
 
          - name: Build in-tree
            run: |
