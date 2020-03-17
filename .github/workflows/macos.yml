@@ -22,6 +22,7 @@ jobs:
          - name: Install dependencies for a standalone build
            run: |
               brew install wireshark -v
+
          - name: Build standalone
            run: |
               mkdir build
@@ -45,6 +46,7 @@ jobs:
          - name: Apply patch
            run: |
               git apply plugins/epan/sap/wireshark-${{ env.WIRESHARK_BRANCH }}.patch
+
          - name: Set up Python 3.8
            uses: actions/setup-python@v1
            with:
@@ -71,4 +73,29 @@ jobs:
               cd build
               cmake ..
               make
-              
+
+         - name: Install dependencies for testing
+           run: |
+              brew install --with-python libdnet
+              brew install https://raw.githubusercontent.com/secdev/scapy/master/.travis/pylibpcap.rb
+         - name: Set up Python
+           uses: actions/setup-python@v1
+           with:
+              python-version: 2.7
+         - name: Install Python packages for testing
+           run: |
+              python -m pip install --upgrade pip setuptools
+              pip install pysap pyshark-legacy
+         - name: Run tests
+           run: |
+              python tests/__init__.py           
+
+         - name: Copy plugin so
+           run: |
+              mkdir exe
+              cp build/run/Wireshark.app/Contents/PlugIns/wireshark/3-2/epan/sap.so exe/sap-source.so
+         - name: Upload Ubuntu packages
+           uses: actions/upload-artifact@v1
+           with:
+              name: packages
+              path: exe
