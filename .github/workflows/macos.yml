@@ -1,0 +1,74 @@
+# GitHub Action workflows to build and test the plug-in on MacOS
+#
+# Adapted from Wireshark's repository https://github.com/wireshark/wireshark/tree/master/.github/workflows
+
+name: Build MacOS plug-in
+
+on: [push]
+
+env:
+   WIRESHARK_BRANCH: master-3.2
+   WIRESHARK_QT_VERSION: 5.12.3
+
+jobs:
+   standalone:
+      name: Build standalone plugin
+      runs-on: macos-latest
+      steps:
+         - name: Checkout plug-in
+           uses: actions/checkout@v2
+         - name: Update brew packages
+           run: brew update
+         - name: Install dependencies for a standalone build
+           run: |
+              brew install wireshark -v
+         - name: Build standalone
+           run: |
+              mkdir build
+              cd build
+              cmake ..
+              make
+
+   intree:
+      name: Build in-tree plugin
+      runs-on: macos-latest
+      steps:
+         - name: Checkout Wireshark
+           uses: actions/checkout@v2
+           with:
+              repository: wireshark/wireshark
+              ref: ${{ env.WIRESHARK_BRANCH }}
+         - name: Checkout plug-in
+           uses: actions/checkout@v2
+           with:
+              path: plugins/epan/sap
+         - name: Apply patch
+           run: |
+              git apply plugins/epan/sap/wireshark-${{ env.WIRESHARK_BRANCH }}.patch
+         - name: Set up Python 3.8
+           uses: actions/setup-python@v1
+           with:
+              python-version: 3.8
+         - name: Set up Ruby 2.6
+           uses: actions/setup-ruby@v1
+           with:
+              ruby-version: '2.6'
+         - name: Update brew packages
+           run: brew update
+         - name: Install dependencies for a in-tree build
+           run: |
+              brew install c-ares glib libgcrypt gnutls lua@5.1 cmake nghttp2 snappy lz4 libxml2 ninja libmaxminddb doxygen libsmi spandsp brotli minizip zstd || true
+         - name: Install Qt
+           uses: jurplel/install-qt-action@v2
+           with:
+              version: ${{ env.WIRESHARK_QT_VERSION }}
+         - name: Install asciidoctor
+           run: gem install asciidoctor
+
+         - name: Build in-tree
+           run: |
+              mkdir build
+              cd build
+              cmake ..
+              make
+              
