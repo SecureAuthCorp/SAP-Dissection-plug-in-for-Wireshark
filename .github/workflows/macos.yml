@@ -30,6 +30,16 @@ jobs:
               cmake ..
               make
 
+         - name: Copy plugin so
+           run: |
+              mkdir exe
+              cp build/sap.so exe/sap-standalone.so
+         - name: Upload Ubuntu packages
+           uses: actions/upload-artifact@v1
+           with:
+              name: packages
+              path: exe
+
    intree:
       name: Build in-tree plugin
       runs-on: macos-latest
