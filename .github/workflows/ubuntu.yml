@@ -16,14 +16,36 @@ jobs:
       steps:
          - name: Checkout plug-in
            uses: actions/checkout@v2
+           
          - name: Install dependencies for a standalone build
-           run: sudo tools/ubuntu-provision-standalone.sh
+           run: |
+              sudo add-apt-repository ppa:wireshark-dev/stable -y
+              sudo apt-get update -qq
+              export DEBIAN_FRONTEND=noninteractive
+              echo "wireshark-common wireshark-common/install-setuid boolean true" | sudo debconf-set-selections
+              sudo apt-get install -yqq cmake wireshark wireshark-dev tshark
+
          - name: Build standalone
            run: |
               mkdir build
               cd build
               cmake ..
               make
+
+         - name: Install dependencies for testing
+           run: |
+              sudo apt-get install -yqq libxml2-dev libxslt-dev python-dev python-pip
+         - name: Set up Python
+           uses: actions/setup-python@v1
+           with:
+              python-version: 2.7
+         - name: Install Python packages for testing
+           run: |
+              python -m pip install --upgrade pip setuptools
+              pip install pysap pyshark-legacy
+         - name: Run tests
+           run: |
+              python tests/__init__.py           
 
          - name: Copy plugin so
            run: |
@@ -61,6 +83,21 @@ jobs:
               cd build
               cmake ..
               make
+
+         - name: Install dependencies for testing
+           run: |
+              sudo apt-get install -yqq libxml2-dev libxslt-dev python-dev python-pip
+         - name: Set up Python
+           uses: actions/setup-python@v1
+           with:
+              python-version: 2.7
+         - name: Install Python packages for testing
+           run: |
+              python -m pip install --upgrade pip setuptools
+              pip install pysap pyshark-legacy
+         - name: Run tests
+           run: |
+              python tests/__init__.py           
 
          - name: Copy plugin so
            run: |
