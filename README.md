@@ -102,7 +102,6 @@ with version 3.2.
 
 To build and install the plugin on Debian/Ubuntu linux distributions:
 
-    ```
     sudo add-apt-repository ppa:wireshark-dev/stable -y
     sudo apt-get update
     sudo apt-get install wireshark wireshark-dev
@@ -113,7 +112,6 @@ To build and install the plugin on Debian/Ubuntu linux distributions:
     cmake ..
     make
     make install
-    ```
 
 #### As part of Wireshark ####
 
@@ -225,9 +223,7 @@ distributions and frameworks.
 
 Installation on the [Pentoo](http://www.pentoo.ch/) livecd distribution:
 
-    ```
     emerge net-misc/wireshark-sap-plugin
-    ```
 
 #### Installing with The PenTesters Framework (PTF) ####
 
@@ -235,10 +231,8 @@ Installation on Debian, Ubuntu and ArchLinux can be performed using
 [The PenTesters Framework (PTF)](https://github.com/trustedsec/ptf). From inside
 the `ptf` command-line, run:
 
-    ```
     use modules/intelligence-gathering/sap-wireshark-plugin
     install
-    ```
 
 
 ### Additional notes ###
@@ -271,15 +265,11 @@ filter could be used for identifying packets containing fields marked as
 sensitive data. Early packets in a Diag session probably contains values for
 user id and password fields.
 
-    ```
     sapdiag.item.value.dyntatom.item.attr.INVISIBLE == 1
-    ```
 
 The same results can be achieved also using expert info (security group):
 
-    ```
     sapdiag.item.value.dyntatom.item.password
-    ```
 
 ![SAP Diag login password](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/raw/master/docs/sapdiag_login_password.png "SAP Diag login password")
 
