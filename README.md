@@ -117,8 +117,8 @@ To build and install the plugin on Debian/Ubuntu linux distributions:
 
 The following steps are required to build and install the plugin as part of Wireshark:
 
-1) Download and decompress the [Wireshark version 3.2 source](https://www.wireshark.org/download.html) [9]
-   or checkout the code from the [source repository](https://code.wireshark.org/review/wireshark) [10].
+1) Download and decompress the [Wireshark version 3.2 source](https://www.wireshark.org/download.html)
+   or checkout the code from the [source repository](https://code.wireshark.org/review/wireshark).
 
     ```
     git clone https://code.wireshark.org/review/wireshark
@@ -233,6 +233,12 @@ the `ptf` command-line, run:
 
     use modules/intelligence-gathering/sap-wireshark-plugin
     install
+
+
+### Using Docker ###
+
+[jbelamor](https://github.com/jbelamor/) built a docker container for compiling and setting up the plugin. Check it out at
+[docker_wireshark_sap_plugin](https://github.com/jbelamor/docker_wireshark_sap_plugin).
 
 
 ### Additional notes ###
