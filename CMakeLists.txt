@@ -47,7 +47,7 @@ if(Wireshark_FOUND)
   set(LINK_MODE_MODULE MODULE)
 
   # Plugin name and version info (major minor micro)
-  set(PLUGIN_VERSION "0.8.1")
+  set(PLUGIN_VERSION "0.8.2.dev")
   add_definitions(-DPLUGIN_VERSION=\"${PLUGIN_VERSION}\")
 
 else(Wireshark_FOUND)
@@ -57,7 +57,7 @@ else(Wireshark_FOUND)
   include(WiresharkPlugin)
 
   # Plugin name and version info (major minor micro extra)
-  set_module_info(sap 0 8 1 0)
+  set_module_info(sap 0 8 2 0)
 
 endif(Wireshark_FOUND)
 
