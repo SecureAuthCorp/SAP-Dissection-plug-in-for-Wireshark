@@ -1,29 +1,34 @@
 SAP Dissector Plugin for Wireshark
 ==================================
 
+[![Build Ubuntu plug-in](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/workflows/Build%20Ubuntu%20plug-in/badge.svg)](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/actions?query=workflow%3A%22Build+Ubuntu+plug-in%22)
+[![Build Windows plug-in](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/workflows/Build%20Windows%20plug-in/badge.svg)](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/actions?query=workflow%3A%22Build+Windows+plug-in%22)
+[![Build MacOS plug-in](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/workflows/Build%20MacOS%20plug-in/badge.svg)](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/actions?query=workflow%3A%22Build+MacOS+plug-in%22)
+
 [![Build Status](https://travis-ci.org/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark.svg)](https://travis-ci.org/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark)
 [![Build status](https://ci.appveyor.com/api/projects/status/y52ophpdwb019glj?svg=true)](https://ci.appveyor.com/project/martingalloar/sap-dissection-plug-in-for-wireshark)
 
+
 SECUREAUTH LABS. Copyright (C) 2020 SecureAuth Corporation. All rights reserved.
 
-Version 0.8.1.dev (XXX 2020)
+Version 0.8.2.dev (XXX 2020)
 
 
 Overview
 --------
 
-[SAP Netweaver](https://www.sap.com/platform/netweaver/index.epx) [1] and
-[SAP HANA](https://www.sap.com/products/hana.html) [2] are technology platforms for
+[SAP Netweaver](https://www.sap.com/platform/netweaver/index.epx) and
+[SAP HANA](https://www.sap.com/products/hana.html)are technology platforms for
 building and integrating SAP business applications. Communication between components
 uses different network protocols. While some of them are standard and well-known
 protocols, others are proprietaries and public information is not available.
 
-This [Wireshark](https://www.wireshark.org/) [3] plugin provides dissection
+This [Wireshark](https://www.wireshark.org/) plugin provides dissection
 of SAP's NI, Message Server, Router, Diag, Enqueue, IGS and SNC protocols. The
 dissectors are based on information acquired at researching the different
 protocols and services. Additional experimental support is included for SAP's
-RFC protocol. Detailed information about the research can be found at [4],
-[5], [6], [7] and [8].
+RFC protocol. Detailed information about the research can be found in
+[pysap's documentation](https://pysap.readthedocs.io/en/latest/user/index.html#references).
 
 
 Features
@@ -112,29 +117,37 @@ To build and install the plugin on Debian/Ubuntu linux distributions:
 
 The following steps are required to build and install the plugin as part of Wireshark:
 
-1) Download and decompress the [Wireshark version 3.2 source](https://www.wireshark.org/download.html) [9]
-   or checkout the code from the [source repository](https://code.wireshark.org/review/wireshark) [10].
+1) Download and decompress the [Wireshark version 3.2 source](https://www.wireshark.org/download.html)
+   or checkout the code from the [source repository](https://code.wireshark.org/review/wireshark).
 
+    ```
     git clone https://code.wireshark.org/review/wireshark
     cd wireshark
     git checkout master-3.2
+    ```
 
 2) Copy the SAP Wireshark Plugin to a new `plugins/epan/sap` directory.
 
+    ```
     git clone https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/ plugins/epan/sap
+    ```
 
 3) Configure the plugin to be included in the build process. This step can be
    performed using the patch file provided. At the root directory run:
 
+    ```
     git apply plugins/epan/sap/wireshark-master-3.2.patch
+    ```
 
 4) Perform a new build including the plugin. At the root directory run:
 
+    ```
     mkdir -p build
     cd build
     cmake ..
     make
     make install
+    ```
 
 
 #### Using Vagrant ####
@@ -155,17 +168,23 @@ The following steps can be used to setup a Vagrant machine and build the plugin:
 
 1) Install VirtualBox and Vagrant 1.8 or greater.
 
+    ```
     sudo apt-get install virtualbox vagrant
+    ```
 
 2) Inside the plugin's directory, launch the desired Vagrant machine, in this
 case `standalone`:
 
+    ```
     vagrant up standalone
+    ```
 
 3) Login into the Vagrant machine and run Wireshark:
 
+    ```
     vagrant ssh standalone
     wireshark
+    ```
 
 
 ### Installing on Windows ###
@@ -173,7 +192,7 @@ case `standalone`:
 Windows build can be only performed as part of the whole Wireshark. The
 following steps are required to compile the plugin on Windows:
 
-1) Follow the [step-to-step guide](https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html) [11]
+1) Follow the [step-to-step guide](https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html)
 for building Wireshark on Windows.
 
 2) Copy the SAP Wireshark Plugin to a new `plugins/epan/sap` directory.
@@ -181,7 +200,9 @@ for building Wireshark on Windows.
 3) Configure the plugin to be included in the build process. This step can be
    performed using the patch file provided. At the root directory run:
 
+    ```
     git apply plugins/epan/sap/wireshark-master-3.2.patch
+    ```
 
 4) Perform a new build including the plugin.
 
@@ -190,7 +211,7 @@ for building Wireshark on Windows.
 
 The build process for OSX is similar to the one for Linux systems. It was
 reported that compiling Wireshark on OSX requires fixing link for the `gettext`
-library if it was installed using `home-brew`.
+library if it was installed using `homebrew`.
 
 
 ### Penetration testing distribution and frameworks ###
@@ -202,7 +223,7 @@ distributions and frameworks.
 
 Installation on the [Pentoo](http://www.pentoo.ch/) livecd distribution:
 
-	emerge net-misc/wireshark-sap-plugin
+    emerge net-misc/wireshark-sap-plugin
 
 #### Installing with The PenTesters Framework (PTF) ####
 
@@ -210,8 +231,14 @@ Installation on Debian, Ubuntu and ArchLinux can be performed using
 [The PenTesters Framework (PTF)](https://github.com/trustedsec/ptf). From inside
 the `ptf` command-line, run:
 
-  use modules/intelligence-gathering/sap-wireshark-plugin
-  install
+    use modules/intelligence-gathering/sap-wireshark-plugin
+    install
+
+
+### Using Docker ###
+
+[jbelamor](https://github.com/jbelamor/) built a docker container for compiling and setting up the plugin. Check it out at
+[docker_wireshark_sap_plugin](https://github.com/jbelamor/docker_wireshark_sap_plugin).
 
 
 ### Additional notes ###
@@ -219,7 +246,7 @@ the `ptf` command-line, run:
 It's worth mentioning that compression libraries for SAP Diag/RFC protocol are
 originally written in C++, thus the entire plugin needs to be compiled for C++.
 See [Wireshark's portability notes](https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-3.2)
-for more information [12].
+for more information.
 
 
 Usage
@@ -244,11 +271,11 @@ filter could be used for identifying packets containing fields marked as
 sensitive data. Early packets in a Diag session probably contains values for
 user id and password fields.
 
-	sapdiag.item.value.dyntatom.item.attr.INVISIBLE == 1
+    sapdiag.item.value.dyntatom.item.attr.INVISIBLE == 1
 
 The same results can be achieved also using expert info (security group):
 
-	sapdiag.item.value.dyntatom.item.password
+    sapdiag.item.value.dyntatom.item.password
 
 ![SAP Diag login password](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/raw/master/docs/sapdiag_login_password.png "SAP Diag login password")
 
@@ -270,46 +297,18 @@ SecureAuth Labs team.
 
 Contributions made by:
 
-  * Joris van de Vis ([@jvis](https://twitter.com/jvis))
-  * Anton Bolshakov ([@blshkv](https://github.com/blshkv))
-  * Valeriy Gusev
-  * Daniel Berlin ([@daberlin](https://github.com/daberlin))
-  * Victor Portal Gonzalez
-  * Dave Hartley ([@nmonkee](https://twitter.com/nmonkee))
-  * Jean-Paul Roliers
-  * Dongha Shin
-  * Luca Di Stefano
-  * Alexis La Goutte ([@alagoutte](https://github.com/alagoutte))
-  * Yvan Genuer ([@iggy38](https://github.com/iggy38))
-  * Mathieu Geli ([@gelim](https://github.com/gelim)))
-
-
-References
-----------
-
-[1] https://www.sap.com/platform/netweaver/index.epx
-
-[2] https://www.sap.com/products/hana.html
-
-[3] https://www.wireshark.org/
-
-[4] https://www.secureauth.com/labs/open-source-tools/sap-dissection-plug-wireshark
-
-[5] https://www.coresecurity.com/content/sap-netweaver-dispatcher-multiple-vulnerabilities
-
-[6] https://www.coresecurity.com/content/SAP-netweaver-msg-srv-multiple-vulnerabilities
-
-[7] https://www.coresecurity.com/corelabs-research/publications/uncovering-sap-vulnerabilities-reversing-and-breaking-diag-protocol
-
-[8] https://www.coresecurity.com/corelabs-research/publications/sap-network-protocols-revisited
-
-[9] https://www.wireshark.org/download.html
-
-[10] https://code.wireshark.org/review/wireshark
-
-[11] https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-3.2
-
-[12] https://www.wireshark.org/docs/wsdg_html_chunked/ChSetupWin32.html
+* Joris van de Vis ([@jvis](https://twitter.com/jvis))
+* Anton Bolshakov ([@blshkv](https://github.com/blshkv))
+* Valeriy Gusev
+* Daniel Berlin ([@daberlin](https://github.com/daberlin))
+* Victor Portal Gonzalez
+* Dave Hartley ([@nmonkee](https://twitter.com/nmonkee))
+* Jean-Paul Roliers
+* Dongha Shin
+* Luca Di Stefano
+* Alexis La Goutte ([@alagoutte](https://github.com/alagoutte))
+* Yvan Genuer ([@iggy38](https://github.com/iggy38))
+* Mathieu Geli ([@gelim](https://github.com/gelim)))
 
 
 Contact
