@@ -2,7 +2,7 @@
 #
 # Adapted from Wireshark's repository https://github.com/wireshark/wireshark/tree/master/.github/workflows
 
-name: Build MacOS plug-in
+name: Build and test MacOS plug-in
 
 on: [push]
 
@@ -12,7 +12,7 @@ env:
 
 jobs:
    standalone:
-      name: Build standalone plugin
+      name: Build and test standalone plugin
       runs-on: macos-latest
       steps:
          - name: Checkout plug-in
@@ -29,6 +29,24 @@ jobs:
               cd build
               cmake ..
               make
+              make install
+
+         - name: Set up Python
+           uses: actions/setup-python@v1
+           with:
+              python-version: 2.7
+         - name: Install dependencies for testing
+           run: |
+              brew install libdnet --with-python
+              brew install https://raw.githubusercontent.com/secdev/scapy/master/.travis/pylibpcap.rb
+         - name: Install Python packages for testing
+           run: |
+              python -m pip install --upgrade pip setuptools
+              pip install pysap pyshark-legacy
+         - name: Run tests
+           run: |
+              cd plugins/epan/sap
+              python tests/__init__.py        
 
          - name: Copy plugin so
            run: |
@@ -84,20 +102,21 @@ jobs:
               cmake ..
               make
 
-         - name: Install dependencies for testing
-           run: |
-              brew install --with-python libdnet
-              brew install https://raw.githubusercontent.com/secdev/scapy/master/.travis/pylibpcap.rb
          - name: Set up Python
            uses: actions/setup-python@v1
            with:
               python-version: 2.7
+         - name: Install dependencies for testing
+           run: |
+              brew install libdnet --with-python
+              brew install https://raw.githubusercontent.com/secdev/scapy/master/.travis/pylibpcap.rb
          - name: Install Python packages for testing
            run: |
               python -m pip install --upgrade pip setuptools
               pip install pysap pyshark-legacy
          - name: Run tests
            run: |
+              cd plugins/epan/sap
               python tests/__init__.py           
 
          - name: Copy plugin so
