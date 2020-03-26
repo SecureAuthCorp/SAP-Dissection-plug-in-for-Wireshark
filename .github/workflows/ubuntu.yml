@@ -2,7 +2,7 @@
 #
 # Adapted from Wireshark's repository https://github.com/wireshark/wireshark/tree/master/.github/workflows
 
-name: Build Ubuntu plug-in
+name: Build and test Ubuntu plug-in
 
 on: [push]
 
@@ -11,7 +11,7 @@ env:
 
 jobs:
    standalone:
-      name: Build standalone plugin
+      name: Build and test standalone plugin
       runs-on: ubuntu-latest
       steps:
          - name: Checkout plug-in
@@ -31,6 +31,7 @@ jobs:
               cd build
               cmake ..
               make
+              make install
 
          - name: Install dependencies for testing
            run: |
@@ -98,6 +99,7 @@ jobs:
               pip install pysap pyshark-legacy
          - name: Run tests
            run: |
+              cd plugins/epan/sap
               python tests/__init__.py           
 
          - name: Copy plugin so
