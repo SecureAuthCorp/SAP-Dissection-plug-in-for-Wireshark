@@ -98,7 +98,7 @@ int decompress_packet (const guint8 *in, gint in_length, guint8 *out, guint *out
 	class CsObjectInt csObject;
 	int rt = 0, finished = false;
 	SAP_BYTE *bufin = NULL, *bufin_pos = NULL, *bufout = NULL, *bufout_pos = NULL;
-	SAP_INT bufin_length = 0, bufin_rest = 0, bufout_length = 0, bufout_rest = 0, data_length = 0, bytes_read = 0, bytes_decompressed = 0, total_decompressed = 0;
+	SAP_INT bufin_rest = 0, bufout_length = 0, bufout_rest = 0, data_length = 0, bytes_read = 0, bytes_decompressed = 0, total_decompressed = 0;
 
 #ifdef DEBUG
 	printf("sapdecompress.cpp: Decompressing (%d bytes, reported length of %d bytes)...\n", in_length, *out_length);
@@ -115,7 +115,7 @@ int decompress_packet (const guint8 *in, gint in_length, guint8 *out, guint *out
 		return (CS_E_OUT_BUFFER_LEN);
 
 	/* Allocate buffers */
-	bufin_length = bufin_rest = (SAP_INT)in_length;
+	bufin_rest = (SAP_INT)in_length;
 	bufin = bufin_pos = (SAP_BYTE*) wmem_alloc0(wmem_packet_scope(), in_length);
 	if (!bufin){
 		return (CS_E_MEMORY_ERROR);
