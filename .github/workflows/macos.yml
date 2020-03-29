@@ -100,7 +100,7 @@ jobs:
               mkdir build
               cd build
               cmake ..
-              make
+              make sap tshark
 
          - name: Set up Python
            uses: actions/setup-python@v1

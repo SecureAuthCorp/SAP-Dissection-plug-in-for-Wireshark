@@ -84,7 +84,7 @@ jobs:
               mkdir build
               cd build
               cmake ..
-              make
+              make sap tshark
 
          - name: Install dependencies for testing
            run: |
@@ -99,6 +99,8 @@ jobs:
               pip install pysap pyshark-legacy
          - name: Run tests
            run: |
+              export PATH=${PATH}:./build/run
+              export WIRESHARK_RUN_FROM_BUILD_DIRECTORY=1
               cd plugins/epan/sap
               python tests/__init__.py           
 
