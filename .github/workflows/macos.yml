@@ -37,7 +37,7 @@ jobs:
               python-version: 2.7
          - name: Install dependencies for testing
            run: |
-              brew install libdnet --with-python
+              brew install libdnet
               brew install https://raw.githubusercontent.com/secdev/scapy/master/.travis/pylibpcap.rb
          - name: Install Python packages for testing
            run: |
