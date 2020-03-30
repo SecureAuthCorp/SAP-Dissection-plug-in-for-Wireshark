@@ -37,15 +37,13 @@ jobs:
               python-version: 2.7
          - name: Install dependencies for testing
            run: |
-              brew install libdnet
-              brew install https://raw.githubusercontent.com/secdev/scapy/master/.travis/pylibpcap.rb
+              brew install libdnet libpcap
          - name: Install Python packages for testing
            run: |
               python -m pip install --upgrade pip setuptools
               pip install pysap pyshark-legacy
          - name: Run tests
            run: |
-              cd plugins/epan/sap
               python tests/__init__.py        
 
          - name: Copy plugin so
@@ -59,7 +57,7 @@ jobs:
               path: exe
 
    intree:
-      name: Build in-tree plugin
+      name: Build and test in-tree plugin
       runs-on: macos-latest
       steps:
          - name: Checkout Wireshark
@@ -108,16 +106,15 @@ jobs:
               python-version: 2.7
          - name: Install dependencies for testing
            run: |
-              brew install libdnet --with-python
-              brew install https://raw.githubusercontent.com/secdev/scapy/master/.travis/pylibpcap.rb
+              brew install libdnet libpcap
          - name: Install Python packages for testing
            run: |
               python -m pip install --upgrade pip setuptools
               pip install pysap pyshark-legacy
          - name: Run tests
            run: |
-              cd plugins/epan/sap
-              python tests/__init__.py           
+              cd build/run/
+              python ../../plugin/epan/sap/tests/__init__.py           
 
          - name: Copy plugin so
            run: |
