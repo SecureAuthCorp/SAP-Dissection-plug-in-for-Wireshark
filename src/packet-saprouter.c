@@ -232,12 +232,12 @@ typedef struct saprouter_session_state {
 	gboolean route_accepted;
 	guint	 route_accepted_in;
 	gboolean route_snc_protected;
-	guchar 	*src_hostname;			/* Source hostname (first entry in the route string) */
+	gchar 	*src_hostname;			/* Source hostname (first entry in the route string) */
 	guint32  src_port;				/* Source port number */
-	guchar 	*src_password;			/* Source password XXX: Check if possible */
-	guchar 	*dest_hostname;			/* Destination hostname (last entry in the route string) */
+	gchar 	*src_password;			/* Source password XXX: Check if possible */
+	gchar 	*dest_hostname;			/* Destination hostname (last entry in the route string) */
 	guint32  dest_port;				/* Destination port number */
-	guchar 	*dest_password;			/* Destination password */
+	gchar 	*dest_password;			/* Destination password */
 } saprouter_session_state;
 
 /*
@@ -246,7 +246,7 @@ typedef struct saprouter_session_state {
 void proto_reg_handoff_saprouter(void);
 
 static guint32
-dissect_serviceport(guchar *port){
+dissect_serviceport(gchar *port){
 	guint32 portnumber = 0;
 
 	if (g_ascii_isdigit(port[0])){
@@ -265,7 +265,7 @@ static void
 dissect_routestring(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset, saprouter_session_state *session_state){
 	int hop = 1;
 	guint32 len, route_offset, int_port = 0;
-	guchar *hostname = NULL, *port = NULL, *password = NULL;
+	gchar *hostname = NULL, *port = NULL, *password = NULL;
 	proto_item *route_hop = NULL, *route_password = NULL;
 	proto_tree *route_hop_tree = NULL;
 
@@ -279,19 +279,19 @@ dissect_routestring(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32
 
 		/* Dissect the hostname string */
 		len = tvb_strsize(tvb, offset);
-		hostname = tvb_get_string_enc(wmem_file_scope(), tvb, offset, len - 1, ENC_ASCII);
+		hostname = (gchar *)tvb_get_string_enc(wmem_file_scope(), tvb, offset, len - 1, ENC_ASCII);
 		proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_hostname, tvb, offset, len, ENC_ASCII|ENC_NA);
 		offset += len;
 
 		/* Dissect the port string */
 		len = tvb_strsize(tvb, offset);
-		port = tvb_get_string_enc(wmem_packet_scope(), tvb, offset, len - 1, ENC_ASCII);
+		port = (gchar *)tvb_get_string_enc(wmem_packet_scope(), tvb, offset, len - 1, ENC_ASCII);
 		proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_service, tvb, offset, len, ENC_ASCII|ENC_NA);
 		offset += len;
 
 		/* Dissect the password string */
 		len = tvb_strsize(tvb, offset);
-		password = tvb_get_string_enc(wmem_file_scope(), tvb, offset, len - 1, ENC_ASCII);
+		password = (gchar *)tvb_get_string_enc(wmem_file_scope(), tvb, offset, len - 1, ENC_ASCII);
 		route_password = proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_password, tvb, offset, len, ENC_ASCII|ENC_NA);
 
 		/* If a password was found, add a expert warning in the security category */
