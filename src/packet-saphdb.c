@@ -262,8 +262,8 @@ dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, 
 		case 33:  // AUTHENTICATION
 
 			/* Parse the field count */
-			field_count = tvb_get_guint16(tvb, offset, ENC_LITTLE_ENDIAN);
-			proto_tree_add_item(tree, hf_saphdb_part_authentication_field_count, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; length -= 2;
+			field_count = tvb_get_guint16(tvb, offset, ENC_BIG_ENDIAN);
+			proto_tree_add_item(tree, hf_saphdb_part_authentication_field_count, tvb, offset, 2, ENC_BIG_ENDIAN); offset += 2; length -= 2;
 
 			for (guint16 field = 0; field < field_count; field++) {
 
@@ -271,7 +271,7 @@ dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, 
 				field_short_length = tvb_get_guint8(tvb, offset);
 				if (field_short_length == 0xff) {
 					offset += 1; length -= 1;
-					field_length = tvb_get_guint16(tvb, offset, ENC_LITTLE_ENDIAN);
+					field_length = tvb_get_guint16(tvb, offset, ENC_BIG_ENDIAN);
 					proto_tree_add_item(tree, hf_saphdb_part_authentication_field_length, tvb, offset, 2, ENC_BIG_ENDIAN); offset += 2; length -= 2;
 				} else {
 					proto_tree_add_item(tree, hf_saphdb_part_authentication_field_length, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length -= 1;
