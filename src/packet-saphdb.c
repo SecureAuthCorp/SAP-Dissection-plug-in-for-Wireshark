@@ -182,6 +182,7 @@ static const value_string saphdb_part_partkind_vals[] = {
 
 /* SAP HDB Type values */
 static const value_string saphdb_part_type_vals[] = {
+	{ 0, "NULL" },
 	{ 1, "TINYINT" },
 	{ 2, "SMALLINT" },
 	{ 3, "INT" },
@@ -217,12 +218,27 @@ static const value_string saphdb_part_type_vals[] = {
 	{ 33, "BSTRING" },
 	{ 34, "DECIMAL_DIGIT_ARRAY" },
 	{ 35, "VARCHAR2" },
+	{ 36, "VARCHAR3" },
+	{ 37, "NVARCHAR3" },
+	{ 38, "VARBINARY3" },
+	{ 39, "VARGROUP" },
+	{ 40, "TINYINT_NOTNULL" },
+	{ 41, "SMALLINT_NOTNULL" },
+	{ 42, "INT_NOTNULL" },
+	{ 43, "BIGINT_NOTNULL" },
+	{ 44, "ARGUMENT" },
 	{ 45, "TABLE" },
+	{ 46, "CURSOR" },
+	{ 47, "SMALLDECIMAL" },
 	{ 48, "ABAPSTREAM" },
 	{ 49, "ABAPSTRUCT" },
+	{ 50, "ARRAY" },
 	{ 51, "TEXT" },
 	{ 52, "SHORTTEXT" },
+	{ 53, "FIXEDSTRING" },
+	{ 54, "FIXEDPOINTDECIMAL" },
 	{ 55, "ALPHANUM" },
+	{ 56, "TLOCATOR" },
 	{ 61, "LONGDATE" },
 	{ 62, "SECONDDATE" },
 	{ 63, "DAYDATE" },
@@ -232,6 +248,13 @@ static const value_string saphdb_part_type_vals[] = {
 	{ 71, "BLOB_DISK" },
 	{ 72, "CLOB_DISK" },
 	{ 73, "NCLOB_DISK" },
+	{ 74, "GEOMETRY" },
+	{ 75, "POINT" },
+	{ 76, "FIXED16" },
+	{ 77, "BLOB_HYBRID" },
+	{ 78, "CLOB_HYBRID" },
+	{ 79, "NCLOB_HYBRID" },
+	{ 80, "POINTZ" },
 	/* NULL */
 	{ 0x00, NULL }
 };
@@ -302,6 +325,91 @@ static const option_part_definition saphdb_part_connect_options_vals[] = {
 	{ 54, "Topology Network Group", 28 },
 	{ 55, "IP Address", 29 },
 	{ 56, "LRR Ping Time", 3 },
+	/* NULL */
+	{ 0x00, NULL }
+};
+
+static const option_part_definition saphdb_part_commit_options_vals[] = {
+	{ 1, "Hold Cursors Over Commit", 28 },
+	/* NULL */
+	{ 0x00, NULL }
+};
+
+static const option_part_definition saphdb_part_fetch_options_vals[] = {
+	{ 1, "Result Set Pos", 3 },
+	/* NULL */
+	{ 0x00, NULL }
+};
+
+static const option_part_definition saphdb_part_transaction_flags_vals[] = {
+	{ 0, "Rolled Back", 28 },
+	{ 1, "Commited", 28 },
+	{ 2, "New Isolation Level", 3 },
+	{ 3, "DDL Commit Mode Changed", 28 },
+	{ 4, "Write Transaction Started", 28 },
+	{ 5, "No Write Transaction Started", 28 },
+	{ 6, "Session Closing Transaction Error", 28 },
+	/* NULL */
+	{ 0x00, NULL }
+};
+
+static const option_part_definition saphdb_part_topology_info_vals[] = {
+	{ 1, "Host Name", 29 },
+	{ 2, "Host Port Number", 3 },
+	{ 3, "Tenant Name", 29 },
+	{ 4, "Load Factor", 7 },
+	{ 5, "Site Volume ID", 3 },
+	{ 6, "Is Master", 28 },
+	{ 7, "Is Current Session", 28 },
+	{ 8, "Service Type", 0 },
+	{ 9, "Network Domain", 29 },
+	{ 10, "Is Stand-By", 28 },
+	{ 11, "All IP Addresses", 29 },
+	{ 12, "All Host Names", 29 },
+	{ 13, "Site Type", 3 },
+	/* NULL */
+	{ 0x00, NULL }
+};
+
+static const option_part_definition saphdb_part_command_info_vals[] = {
+	{ 1, "Line Number", 3 },
+	{ 2, "Source Module", 29 },
+	/* NULL */
+	{ 0x00, NULL }
+};
+
+static const option_part_definition saphdb_part_session_context_vals[] = {
+	{ 1, "Primary Connection ID", 3 },
+	{ 2, "Primary Host Name", 29 },
+	{ 3, "Primary Host Port Number", 3 },
+	{ 4, "Master Connection ID", 3 },
+	{ 5, "Master Host Name", 29 },
+	{ 6, "Master Host Port Number", 3 },
+	/* NULL */
+	{ 0x00, NULL }
+};
+
+static const option_part_definition saphdb_part_statement_context_vals[] = {
+	{ 1, "Statement Sequence Info", 33 },
+	{ 2, "Server Processing Time", 4 },
+	{ 3, "Schema Name", 29 },
+	{ 4, "Flag Set", 8 },
+	{ 5, "Query Time Out", 4 },
+	/* NULL */
+	{ 0x00, NULL }
+};
+
+static const option_part_definition saphdb_part_dbconnect_info_flags_vals[] = {
+	{ 1, "Database Name", 29 },
+	{ 2, "Host", 29 },
+	{ 3, "Port", 3 },
+	{ 4, "Is Connected", 28 },
+	/* NULL */
+	{ 0x00, NULL }
+};
+
+static const option_part_definition saphdb_part_lob_flags_vals[] = {
+	{ 0, "Implicit Streaming", 28 },
 	/* NULL */
 	{ 0x00, NULL }
 };
@@ -454,7 +562,8 @@ dissect_saphdb_part_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 				proto_tree_add_item(tree, hf_saphdb_part_option_value, tvb, offset + parsed_length, 1, ENC_NA == 0x02); parsed_length += 1;
 				break;
 			case 29:     // STRING
-			case 30:     // BSTRING
+			case 30:     // NSTRING
+			case 33:     // BSTRING
 				option_length = tvb_get_gint16(tvb, offset + parsed_length, ENC_LITTLE_ENDIAN);
 				proto_tree_add_item(tree, hf_saphdb_part_option_length, tvb, offset + parsed_length, 2, ENC_LITTLE_ENDIAN); parsed_length += 2;
 
@@ -469,6 +578,8 @@ dissect_saphdb_part_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 				break;
 			default:
 				// Unknown type, we don't know the length.
+				/* TODO: Need to be turned into an expert warning */
+				printf("Option Type %d length unknown\n", option_type);
 				break;
 		}
 		argcount--;
@@ -487,11 +598,6 @@ dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, 
 	switch (partkind) {
 		case 29:  // CLIENTCONTEXT
 			offset += length;
-			break;
-
-		// Option Parts
-		case 42:  // CONNECTOPTIONS
-			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, length, argcount, saphdb_part_connect_options_vals);
 			break;
 
 		case 33:  // AUTHENTICATION
@@ -519,6 +625,38 @@ dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, 
 			}
 
 			offset += length;
+			break;
+
+		// Option Parts
+		case 15:  // TOPOLOGYINFORMATION
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, length, argcount, saphdb_part_topology_info_vals);
+			break;
+		case 27:  // COMMANDINFO
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, length, argcount, saphdb_part_command_info_vals);
+			break;
+		case 34:  // SESSIONCONTEXT
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, length, argcount, saphdb_part_session_context_vals);
+			break;
+		case 39:  // STATEMENTCONTEXT
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, length, argcount, saphdb_part_statement_context_vals);
+			break;
+		case 42:  // CONNECTOPTIONS
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, length, argcount, saphdb_part_connect_options_vals);
+			break;
+		case 43:  // COMMITOPTIONS
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, length, argcount, saphdb_part_commit_options_vals);
+			break;
+		case 44:  // FETCHOPTIONS
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, length, argcount, saphdb_part_fetch_options_vals);
+			break;
+		case 64:  // TRANSACTIONFLAGS
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, length, argcount, saphdb_part_transaction_flags_vals);
+			break;
+		case 67:  // DBCONNECTINFO
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, length, argcount, saphdb_part_dbconnect_info_flags_vals);
+			break;
+		case 68:  // LOBFLAGS
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, length, argcount, saphdb_part_lob_flags_vals);
 			break;
 
 		default:
