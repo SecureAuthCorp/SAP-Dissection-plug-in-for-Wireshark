@@ -482,6 +482,14 @@ static gint ett_saphdb = -1;
 static range_t *global_saphdb_port_range;
 
 
+/* Expert info */
+static expert_field ei_saphdb_option_part_unknown = EI_INIT;
+
+
+/* Global highlight preference */
+static gboolean global_saphdb_highlight_items = TRUE;
+
+
 /* Protocol handle */
 static dissector_handle_t saphdb_handle;
 
@@ -531,6 +539,7 @@ dissect_saphdb_part_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 		gint16 option_length = 0;
 		gint32 option_value_int = 0;
 		gint64 option_value_int64 = 0;
+		proto_item *option_type_item = NULL;
 
 		/* TODO: Create a row tree and add items there */
 
@@ -539,10 +548,11 @@ dissect_saphdb_part_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 				"Option Name: %s (%d)", opv_to_opi(option_key, definition, "Unknown"), option_key); parsed_length += 1;
 
 		option_type = tvb_get_gint8(tvb, offset + parsed_length);
-		proto_tree_add_item(tree, hf_saphdb_part_option_type, tvb, offset + parsed_length, 1, ENC_NA); parsed_length += 1;
+		option_type_item = proto_tree_add_item(tree, hf_saphdb_part_option_type, tvb, offset + parsed_length, 1, ENC_NA); parsed_length += 1;
 		if (option_type != opv_to_opt(option_key, definition)) {
-			/* TODO: Need to be turned into an expert warning */
-			printf("Option Type for key %d doesn't match! (expected %d, obtained %d)\n", option_key, opv_to_opt(option_key, definition), option_type);
+			if (global_saphdb_highlight_items){
+				expert_add_info_format(pinfo, option_type_item, &ei_saphdb_option_part_unknown, "Option Type for key %d doesn't match! (expected %d, obtained %d)", option_key, opv_to_opt(option_key, definition), option_type);
+			}
 		}
 
 		switch (option_type) {
@@ -576,10 +586,10 @@ dissect_saphdb_part_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 					}
 				}
 				break;
-			default:
-				// Unknown type, we don't know the length.
-				/* TODO: Need to be turned into an expert warning */
-				printf("Option Type %d length unknown\n", option_type);
+			default:     // Unknown type, we don't know the length nor how to parse it
+				if (global_saphdb_highlight_items){
+					expert_add_info_format(pinfo, option_type_item, &ei_saphdb_option_part_unknown, "Option Type %d length unknown", option_type);
+				}
 				break;
 		}
 		argcount--;
@@ -590,7 +600,7 @@ dissect_saphdb_part_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 
 
 static int
-dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset, guint32 length, gint16 argcount, guint8 partkind)
+dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset, guint32 length, gint16 argcount, guint8 partkind, proto_item *partkind_item)
 {
 	guint8 field_short_length = 0;
 	guint16 field_count = 0, field_length = 0;
@@ -660,7 +670,11 @@ dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, 
 			break;
 
 		default:
+			if (global_saphdb_highlight_items){
+				expert_add_info_format(pinfo, partkind_item, &ei_saphdb_option_part_unknown, "Part Kind %d unknown", partkind);
+			}
 			offset += length;
+			break;
 	}
 
 	return length;
@@ -674,7 +688,7 @@ dissect_saphdb_part(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *d
 	gint16 argcount = 0;
 	gint32 bufferlength = 0;
 	guint32 length = 0;
-	proto_item *part = NULL, *part_buffer = NULL;
+	proto_item *part = NULL, *partkind_item = NULL, *part_buffer = NULL;
 	proto_tree *part_tree = NULL, *part_buffer_tree = NULL;
 
 	/* Add the Part subtree */
@@ -684,7 +698,7 @@ dissect_saphdb_part(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *d
 
 	/* Add the Part fields */
 	partkind = tvb_get_gint8(tvb, offset);
-	proto_tree_add_item(part_tree, hf_saphdb_part_partkind, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
+	partkind_item = proto_tree_add_item(part_tree, hf_saphdb_part_partkind, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
 	proto_tree_add_item(part_tree, hf_saphdb_part_partattributes, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
 	argcount = tvb_get_gint16(tvb, offset, ENC_LITTLE_ENDIAN);
 	proto_tree_add_item(part_tree, hf_saphdb_part_argumentcount, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; length += 2;
@@ -702,11 +716,11 @@ dissect_saphdb_part(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *d
 		bufferlength = tvb_reported_length_remaining(tvb, offset);
 	}
 
-  /* Add the part buffer tree and dissect it */
+    /* Add the part buffer tree and dissect it */
 	part_buffer = proto_tree_add_item(part_tree, hf_saphdb_part_buffer, tvb, offset, bufferlength, ENC_NA);
 	part_buffer_tree = proto_item_add_subtree(part_buffer, ett_saphdb);
 
-	dissect_saphdb_part_buffer(tvb, pinfo, part_buffer_tree, offset, bufferlength, argcount, partkind);
+	dissect_saphdb_part_buffer(tvb, pinfo, part_buffer_tree, offset, bufferlength, argcount, partkind, partkind_item);
 	offset += bufferlength; length += bufferlength;
 
 	/* Adjust the item tree length */
@@ -983,10 +997,19 @@ proto_register_saphdb(void)
 		&ett_saphdb
 	};
 
+	/* Register the expert info */
+	static ei_register_info ei[] = {
+		{ &ei_saphdb_option_part_unknown, { "saphdb.segment.part.option.unknown", PI_UNDECODED, PI_WARN, "The Option Part has a unknown type that is not dissected", EXPFILL }},
+	};
+
 	module_t *saphdb_module;
+	expert_module_t* saphdb_expert;
 
 	/* Register the protocol */
 	proto_saphdb = proto_register_protocol("SAP HANA SQL Command Network Protocol", "SAPHDB", "saphdb");
+
+	saphdb_expert = expert_register_protocol(proto_saphdb);
+	expert_register_field_array(saphdb_expert, ei, array_length(ei));
 
 	register_dissector("saphdb", dissect_saphdb, proto_saphdb);
 
@@ -998,6 +1021,8 @@ proto_register_saphdb(void)
 
 	range_convert_str(wmem_epan_scope(), &global_saphdb_port_range, SAPHDB_PORT_RANGE, MAX_TCP_PORT);
 	prefs_register_range_preference(saphdb_module, "tcp_ports", "SAP HANA SQL Command Network Protocol port numbers", "Port numbers used for SAP HANA SQL Command Network Protocol (default " SAPHDB_PORT_RANGE ")", &global_saphdb_port_range, MAX_TCP_PORT);
+
+	prefs_register_bool_preference(saphdb_module, "highlight_unknown_items", "Highlight unknown SAP HANA HDB items", "Whether the SAP HANA HDB Protocol dissector should highlight unknown items (might be noise and generate a lot of expert warnings)", &global_saphdb_highlight_items);
 
 }
 
