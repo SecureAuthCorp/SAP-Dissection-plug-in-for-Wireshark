@@ -180,6 +180,133 @@ static const value_string saphdb_part_partkind_vals[] = {
 };
 
 
+/* SAP HDB Type values */
+static const value_string saphdb_part_type_vals[] = {
+	{ 1, "TINYINT" },
+	{ 2, "SMALLINT" },
+	{ 3, "INT" },
+	{ 4, "BIGINT" },
+	{ 5, "DECIMAL" },
+	{ 6, "REAL" },
+	{ 7, "DOUBLE" },
+	{ 8, "CHAR" },
+	{ 9, "VARCHAR1" },
+	{ 10, "NCHAR" },
+	{ 11, "NVARCHAR" },
+	{ 12, "BINARY" },
+	{ 13, "VARBINARY" },
+	{ 14, "DATE" },
+	{ 15, "TIME" },
+	{ 16, "TIMESTAMP" },
+	{ 17, "TIME_TZ" },
+	{ 18, "TIME_LTZ" },
+	{ 19, "TIMESTAMP_TZ" },
+	{ 20, "TIMESTAMP_LTZ" },
+	{ 21, "INTERVAL_YM" },
+	{ 22, "INTERVAL_DS" },
+	{ 23, "ROWID" },
+	{ 24, "UROWID" },
+	{ 25, "CLOB" },
+	{ 26, "NCLOB" },
+	{ 27, "BLOB" },
+	{ 28, "BOOLEAN" },
+	{ 29, "STRING" },
+	{ 30, "NSTRING" },
+	{ 31, "LOCATOR" },
+	{ 32, "NLOCATOR" },
+	{ 33, "BSTRING" },
+	{ 34, "DECIMAL_DIGIT_ARRAY" },
+	{ 35, "VARCHAR2" },
+	{ 45, "TABLE" },
+	{ 48, "ABAPSTREAM" },
+	{ 49, "ABAPSTRUCT" },
+	{ 51, "TEXT" },
+	{ 52, "SHORTTEXT" },
+	{ 55, "ALPHANUM" },
+	{ 61, "LONGDATE" },
+	{ 62, "SECONDDATE" },
+	{ 63, "DAYDATE" },
+	{ 64, "SECONDTIME" },
+	{ 65, "CSDATE" },
+	{ 66, "CSTIME" },
+	{ 71, "BLOB_DISK" },
+	{ 72, "CLOB_DISK" },
+	{ 73, "NCLOB_DISK" },
+	/* NULL */
+	{ 0x00, NULL }
+};
+
+
+/* Structure to define Option Parts */
+typedef struct _option_part_definition {
+    gint8       value;
+    const gchar *identifier_strptr;
+    gint8	    type;
+} option_part_definition;
+
+
+static const option_part_definition saphdb_part_connect_options_vals[] = {
+	{ 1, "Connection ID", 3 },
+	{ 2, "Complete Array Execution", 28 },
+	{ 3, "Client Locale", 29 },
+	{ 4, "Supports Large Bulk Operations", 28 },
+	{ 5, "Distribution Enabled", 28 },
+	{ 6, "Primary Connection ID", 0 },
+	{ 7, "Primary Connection Host", 0 },
+	{ 8, "Primary Connection Port", 0 },
+	{ 9, "Complete Data Type Support", 0 },
+	{ 10, "Large Number of Parameters Support", 28 },
+	{ 11, "System ID", 29 },
+	{ 12, "Data Format Version", 3 },
+	{ 13, "ABAP VARCHAR Mode", 28 },
+	{ 14, "Select for Update Supported", 28 },
+	{ 15, "Client Distribution Mode", 3 },
+	{ 16, "Engine Data Format Version", 3 },
+	{ 17, "Distribution Protocol Version", 3 },
+	{ 18, "Split Batch Commands", 28 },
+	{ 19, "Use Transaction Flags Only", 28 },
+	{ 20, "Row and Column Optimized Format", 28 },
+	{ 21, "Ignore Unknown Parts", 3 },
+	{ 22, "Table Output Parameter", 28 },
+	{ 23, "Data Format Version 2", 3 },
+	{ 24, "ITAB Parameter", 28 },
+	{ 25, "Describe Table Output Parameter", 28 },
+	{ 26, "Columnar Result Set", 0 },   /* This is BITVECTOR type ??? */
+	{ 27, "Scrollable Result Set", 3 },
+	{ 28, "Client Info NULL Value Supported", 28 },
+	{ 29, "Associated Connection ID", 3 },
+	{ 30, "Non-Transactional Prepare", 28 },
+	{ 31, "Fast Data Access Enabled", 28 },
+	{ 32, "OS User", 29 },
+	{ 33, "Row Slot Image Result", 0 },   /* This is BITVECTOR type ??? */
+	{ 34, "Endianness", 3 },
+	{ 35, "Update Topology Anwhere", 28 },
+	{ 36, "Enable Array Type", 28 },
+	{ 37, "Implicit LOB Streaming", 28 },
+	{ 38, "Cached View Property", 28 },
+	{ 39, "X OpenXA Protocol Supported", 28 },
+	{ 40, "Master Commit Redirection Supported", 28 },
+	{ 41, "Active/Active Protocol Version", 3 },
+	{ 42, "Active/Active Connection Origin Site", 3 },
+	{ 43, "Query Timeout Supported", 28 },
+	{ 44, "Full Version String", 29 },
+	{ 45, "Database Name", 29 },
+	{ 46, "Build Platform", 3 },
+	{ 47, "Implicit XA Session Supported", 28 },
+	{ 48, "Client Side Column Encryption Version", 3 },
+	{ 49, "Compression Level And Flags", 3 },
+	{ 50, "Client Side Re-Execution Supported", 28 },
+	{ 51, "Client Reconnect Wait Timeout", 28 },
+	{ 52, "Original Anchor Connection ID", 28 },
+	{ 53, "Flag Set 1", 3 },
+	{ 54, "Topology Network Group", 28 },
+	{ 55, "IP Address", 29 },
+	{ 56, "LRR Ping Time", 3 },
+	/* NULL */
+	{ 0x00, NULL }
+};
+
+
 static int proto_saphdb = -1;
 
 /* SAP HDB Initialization items */
@@ -227,6 +354,13 @@ static int hf_saphdb_part_buffersize = -1;
 /* SAP HDB Part Buffer items */
 static int hf_saphdb_part_buffer = -1;
 
+/* SAP HDB Part Buffer Option Part Data items */
+static int hf_saphdb_part_option_row = -1;
+static int hf_saphdb_part_option_name = -1;
+static int hf_saphdb_part_option_type = -1;
+static int hf_saphdb_part_option_length = -1;
+static int hf_saphdb_part_option_value = -1;
+
 /* SAP HDB Part Buffer AUTHENTICATE items */
 static int hf_saphdb_part_authentication_field_count = -1;
 static int hf_saphdb_part_authentication_field_length = -1;
@@ -246,24 +380,125 @@ static dissector_handle_t saphdb_handle;
 void proto_reg_handoff_saphdb(void);
 
 
+/* Option Part Value to Option Part Identifier */
+const gchar *
+opv_to_opi(const gint8 value, const option_part_definition *opd, const char *unknown_str)
+{
+	gint i = 0;
+	if (opd) {
+        while (opd[i].identifier_strptr) {
+            if (opd[i].value == value) {
+                return(opd[i].identifier_strptr);
+            }
+            i++;
+        }
+	}
+	return unknown_str;
+}
+
+/* Option Part Value to Option Part Type */
+const gint8
+opv_to_opt(const gint8 value, const option_part_definition *opd)
+{
+	gint i = 0;
+	if (opd) {
+        while (opd[i].identifier_strptr) {
+            if (opd[i].value == value) {
+                return(opd[i].type);
+            }
+            i++;
+        }
+	}
+	return 0;
+}
+
+
 static int
-dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset, guint32 length, guint8 partkind)
+dissect_saphdb_part_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset, guint32 length, gint16 argcount, const option_part_definition *definition)
+{
+	guint32 parsed_length = 0;
+
+	while (argcount > 0 && tvb_reported_length_remaining(tvb, offset + parsed_length) > 2) {
+		gint8 option_key = 0, option_type = 0;
+		gint16 option_length = 0;
+		gint32 option_value_int = 0;
+		gint64 option_value_int64 = 0;
+
+		/* TODO: Create a row tree and add items there */
+
+		option_key = tvb_get_gint8(tvb, offset + parsed_length);
+		proto_tree_add_int_format(tree, hf_saphdb_part_option_name, tvb, offset + parsed_length, 1, option_key,
+				"Option Name: %s (%d)", opv_to_opi(option_key, definition, "Unknown"), option_key); parsed_length += 1;
+
+		option_type = tvb_get_gint8(tvb, offset + parsed_length);
+		proto_tree_add_item(tree, hf_saphdb_part_option_type, tvb, offset + parsed_length, 1, ENC_NA); parsed_length += 1;
+		if (option_type != opv_to_opt(option_key, definition)) {
+			/* TODO: Need to be turned into an expert warning */
+			printf("Option Type for key %d doesn't match! (expected %d, obtained %d)\n", option_key, opv_to_opt(option_key, definition), option_type);
+		}
+
+		switch (option_type) {
+			case 1:		// TINYINT
+				proto_tree_add_item(tree, hf_saphdb_part_option_value, tvb, offset + parsed_length, 1, ENC_NA); parsed_length += 1;
+				break;
+			case 2:		// SMALLINT
+				proto_tree_add_item(tree, hf_saphdb_part_option_value, tvb, offset + parsed_length, 2, ENC_LITTLE_ENDIAN); parsed_length += 2;
+				break;
+			case 3:     // INT
+				proto_tree_add_item(tree, hf_saphdb_part_option_value, tvb, offset + parsed_length, 4, ENC_LITTLE_ENDIAN); parsed_length += 4;
+				break;
+			case 4:     // BIGINT
+				proto_tree_add_item(tree, hf_saphdb_part_option_value, tvb, offset + parsed_length, 8, ENC_LITTLE_ENDIAN); parsed_length += 8;
+				break;
+			case 28:	// BOOLEAN
+				proto_tree_add_item(tree, hf_saphdb_part_option_value, tvb, offset + parsed_length, 1, ENC_NA == 0x02); parsed_length += 1;
+				break;
+			case 29:     // STRING
+			case 30:     // BSTRING
+				option_length = tvb_get_gint16(tvb, offset + parsed_length, ENC_LITTLE_ENDIAN);
+				proto_tree_add_item(tree, hf_saphdb_part_option_length, tvb, offset + parsed_length, 2, ENC_LITTLE_ENDIAN); parsed_length += 2;
+
+				if (tvb_reported_length_remaining(tvb, offset + parsed_length) >= option_length) {
+					if (option_type == 29) {
+						/* TODO: This need to be CESU-8 decoded */
+						proto_tree_add_item(tree, hf_saphdb_part_option_value, tvb, offset + parsed_length, option_length, ENC_UTF_16); parsed_length += option_length;
+					} else {
+						proto_tree_add_item(tree, hf_saphdb_part_option_value, tvb, offset + parsed_length, option_length, ENC_NA); parsed_length += option_length;
+					}
+				}
+				break;
+			default:
+				// Unknown type, we don't know the length.
+				break;
+		}
+		argcount--;
+	}
+
+	return parsed_length;
+}
+
+
+static int
+dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset, guint32 length, gint16 argcount, guint8 partkind)
 {
 	guint8 field_short_length = 0;
 	guint16 field_count = 0, field_length = 0;
 
 	switch (partkind) {
 		case 29:  // CLIENTCONTEXT
-
-			
 			offset += length;
+			break;
+
+		// Option Parts
+		case 42:  // CONNECTOPTIONS
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, length, argcount, saphdb_part_connect_options_vals);
 			break;
 
 		case 33:  // AUTHENTICATION
 
-			/* Parse the field count */
-			field_count = tvb_get_guint16(tvb, offset, ENC_BIG_ENDIAN);
-			proto_tree_add_item(tree, hf_saphdb_part_authentication_field_count, tvb, offset, 2, ENC_BIG_ENDIAN); offset += 2; length -= 2;
+			/* Parse the field count */ /* TODO: Should this match with argcount? */
+			field_count = tvb_get_guint16(tvb, offset, ENC_LITTLE_ENDIAN);
+			proto_tree_add_item(tree, hf_saphdb_part_authentication_field_count, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; length -= 2;
 
 			for (guint16 field = 0; field < field_count; field++) {
 
@@ -298,8 +533,9 @@ static int
 dissect_saphdb_part(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_, guint32 offset, guint16 noofparts, guint16 nopart)
 {
 	gint8 partkind = 0;
-	guint32 length = 0;
+	gint16 argcount = 0;
 	gint32 bufferlength = 0;
+	guint32 length = 0;
 	proto_item *part = NULL, *part_buffer = NULL;
 	proto_tree *part_tree = NULL, *part_buffer_tree = NULL;
 
@@ -312,6 +548,7 @@ dissect_saphdb_part(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *d
 	partkind = tvb_get_gint8(tvb, offset);
 	proto_tree_add_item(part_tree, hf_saphdb_part_partkind, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
 	proto_tree_add_item(part_tree, hf_saphdb_part_partattributes, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
+	argcount = tvb_get_gint16(tvb, offset, ENC_LITTLE_ENDIAN);
 	proto_tree_add_item(part_tree, hf_saphdb_part_argumentcount, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; length += 2;
 	proto_tree_add_item(part_tree, hf_saphdb_part_bigargumentcount, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length += 4;
 	proto_tree_add_item_ret_int(part_tree, hf_saphdb_part_bufferlength, tvb, offset, 4, ENC_LITTLE_ENDIAN, &bufferlength); offset += 4; length += 4;
@@ -331,7 +568,7 @@ dissect_saphdb_part(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *d
 	part_buffer = proto_tree_add_item(part_tree, hf_saphdb_part_buffer, tvb, offset, bufferlength, ENC_NA);
 	part_buffer_tree = proto_item_add_subtree(part_buffer, ett_saphdb);
 
-	dissect_saphdb_part_buffer(tvb, pinfo, part_buffer_tree, offset, bufferlength, partkind);
+	dissect_saphdb_part_buffer(tvb, pinfo, part_buffer_tree, offset, bufferlength, argcount, partkind);
 	offset += bufferlength; length += bufferlength;
 
 	/* Adjust the item tree length */
@@ -581,6 +818,18 @@ proto_register_saphdb(void)
 		/* Part Buffer items */
 		{ &hf_saphdb_part_buffer,
 			{ "Part Buffer", "saphdb.segment.part.buffer", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Part Buffer", HFILL }},
+
+		/* Part Buffer Option Part Data items */
+		{ &hf_saphdb_part_option_row,
+			{ "Option Row", "saphdb.segment.part.option", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Option Part Row", HFILL }},
+		{ &hf_saphdb_part_option_name,
+			{ "Option Name", "saphdb.segment.part.option.name", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Option Part Name", HFILL }},
+		{ &hf_saphdb_part_option_type,
+			{ "Option Type", "saphdb.segment.part.option.type", FT_INT8, BASE_DEC, VALS(saphdb_part_type_vals), 0x0, "SAP HDB Option Part Type", HFILL }},
+		{ &hf_saphdb_part_option_length,
+			{ "Option Length", "saphdb.segment.part.option.length", FT_INT16, BASE_DEC, NULL, 0x0, "SAP HDB Option Part Value", HFILL }},
+		{ &hf_saphdb_part_option_value,
+			{ "Option Value", "saphdb.segment.part.option.value", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Option Part Value", HFILL }},
 
 		/* Part Buffer AUTHENTICATION items */
 		{ &hf_saphdb_part_authentication_field_count,
