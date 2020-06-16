@@ -259,6 +259,15 @@ static const value_string saphdb_part_type_vals[] = {
 	{ 0x00, NULL }
 };
 
+/* SAP HDB Error Level values */
+static const value_string saphdb_error_level_vals[] = {
+	{ 0, "WARNING" },
+	{ 1, "ERROR" },
+	{ 2, "FATALERROR" },
+	/* NULL */
+	{ 0x00, NULL }
+};
+
 
 /* Structure to define Option Parts */
 typedef struct _option_part_definition {
@@ -475,6 +484,14 @@ static int hf_saphdb_part_option_value_int = -1;
 static int hf_saphdb_part_option_value_bigint = -1;
 static int hf_saphdb_part_option_value_string = -1;
 
+/* SAP HDB Part Buffer ERROR items */
+static int hf_saphdb_part_error_code = -1;
+static int hf_saphdb_part_error_position = -1;
+static int hf_saphdb_part_error_text_length = -1;
+static int hf_saphdb_part_error_level = -1;
+static int hf_saphdb_part_error_sqlstate = -1;
+static int hf_saphdb_part_error_text = -1;
+
 /* SAP HDB Part Buffer AUTHENTICATE items */
 static int hf_saphdb_part_authentication_field_count = -1;
 static int hf_saphdb_part_authentication_field_length = -1;
@@ -618,8 +635,26 @@ dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, 
 {
 	guint8 field_short_length = 0;
 	guint16 field_count = 0, field_length = 0;
+	gint32 error_text_length = 0;
 
 	switch (partkind) {
+		case 6:   // ERROR
+
+			proto_tree_add_item(tree, hf_saphdb_part_error_code, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length -= 4;
+			proto_tree_add_item(tree, hf_saphdb_part_error_position, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length -= 4;
+			proto_tree_add_item_ret_int(tree, hf_saphdb_part_error_text_length, tvb, offset, 4, ENC_LITTLE_ENDIAN, &error_text_length); offset += 4; length -= 4;
+			proto_tree_add_item(tree, hf_saphdb_part_error_level, tvb, offset, 1, ENC_NA); offset += 1; length -= 1;
+			proto_tree_add_item(tree, hf_saphdb_part_error_sqlstate, tvb, offset, 5, ENC_NA); offset += 5; length -= 5;
+
+			if (error_text_length > 0 && tvb_reported_length_remaining(tvb, offset) >= error_text_length) {
+				proto_tree_add_item(tree, hf_saphdb_part_error_text, tvb, offset, error_text_length, ENC_NA); offset += error_text_length; length -= error_text_length;
+
+				/* Align the error text length to 8 */
+				if (error_text_length % 8 != 0) {
+					length += 8 - error_text_length % 8;
+				}
+			}
+			break;
 		case 29:  // CLIENTCONTEXT
 			offset += length;
 			break;
@@ -1009,7 +1044,19 @@ proto_register_saphdb(void)
 		{ &hf_saphdb_part_option_value_string,
 			{ "Option Value", "saphdb.segment.part.option.value", FT_STRING, BASE_NONE, NULL, 0x0, "SAP HDB Option Part Value", HFILL }},
 
-
+		/* SAP HDB Part Buffer ERROR items */
+		{ &hf_saphdb_part_error_code,
+			{ "Error Code", "saphdb.segment.part.buffer.error.code", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Error Code", HFILL }},
+		{ &hf_saphdb_part_error_position,
+			{ "Error Position", "saphdb.segment.part.buffer.error.position", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Error Position", HFILL }},
+		{ &hf_saphdb_part_error_text_length,
+			{ "Error Text Length", "saphdb.segment.part.buffer.error.text_length", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Error Text Length", HFILL }},
+		{ &hf_saphdb_part_error_level,
+			{ "Error Level", "saphdb.segment.part.buffer.error.level", FT_INT8, BASE_DEC, VALS(saphdb_error_level_vals), 0x0, "SAP HDB Error Level", HFILL }},
+		{ &hf_saphdb_part_error_sqlstate,
+			{ "SQL State", "saphdb.segment.part.buffer.error.sqlstate", FT_STRING, BASE_NONE, NULL, 0x0, "SAP HDB Error SQL State", HFILL }},
+		{ &hf_saphdb_part_error_text,
+			{ "Error Text", "saphdb.segment.part.buffer.error.text", FT_STRING, BASE_NONE, NULL, 0x0, "SAP HDB Error Text", HFILL }},
 
 		/* Part Buffer AUTHENTICATION items */
 		{ &hf_saphdb_part_authentication_field_count,
