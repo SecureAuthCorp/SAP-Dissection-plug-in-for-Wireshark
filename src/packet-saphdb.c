@@ -468,6 +468,12 @@ static int hf_saphdb_part_option_name = -1;
 static int hf_saphdb_part_option_type = -1;
 static int hf_saphdb_part_option_length = -1;
 static int hf_saphdb_part_option_value = -1;
+static int hf_saphdb_part_option_value_bool = -1;
+static int hf_saphdb_part_option_value_byte = -1;
+static int hf_saphdb_part_option_value_short = -1;
+static int hf_saphdb_part_option_value_int = -1;
+static int hf_saphdb_part_option_value_bigint = -1;
+static int hf_saphdb_part_option_value_string = -1;
 
 /* SAP HDB Part Buffer AUTHENTICATE items */
 static int hf_saphdb_part_authentication_field_count = -1;
@@ -542,11 +548,10 @@ dissect_saphdb_part_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 	while (argcount > 0 && tvb_reported_length_remaining(tvb, offset + parsed_length) > 2) {
 		gint8 option_key = 0, option_type = 0;
 		gint16 option_length = 0;
+		gint8 option_value_byte = 0;
 		gint32 option_value_int = 0;
 		gint64 option_value_int64 = 0;
 		proto_item *option_type_item = NULL;
-
-		/* TODO: Create a row tree and add items there */
 
 		option_key = tvb_get_gint8(tvb, offset + parsed_length);
 		proto_tree_add_int_format(tree, hf_saphdb_part_option_name, tvb, offset + parsed_length, 1, option_key,
@@ -562,19 +567,20 @@ dissect_saphdb_part_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 
 		switch (option_type) {
 			case 1:		// TINYINT
-				proto_tree_add_item(tree, hf_saphdb_part_option_value, tvb, offset + parsed_length, 1, ENC_NA); parsed_length += 1;
+				proto_tree_add_item(tree, hf_saphdb_part_option_value_byte, tvb, offset + parsed_length, 1, ENC_NA); parsed_length += 1;
 				break;
 			case 2:		// SMALLINT
-				proto_tree_add_item(tree, hf_saphdb_part_option_value, tvb, offset + parsed_length, 2, ENC_LITTLE_ENDIAN); parsed_length += 2;
+				proto_tree_add_item(tree, hf_saphdb_part_option_value_short, tvb, offset + parsed_length, 2, ENC_LITTLE_ENDIAN); parsed_length += 2;
 				break;
 			case 3:     // INT
-				proto_tree_add_item(tree, hf_saphdb_part_option_value, tvb, offset + parsed_length, 4, ENC_LITTLE_ENDIAN); parsed_length += 4;
+				proto_tree_add_item(tree, hf_saphdb_part_option_value_int, tvb, offset + parsed_length, 4, ENC_LITTLE_ENDIAN); parsed_length += 4;
 				break;
 			case 4:     // BIGINT
-				proto_tree_add_item(tree, hf_saphdb_part_option_value, tvb, offset + parsed_length, 8, ENC_LITTLE_ENDIAN); parsed_length += 8;
+				proto_tree_add_item(tree, hf_saphdb_part_option_value_bigint, tvb, offset + parsed_length, 8, ENC_LITTLE_ENDIAN); parsed_length += 8;
 				break;
 			case 28:	// BOOLEAN
-				proto_tree_add_item(tree, hf_saphdb_part_option_value, tvb, offset + parsed_length, 1, ENC_NA == 0x02); parsed_length += 1;
+				option_value_byte = tvb_get_gint8(tvb, offset + parsed_length);
+				proto_tree_add_boolean(tree, hf_saphdb_part_option_value_bool, tvb, offset + parsed_length, 1, option_value_byte); parsed_length += 1;
 				break;
 			case 29:     // STRING
 			case 30:     // NSTRING
@@ -585,8 +591,11 @@ dissect_saphdb_part_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 				if (tvb_reported_length_remaining(tvb, offset + parsed_length) >= option_length) {
 					if (option_type == 29) {
 						/* TODO: This need to be CESU-8 decoded */
-						proto_tree_add_item(tree, hf_saphdb_part_option_value, tvb, offset + parsed_length, option_length, ENC_UTF_16); parsed_length += option_length;
-					} else {
+						proto_tree_add_item(tree, hf_saphdb_part_option_value_string, tvb, offset + parsed_length, option_length, ENC_UTF_8); parsed_length += option_length;
+					} else if (option_type == 30) {
+						proto_tree_add_item(tree, hf_saphdb_part_option_value_string, tvb, offset + parsed_length, option_length, ENC_UTF_8); parsed_length += option_length;
+					} else if (option_type == 33) {
+						/* This is binary data, not rendering it as a string */
 						proto_tree_add_item(tree, hf_saphdb_part_option_value, tvb, offset + parsed_length, option_length, ENC_NA); parsed_length += option_length;
 					}
 				}
@@ -987,6 +996,20 @@ proto_register_saphdb(void)
 			{ "Option Length", "saphdb.segment.part.option.length", FT_INT16, BASE_DEC, NULL, 0x0, "SAP HDB Option Part Value", HFILL }},
 		{ &hf_saphdb_part_option_value,
 			{ "Option Value", "saphdb.segment.part.option.value", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Option Part Value", HFILL }},
+		{ &hf_saphdb_part_option_value_bool,
+			{ "Option Value", "saphdb.segment.part.option.value", FT_BOOLEAN, BASE_DEC, NULL, 0x0, "SAP HDB Option Part Value", HFILL }},
+		{ &hf_saphdb_part_option_value_byte,
+			{ "Option Value", "saphdb.segment.part.option.value", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Option Part Value", HFILL }},
+		{ &hf_saphdb_part_option_value_short,
+			{ "Option Value", "saphdb.segment.part.option.value", FT_INT16, BASE_DEC, NULL, 0x0, "SAP HDB Option Part Value", HFILL }},
+		{ &hf_saphdb_part_option_value_int,
+			{ "Option Value", "saphdb.segment.part.option.value", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Option Part Value", HFILL }},
+		{ &hf_saphdb_part_option_value_bigint,
+			{ "Option Value", "saphdb.segment.part.option.value", FT_INT64, BASE_DEC, NULL, 0x0, "SAP HDB Option Part Value", HFILL }},
+		{ &hf_saphdb_part_option_value_string,
+			{ "Option Value", "saphdb.segment.part.option.value", FT_STRING, BASE_NONE, NULL, 0x0, "SAP HDB Option Part Value", HFILL }},
+
+
 
 		/* Part Buffer AUTHENTICATION items */
 		{ &hf_saphdb_part_authentication_field_count,
