@@ -387,6 +387,14 @@ static const option_part_definition saphdb_part_command_info_vals[] = {
 	{ 0x00, NULL }
 };
 
+static const option_part_definition saphdb_part_client_context_vals[] = {
+	{ 1, "Client Version", 29 },
+	{ 2, "Client Type", 29 },
+	{ 3, "Application Name", 29 },
+	/* NULL */
+	{ 0x00, NULL }
+};
+
 static const option_part_definition saphdb_part_session_context_vals[] = {
 	{ 1, "Primary Connection ID", 3 },
 	{ 2, "Primary Host Name", 29 },
@@ -695,10 +703,6 @@ dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, 
 				}
 			}
 			break;
-		case 29:  // CLIENTCONTEXT
-			offset += length;
-			break;
-
 		case 33:  // AUTHENTICATION
 
 			/* Parse the field count */ /* TODO: Should this match with argcount? */
@@ -739,6 +743,9 @@ dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, 
 		// Option Parts
 		case 27:  // COMMANDINFO
 			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_command_info_vals);
+			break;
+		case 29:  // CLIENTCONTEXT
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_client_context_vals);
 			break;
 		case 34:  // SESSIONCONTEXT
 			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_session_context_vals);
