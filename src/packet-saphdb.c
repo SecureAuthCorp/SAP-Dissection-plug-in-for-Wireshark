@@ -484,6 +484,9 @@ static int hf_saphdb_part_option_value_int = -1;
 static int hf_saphdb_part_option_value_bigint = -1;
 static int hf_saphdb_part_option_value_string = -1;
 
+/* SAP HDB Part Buffer COMMAND items */
+static int hf_saphdb_part_command = -1;
+
 /* SAP HDB Part Buffer ERROR items */
 static int hf_saphdb_part_error_code = -1;
 static int hf_saphdb_part_error_position = -1;
@@ -496,6 +499,9 @@ static int hf_saphdb_part_error_text = -1;
 static int hf_saphdb_part_authentication_field_count = -1;
 static int hf_saphdb_part_authentication_field_length = -1;
 static int hf_saphdb_part_authentication_field_value = -1;
+
+/* SAP HDB Part Buffer CLIENTID items */
+static int hf_saphdb_part_clientid = -1;
 
 
 static gint ett_saphdb = -1;
@@ -638,8 +644,12 @@ dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, 
 	gint32 error_text_length = 0;
 
 	switch (partkind) {
+		case 3:   // COMMAND
+			if (length > 0 && tvb_reported_length_remaining(tvb, offset) >= length) {
+				proto_tree_add_item(tree, hf_saphdb_part_command, tvb, offset, length, ENC_NA); offset += length; length = 0;
+			}
+			break;
 		case 6:   // ERROR
-
 			proto_tree_add_item(tree, hf_saphdb_part_error_code, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length -= 4;
 			proto_tree_add_item(tree, hf_saphdb_part_error_position, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length -= 4;
 			proto_tree_add_item_ret_int(tree, hf_saphdb_part_error_text_length, tvb, offset, 4, ENC_LITTLE_ENDIAN, &error_text_length); offset += 4; length -= 4;
@@ -684,6 +694,11 @@ dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, 
 			}
 
 			offset += length;
+			break;
+		case 34:   // CLIENTID
+			if (length > 0 && tvb_reported_length_remaining(tvb, offset) >= length) {
+				proto_tree_add_item(tree, hf_saphdb_part_clientid, tvb, offset, length, ENC_NA); offset += length; length = 0;
+			}
 			break;
 
 		// Option Parts
@@ -1044,27 +1059,36 @@ proto_register_saphdb(void)
 		{ &hf_saphdb_part_option_value_string,
 			{ "Option Value", "saphdb.segment.part.option.value", FT_STRING, BASE_NONE, NULL, 0x0, "SAP HDB Option Part Value", HFILL }},
 
+		/* SAP HDB Part Buffer COMMAND items */
+		{ &hf_saphdb_part_command,
+			{ "Command", "saphdb.segment.part.command", FT_STRING, BASE_NONE, NULL, 0x0, "SAP HDB Command", HFILL }},
+
 		/* SAP HDB Part Buffer ERROR items */
 		{ &hf_saphdb_part_error_code,
-			{ "Error Code", "saphdb.segment.part.buffer.error.code", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Error Code", HFILL }},
+			{ "Error Code", "saphdb.segment.part.error.code", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Error Code", HFILL }},
 		{ &hf_saphdb_part_error_position,
-			{ "Error Position", "saphdb.segment.part.buffer.error.position", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Error Position", HFILL }},
+			{ "Error Position", "saphdb.segment.part.error.position", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Error Position", HFILL }},
 		{ &hf_saphdb_part_error_text_length,
-			{ "Error Text Length", "saphdb.segment.part.buffer.error.text_length", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Error Text Length", HFILL }},
+			{ "Error Text Length", "saphdb.segment.part.error.text_length", FT_INT32, BASE_DEC, NULL, 0x0, "SAP HDB Error Text Length", HFILL }},
 		{ &hf_saphdb_part_error_level,
-			{ "Error Level", "saphdb.segment.part.buffer.error.level", FT_INT8, BASE_DEC, VALS(saphdb_error_level_vals), 0x0, "SAP HDB Error Level", HFILL }},
+			{ "Error Level", "saphdb.segment.part.error.level", FT_INT8, BASE_DEC, VALS(saphdb_error_level_vals), 0x0, "SAP HDB Error Level", HFILL }},
 		{ &hf_saphdb_part_error_sqlstate,
-			{ "SQL State", "saphdb.segment.part.buffer.error.sqlstate", FT_STRING, BASE_NONE, NULL, 0x0, "SAP HDB Error SQL State", HFILL }},
+			{ "SQL State", "saphdb.segment.part.error.sqlstate", FT_STRING, BASE_NONE, NULL, 0x0, "SAP HDB Error SQL State", HFILL }},
 		{ &hf_saphdb_part_error_text,
-			{ "Error Text", "saphdb.segment.part.buffer.error.text", FT_STRING, BASE_NONE, NULL, 0x0, "SAP HDB Error Text", HFILL }},
+			{ "Error Text", "saphdb.segment.part.error.text", FT_STRING, BASE_NONE, NULL, 0x0, "SAP HDB Error Text", HFILL }},
 
 		/* Part Buffer AUTHENTICATION items */
 		{ &hf_saphdb_part_authentication_field_count,
-			{ "Field Count", "saphdb.segment.part.buffer.authentication.fieldcount", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP HDB AUTHENTICATION Field Count", HFILL }},
+			{ "Field Count", "saphdb.segment.part.authentication.fieldcount", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP HDB AUTHENTICATION Field Count", HFILL }},
 		{ &hf_saphdb_part_authentication_field_length,
-			{ "Field Length", "saphdb.segment.part.buffer.authentication.fieldlength", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP HDB AUTHENTICATION Field Length", HFILL }},
+			{ "Field Length", "saphdb.segment.part.authentication.fieldlength", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP HDB AUTHENTICATION Field Length", HFILL }},
 		{ &hf_saphdb_part_authentication_field_value,
-			{ "Field Value", "saphdb.segment.part.buffer.authentication.fieldvalue", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB AUTHENTICATION Field Value", HFILL }},
+			{ "Field Value", "saphdb.segment.part.authentication.fieldvalue", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB AUTHENTICATION Field Value", HFILL }},
+
+		/* SAP HDB Part Buffer CLIENTID items */
+		{ &hf_saphdb_part_clientid,
+			{ "Client ID", "saphdb.segment.part.clientid", FT_STRING, BASE_NONE, NULL, 0x0, "SAP HDB Client ID", HFILL }},
+
 	};
 
 	/* Setup protocol subtree array */
