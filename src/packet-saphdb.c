@@ -370,7 +370,7 @@ static const option_part_definition saphdb_part_topology_info_vals[] = {
 	{ 5, "Site Volume ID", 3 },
 	{ 6, "Is Master", 28 },
 	{ 7, "Is Current Session", 28 },
-	{ 8, "Service Type", 0 },
+	{ 8, "Service Type", 3 },
 	{ 9, "Network Domain", 29 },
 	{ 10, "Is Stand-By", 28 },
 	{ 11, "All IP Addresses", 29 },
@@ -473,6 +473,7 @@ static int hf_saphdb_part_buffer = -1;
 
 /* SAP HDB Part Buffer Option Part Data items */
 static int hf_saphdb_part_option_row = -1;
+static int hf_saphdb_part_option_argcount = -1;
 static int hf_saphdb_part_option_name = -1;
 static int hf_saphdb_part_option_type = -1;
 static int hf_saphdb_part_option_length = -1;
@@ -483,6 +484,7 @@ static int hf_saphdb_part_option_value_short = -1;
 static int hf_saphdb_part_option_value_int = -1;
 static int hf_saphdb_part_option_value_bigint = -1;
 static int hf_saphdb_part_option_value_string = -1;
+static int hf_saphdb_part_option_value_double = -1;
 
 /* SAP HDB Part Buffer COMMAND items */
 static int hf_saphdb_part_command = -1;
@@ -564,7 +566,7 @@ opv_to_opt(const gint8 value, const option_part_definition *opd)
 
 
 static int
-dissect_saphdb_part_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset, guint32 length, gint16 argcount, const option_part_definition *definition)
+dissect_saphdb_part_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset, gint16 argcount, const option_part_definition *definition)
 {
 	guint32 parsed_length = 0;
 
@@ -601,6 +603,9 @@ dissect_saphdb_part_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 			case 4:     // BIGINT
 				proto_tree_add_item(tree, hf_saphdb_part_option_value_bigint, tvb, offset + parsed_length, 8, ENC_LITTLE_ENDIAN); parsed_length += 8;
 				break;
+			case 7:     // DOUBLE
+				proto_tree_add_item(tree, hf_saphdb_part_option_value_double, tvb, offset + parsed_length, 8, ENC_LITTLE_ENDIAN); parsed_length += 8;
+				break;
 			case 28:	// BOOLEAN
 				option_value_byte = tvb_get_gint8(tvb, offset + parsed_length);
 				proto_tree_add_boolean(tree, hf_saphdb_part_option_value_bool, tvb, offset + parsed_length, 1, option_value_byte); parsed_length += 1;
@@ -633,6 +638,31 @@ dissect_saphdb_part_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 	}
 
 	return parsed_length;
+}
+
+static int
+dissect_saphdb_part_multi_line_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset, gint16 rowcount, const option_part_definition *definition)
+{
+	guint32 parsed_length = 0;
+
+	/* In Multi-line Option Part, the part's argcount is the number of rows. For each row we need to parse the options. */
+	while (rowcount > 0 && tvb_reported_length_remaining(tvb, offset + parsed_length) > 2) {
+		gint16 argcount = 0;
+
+		/* First we read the amount of arguments in this row */
+		argcount = tvb_get_gint16(tvb, offset + parsed_length, ENC_LITTLE_ENDIAN);
+		proto_tree_add_item(tree, hf_saphdb_part_option_argcount, tvb, offset + parsed_length, 2, ENC_LITTLE_ENDIAN); parsed_length += 2;
+
+		/* Now parse the options in the row if there are*/
+		if (argcount > 0) {
+			parsed_length += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset + parsed_length, argcount, definition);
+		}
+
+		rowcount--;
+	}
+
+	return parsed_length;
+
 }
 
 
@@ -695,42 +725,44 @@ dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, 
 
 			offset += length;
 			break;
-		case 34:   // CLIENTID
+		case 35:   // CLIENTID
 			if (length > 0 && tvb_reported_length_remaining(tvb, offset) >= length) {
 				proto_tree_add_item(tree, hf_saphdb_part_clientid, tvb, offset, length, ENC_NA); offset += length; length = 0;
 			}
 			break;
 
-		// Option Parts
+		// Multi-line Option Parts
 		case 15:  // TOPOLOGYINFORMATION
-			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, length, argcount, saphdb_part_topology_info_vals);
+			offset += dissect_saphdb_part_multi_line_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_topology_info_vals);
 			break;
+
+		// Option Parts
 		case 27:  // COMMANDINFO
-			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, length, argcount, saphdb_part_command_info_vals);
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_command_info_vals);
 			break;
 		case 34:  // SESSIONCONTEXT
-			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, length, argcount, saphdb_part_session_context_vals);
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_session_context_vals);
 			break;
 		case 39:  // STATEMENTCONTEXT
-			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, length, argcount, saphdb_part_statement_context_vals);
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_statement_context_vals);
 			break;
 		case 42:  // CONNECTOPTIONS
-			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, length, argcount, saphdb_part_connect_options_vals);
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_connect_options_vals);
 			break;
 		case 43:  // COMMITOPTIONS
-			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, length, argcount, saphdb_part_commit_options_vals);
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_commit_options_vals);
 			break;
 		case 44:  // FETCHOPTIONS
-			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, length, argcount, saphdb_part_fetch_options_vals);
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_fetch_options_vals);
 			break;
 		case 64:  // TRANSACTIONFLAGS
-			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, length, argcount, saphdb_part_transaction_flags_vals);
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_transaction_flags_vals);
 			break;
 		case 67:  // DBCONNECTINFO
-			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, length, argcount, saphdb_part_dbconnect_info_flags_vals);
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_dbconnect_info_flags_vals);
 			break;
 		case 68:  // LOBFLAGS
-			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, length, argcount, saphdb_part_lob_flags_vals);
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_lob_flags_vals);
 			break;
 
 		default:
@@ -1038,6 +1070,8 @@ proto_register_saphdb(void)
 		/* Part Buffer Option Part Data items */
 		{ &hf_saphdb_part_option_row,
 			{ "Option Row", "saphdb.segment.part.option", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Option Part Row", HFILL }},
+		{ &hf_saphdb_part_option_argcount,
+			{ "Argument Row Count", "saphdb.segment.part.argcount", FT_INT16, BASE_DEC, NULL, 0x0, "SAP HDB Option Part Argument Row Count", HFILL }},
 		{ &hf_saphdb_part_option_name,
 			{ "Option Name", "saphdb.segment.part.option.name", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Option Part Name", HFILL }},
 		{ &hf_saphdb_part_option_type,
@@ -1058,6 +1092,8 @@ proto_register_saphdb(void)
 			{ "Option Value", "saphdb.segment.part.option.value", FT_INT64, BASE_DEC, NULL, 0x0, "SAP HDB Option Part Value", HFILL }},
 		{ &hf_saphdb_part_option_value_string,
 			{ "Option Value", "saphdb.segment.part.option.value", FT_STRING, BASE_NONE, NULL, 0x0, "SAP HDB Option Part Value", HFILL }},
+		{ &hf_saphdb_part_option_value_double,
+			{ "Option Value", "saphdb.segment.part.option.value", FT_DOUBLE, BASE_NONE, NULL, 0x0, "SAP HDB Option Part Value", HFILL }},
 
 		/* SAP HDB Part Buffer COMMAND items */
 		{ &hf_saphdb_part_command,
