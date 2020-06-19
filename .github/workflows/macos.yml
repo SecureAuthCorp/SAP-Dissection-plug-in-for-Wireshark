@@ -114,7 +114,7 @@ jobs:
          - name: Run tests
            run: |
               cd build/run/
-              python ../../plugin/epan/sap/tests/__init__.py           
+              python ../../plugins/epan/sap/tests/__init__.py           
 
          - name: Copy plugin so
            run: |
