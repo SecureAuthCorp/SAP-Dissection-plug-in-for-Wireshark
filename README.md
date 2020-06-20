@@ -5,9 +5,6 @@ SAP Dissector Plugin for Wireshark
 [![Build and test MacOS plug-in](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/workflows/Build%20and%20test%20MacOS%20plug-in/badge.svg)](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/actions?query=workflow%3A%22Build+and+test+MacOS+plug-in%22)
 [![Build Windows plug-in](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/workflows/Build%20Windows%20plug-in/badge.svg)](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/actions?query=workflow%3A%22Build+Windows+plug-in%22)
 
-[![Build Status](https://travis-ci.org/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark.svg)](https://travis-ci.org/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark)
-
-
 SECUREAUTH LABS. Copyright (C) 2020 SecureAuth Corporation. All rights reserved.
 
 Version 0.8.2.dev (XXX 2020)
@@ -284,6 +281,17 @@ License
 
 This Wireshark plugin is distributed under the GPLv2 license. Check the `COPYING`
 file for more details.
+
+
+Disclaimer
+----------
+
+The spirit of this open source initiative is hopefully to help the community to
+alleviate some of the hindrances associated with the implementation of
+networking protocols and stacks, aiming at speeding up research and educational
+activities. By no means this package is meant to be used in production
+environments / commercial products. If so, we would advise to include it into a
+proper SDLC process.
 
 
 Authors
