@@ -4,7 +4,7 @@
 
 name: Build Windows plug-in
 
-on: [push]
+on: [push, pull_request]
 
 env:
    WIRESHARK_BRANCH: master-3.2
@@ -62,15 +62,44 @@ jobs:
               msbuild /m /p:Configuration=RelWithDebInfo nsis_package.vcxproj
            working-directory: build
 
-         - name: Move Windows packages
+         - name: Move Windows artifacts
            run: |
               mkdir exe
               mv build/packaging/nsis/*exe exe/
          - name: Move plugin dll
            run: |
               mv build/run/RelWithDebInfo/plugins/3.2/epan/sap.dll exe/sap.dll
-         - name: Upload Windows packages
-           uses: actions/upload-artifact@v1
+         - name: Upload Windows artifacts
+           uses: actions/upload-artifact@v2
            with:
               name: packages
               path: exe
+
+   release:
+      name: Release
+      runs-on: windows-latest
+      needs: intree
+      env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      if: ${{ github.event_name == 'push' && startsWith(github.ref, 'v') }}
+      steps:
+         - name: Download Windows artifacts
+           uses: actions/download-artifact@v2
+           with:
+              name: packages
+              path: exe
+         - name: Create a release
+           id: create_release
+           uses: actions/create-release@v1
+           with:
+              tag_name: ${{ github.ref }}
+              release_name: SAP Plug-in for Wireshark ${{ github.ref }}
+              draft: true
+              prerelease: false
+         - name: Upload release asset
+           uses: actions/upload-release-asset@v1
+           with:
+              upload_url: ${{ steps.create_release.outputs.upload_url }} 
+              asset_path: exe/sap.dll
+              asset_name: sap-${{ github.ref }}-win64.dll
+              asset_content_type: application/x-msdownload

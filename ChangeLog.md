@@ -4,6 +4,7 @@ Changelog
 v0.8.2 - 2020-XX-XX
 -------------------
 
+- Replaced AppVeyor and Travis builds with GitHub Actions.
 
 
 v0.8.1 - 2020-03-20

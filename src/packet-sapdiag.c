@@ -2710,11 +2710,11 @@ dissect_sapdiag(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data 
 
 	/* Check for error messages */
 	if ((error_no != 0x00) && (tvb_reported_length_remaining(tvb, offset) > 0)){
-		guint8 *error_message = NULL;
+		gchar *error_message = NULL;
 		guint32 error_message_length = 0;
 
 		error_message_length = (guint32)tvb_reported_length_remaining(tvb, offset) - 1;
-		error_message = tvb_get_string_enc(wmem_packet_scope(), tvb, offset, error_message_length, ENC_LITTLE_ENDIAN|ENC_UTF_16);
+		error_message = (gchar *)tvb_get_string_enc(wmem_packet_scope(), tvb, offset, error_message_length, ENC_LITTLE_ENDIAN|ENC_UTF_16);
 		proto_tree_add_string(sapdiag_tree, hf_sapdiag_error_message, tvb, offset, error_message_length, error_message);
 
 	/* If the message is compressed */
