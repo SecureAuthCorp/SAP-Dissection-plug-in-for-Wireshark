@@ -76,13 +76,13 @@ This plugin counts on several different dissectors:
 
 - SAP IGS (Internet Graphic Server) Protocol dissector
 
-  This dissector parses packets used by SAP's IGS services.
+	This dissector parses packets used by SAP's IGS services.
 
 - SAP RFC (Remote Function Call) Protocol dissector (experimental)
 
-  This dissector perform some basic dissection on the main components of the
-  RFC protocol. It dissects general items and does some basic reassembling
-  and decompression of table contents.
+	This dissector perform some basic dissection on the main components of the
+	RFC protocol. It dissects general items and does some basic reassembling
+	and decompression of table contents.
 
 
 Installation & Build

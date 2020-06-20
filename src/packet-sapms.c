@@ -186,7 +186,12 @@ static const value_string sapms_adm_record_opcode_vals[] = {
 	{ 0x48, "AD_LOAD_INFO" },
 	{ 0x49, "AD_TEST" },
 	{ 0x4a, "AD_HANDLE_ACL" },
-	{ 0x4b, "AD_ENQ_LOG_RESET" },
+	{ 0x4b, "AD_PROFILE2" },
+	{ 0x4c, "AD_RSCP_ASYNC" },
+	{ 0x4d, "AD_BATCH_INFO" },
+	{ 0x4e, "AD_SOFT_CANCEL" },
+	{ 0x55, "AD_SYNC_LOAD_FMT" },
+	{ 0x56, "AD_GET_NILIST_PORT" },
 	/* NULL */
 	{ 0x00, NULL }
 };
@@ -220,6 +225,7 @@ static const value_string sapms_adm_rzl_strg_type_vals[] = {
 
 /* MS OP Code values */
 static const value_string sapms_opcode_vals[] = {
+	{  0, "MS_DP_ADM" },
 	{  1, "MS_SERVER_CHG" },
 	{  2, "MS_SERVER_ADD" },
 	{  3, "MS_SERVER_SUB" },
@@ -494,9 +500,12 @@ static int hf_sapms_key = -1;
 static int hf_sapms_flag = -1;
 static int hf_sapms_iflag = -1;
 static int hf_sapms_fromname = -1;
+static int hf_sapms_diagport = -1;
 static int hf_sapms_fromhost = -1;
 static int hf_sapms_fromserv = -1;
 static int hf_sapms_message = -1;
+
+static int hf_sapms_dp_adm_dp_version = -1;
 
 static int hf_sapms_adm_eyecatcher = -1;
 static int hf_sapms_adm_version = -1;
@@ -518,6 +527,10 @@ static int hf_sapms_adm_rzl_strg_type = -1;
 static int hf_sapms_adm_rzl_strg_name = -1;
 static int hf_sapms_adm_rzl_strg_value = -1;
 static int hf_sapms_adm_rzl_strg_value_integer = -1;
+static int hf_sapms_adm_rzl_strg_uptime = -1;
+static int hf_sapms_adm_rzl_strg_delay = -1;
+static int hf_sapms_adm_rzl_strg_users  = -1;
+static int hf_sapms_adm_rzl_strg_quality = -1;
 
 static int hf_sapms_opcode = -1;
 static int hf_sapms_opcode_error = -1;
@@ -527,13 +540,22 @@ static int hf_sapms_opcode_value = -1;
 
 static int hf_sapms_property_client = -1;
 static int hf_sapms_property_id = -1;
-static int hf_sapms_property_length = -1;
 static int hf_sapms_property_value = -1;
+
+static int hf_sapms_property_vhost_logon = -1;
+static int hf_sapms_property_vhost_length = -1;
+static int hf_sapms_property_vhost_value = -1;
 
 static int hf_sapms_property_ip_address = -1;
 static int hf_sapms_property_ip_address6 = -1;
 
-static int hf_sapms_property_service = -1;
+static int hf_sapms_property_param_name_length = -1;
+static int hf_sapms_property_param_name_value = -1;
+static int hf_sapms_property_param_value_length = -1;
+static int hf_sapms_property_param_value_value = -1;
+
+static int hf_sapms_property_service_number = -1;
+static int hf_sapms_property_service_value = -1;
 
 static int hf_sapms_property_release = -1;
 static int hf_sapms_property_release_patchno = -1;
@@ -574,6 +596,7 @@ static int hf_sapms_logon_misc_length = -1;
 static int hf_sapms_logon_misc = -1;
 static int hf_sapms_logon_address6_length = -1;
 static int hf_sapms_logon_address6 = -1;
+static int hf_sapms_logon_end = -1;
 
 static int hf_sapms_shutdown_reason_length = -1;
 static int hf_sapms_shutdown_reason = -1;
@@ -681,12 +704,12 @@ dissect_sapms_adm_record(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, gu
 					case 31:		/* STRG_TYPE_WRITE_I */
 					case 41:		/* STRG_TYPE_DEL_I */
 					case 51:{		/* STRG_TYPE_CREATE_I */
+						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_uptime, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
 						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_value_integer, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
+						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_delay, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
 						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_value_integer, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
-						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_value_integer, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
-						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_value_integer, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
-						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_value_integer, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
-						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_value_integer, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
+						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_users, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
+						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_quality, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
 						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_value_integer, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
 						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_value_integer, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
 						proto_tree_add_item(value_tree, hf_sapms_adm_rzl_strg_value_integer, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
@@ -822,7 +845,7 @@ dissect_sapms_counter(tvbuff_t *tvb, proto_tree *tree, guint32 offset){
 static void
 dissect_sapms_property(tvbuff_t *tvb, proto_tree *tree, guint32 offset){
 	guint32 property_id = 0;
-	proto_item *value= NULL;
+	proto_item *value = NULL;
 	proto_tree *value_tree = NULL;
 
 	proto_tree_add_item(tree, hf_sapms_property_client, tvb, offset, 40, ENC_ASCII|ENC_NA); offset+=40;
@@ -840,13 +863,50 @@ dissect_sapms_property(tvbuff_t *tvb, proto_tree *tree, guint32 offset){
 
 	switch (property_id){
 
+		case 0x02:{			/* MS_PROPERTY_VHOST */
+			guint16 vhost_length = 0;
+
+			proto_tree_add_item(value_tree, hf_sapms_property_vhost_logon, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2;
+
+			offset =+ 12;  /* Padding */
+
+			vhost_length = tvb_get_ntohs(tvb, offset);
+			proto_tree_add_item(value_tree, hf_sapms_property_vhost_length, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2;
+
+			if (vhost_length > 0) {
+				proto_tree_add_item(value_tree, hf_sapms_property_vhost_value, tvb, offset, vhost_length, ENC_ASCII|ENC_NA); offset += vhost_length;
+			}
+
+			offset =+ 2;  /* Padding */
+			break;
+		}
 		case 0x03:{			/* MS_PROPERTY_IPADR */
 			proto_tree_add_item(value_tree, hf_sapms_property_ip_address, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
 			proto_tree_add_item(value_tree, hf_sapms_property_ip_address6, tvb, offset, 16, ENC_NA); offset+=16;
 			break;
 		}
+		case 0x04:{			/* MS_PROPERTY_PARAM */
+			guint32 param_length = 0;
+			guint16 value_length = 0;
+
+			param_length = tvb_get_ntohl(tvb, offset);
+			proto_tree_add_item(value_tree, hf_sapms_property_param_name_length, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4;
+			if (param_length > 0){
+				proto_tree_add_item(value_tree, hf_sapms_property_param_name_value, tvb, offset, param_length, ENC_ASCII|ENC_NA); offset+=param_length;
+			}
+			offset += 100 - param_length;  /* Padding */
+			offset += 2;  /* Padding */
+
+			value_length = tvb_get_ntohs(tvb, offset);
+			proto_tree_add_item(value_tree, hf_sapms_property_param_value_length, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2;
+			if (param_length > 0){
+				proto_tree_add_item(value_tree, hf_sapms_property_param_value_value, tvb, offset, value_length, ENC_ASCII|ENC_NA); offset+=value_length;
+			}
+			break;
+		}
 		case 0x05:{			/* MS_PROPERTY_SERVICE */
-			proto_tree_add_item(value_tree, hf_sapms_property_service, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2;
+			proto_tree_add_item(value_tree, hf_sapms_property_service_number, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2;
+			proto_tree_add_item(value_tree, hf_sapms_property_service_value, tvb, offset, 1, ENC_BIG_ENDIAN); offset+=1;
 			break;
 		}
 		case 0x07:{			/* Release Information */
@@ -862,8 +922,14 @@ dissect_sapms_property(tvbuff_t *tvb, proto_tree *tree, guint32 offset){
 static void
 dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset, guint8 flag, guint8 opcode, guint8 opcode_version, guint32 length){
 	gint client_length = 0;
+	guint8 dp_version = 0;
 
 	switch (opcode){
+		case 0x00:{     /* MS_DP_ADM */
+			dp_version = tvb_get_guint8(tvb, offset);
+			proto_tree_add_item(tree, hf_sapms_dp_adm_dp_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset+=1; length-=1;
+			break;
+		}
 		case 0x02:			/* MS_SERVER_ADD */
 		case 0x03:			/* MS_SERVER_SUB */
 		case 0x04:{			/* MS_SERVER_MOD */
@@ -1019,9 +1085,11 @@ dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint3
 
 			address6_length = tvb_get_ntohs(tvb, offset);
 			proto_tree_add_item(tree, hf_sapms_logon_address6_length, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2; length-=2;
-			if (address6_length==16 && length >= address6_length){
+			if (address6_length == 16 && length >= (address6_length + 4)){
 				tvb_get_ipv6(tvb, offset, &address_ipv6);
 				proto_tree_add_ipv6(tree, hf_sapms_logon_address6, tvb, offset, 16, &address_ipv6); offset+=16; length-=16;
+				proto_tree_add_item(tree, hf_sapms_logon_end, tvb, offset, 4, ENC_BIG_ENDIAN); offset+=4; length-=4;
+
 			} else { /* Add expert info if wrong IPv6 address length */
 				expert_add_info_format(pinfo, tree, &ei_sapms_ip_invalid_length, "Invalid IPv6 address length (%d) or data", address6_length);
 			}
@@ -1147,7 +1215,11 @@ dissect_sapms(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U
 
 			proto_tree_add_item(sapms_tree, hf_sapms_fromname, tvb, offset, 40, ENC_ASCII|ENC_NA); offset+=40;
 
-			offset+=2; /* Skip 2 bytes */
+			if (flag == 0x00 && iflag == 0x00){  /* For MS_REQUEST+MS_LOGIN_2 it's the diag port */
+				proto_tree_add_item(sapms_tree, hf_sapms_diagport, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2;
+			} else {
+				offset+=2; /* Skip 2 bytes */
+			}
 
 			if (!tvb_offset_exists(tvb, offset)){
 				return 0;
@@ -1157,8 +1229,10 @@ dissect_sapms(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U
 			switch (iflag){
 
 				/* MS_SEND_NAME or unknown (forwarded messages) */
-				case 0x00:
-				case 0x01:{
+				case 0x00:      /* MS_UNKNOWN */
+				case 0x01:	    /* MS_SEND_NAME */
+				case 0x02:	 		/* MS_SEND_TYPE */
+				case 0x07:{     /* MS_SEND_TYPE_ONCE */
 					opcode = tvb_get_guint8(tvb, offset);
 					proto_tree_add_item(sapms_tree, hf_sapms_opcode, tvb, offset, 1, ENC_BIG_ENDIAN); offset+=1;
 					proto_tree_add_item(sapms_tree, hf_sapms_opcode_error, tvb, offset, 1, ENC_BIG_ENDIAN); offset+=1;
@@ -1178,8 +1252,7 @@ dissect_sapms(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U
 					}
 					break;
 
-				/* MS_ADM_OPCODES */
-				} case 0x05:{
+				} case 0x05:{   /* MS_ADM_OPCODES */
 					proto_tree_add_item(sapms_tree, hf_sapms_adm_eyecatcher, tvb, offset, 12, ENC_ASCII|ENC_NA); offset+=12;
 					proto_tree_add_item(sapms_tree, hf_sapms_adm_version, tvb, offset, 1, ENC_BIG_ENDIAN); offset+=1;
 					proto_tree_add_item(sapms_tree, hf_sapms_adm_msgtype, tvb, offset, 1, ENC_BIG_ENDIAN); offset+=1;
@@ -1253,6 +1326,8 @@ proto_register_sapms(void)
 			{ "IFlag", "sapms.iflag", FT_UINT8, BASE_HEX, VALS(sapms_iflag_vals), 0x0, "SAP MS IFlag", HFILL }},
 		{ &hf_sapms_fromname,
 			{ "From Name", "sapms.fromname", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS From Name", HFILL }},
+		{ &hf_sapms_diagport,
+			{ "Diag Port", "sapms.diag_port", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP MS Diag Port", HFILL }},
 		{ &hf_sapms_fromhost,
 			{ "From Host", "sapms.fromhost", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS From Host", HFILL }},
 		{ &hf_sapms_fromserv,
@@ -1260,6 +1335,10 @@ proto_register_sapms(void)
 		{ &hf_sapms_message,
 			{ "Message", "sapms.message", FT_NONE, BASE_NONE, NULL, 0x0, "SAP MS Message", HFILL }},
 
+		/* MS_DP_ADM fiels */
+		{ &hf_sapms_dp_adm_dp_version,
+			{ "Dispatcher Version", "sapms.dp_adm.version", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP MS Dispatcher Version", HFILL }},
+		
 		/* ADM Message fields */
 		{ &hf_sapms_adm_eyecatcher,
 			{ "Adm Eye Catcher", "sapms.adm.eyecatcher", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS Adm Eye Catcher", HFILL }},
@@ -1298,6 +1377,14 @@ proto_register_sapms(void)
 			{ "Adm RZL String Value", "sapms.adm.rzl_strg.value", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS Adm RZL String Value", HFILL }},
 		{ &hf_sapms_adm_rzl_strg_value_integer,
 			{ "Adm RZL String Integer Value", "sapms.adm.rzl_strg.value", FT_INT32, BASE_DEC, NULL, 0x0, "SAP MS Adm RZL String Integer Value", HFILL }},
+		{ &hf_sapms_adm_rzl_strg_uptime,
+			{ "Adm RZL String Uptime", "sapms.adm.rzl_strg.uptime", FT_INT32, BASE_DEC, NULL, 0x0, "SAP MS Adm RZL String Uptime", HFILL }},
+		{ &hf_sapms_adm_rzl_strg_delay,
+			{ "Adm RZL String Delay", "sapms.adm.rzl_strg.delay", FT_INT32, BASE_DEC, NULL, 0x0, "SAP MS Adm RZL String Delay", HFILL }},
+		{ &hf_sapms_adm_rzl_strg_users,
+			{ "Adm RZL String Users", "sapms.adm.rzl_strg.users", FT_INT32, BASE_DEC, NULL, 0x0, "SAP MS Adm RZL String Users", HFILL }},
+		{ &hf_sapms_adm_rzl_strg_quality,
+			{ "Adm RZL String Quality", "sapms.adm.rzl_strg.quality", FT_INT32, BASE_DEC, NULL, 0x0, "SAP MS Adm RZL String Quality", HFILL }},
 
 		/* OPCODE fields */
 		{ &hf_sapms_opcode,
@@ -1315,17 +1402,36 @@ proto_register_sapms(void)
 		{ &hf_sapms_property_client,
 			{ "Property Client", "sapms.property.client", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS Property Client", HFILL }},
 		{ &hf_sapms_property_id,
-			{ "Property ID", "sapms.property.id", FT_UINT32, BASE_HEX, VALS(sapms_property_id_vals), 0x0, "SAP MS Property ID", HFILL }},
-		{ &hf_sapms_property_length,
-			{ "Property Length", "sapms.property.length", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP MS Property Length", HFILL }},
+			{ "Property ID", "sapms.property.id", FT_UINT32, BASE_DEC, VALS(sapms_property_id_vals), 0x0, "SAP MS Property ID", HFILL }},
+
 		{ &hf_sapms_property_value,
-			{ "Property", "sapms.property.value", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS Property Value", HFILL }},
+			{ "Property", "sapms.property.value", FT_NONE, BASE_NONE, NULL, 0x0, "SAP MS Property Value", HFILL }},
+
+		{ &hf_sapms_property_vhost_logon,
+			{ "Property VHost Logon", "sapms.property.vhost.logon", FT_UINT16, BASE_DEC, VALS(sapms_logon_type_vals), 0x0, "SAP MS Property VHost Logon", HFILL }},
+		{ &hf_sapms_property_vhost_length,
+			{ "Property VHost Length", "sapms.property.vhost.length", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP MS Property VHost Length", HFILL }},
+		{ &hf_sapms_property_vhost_value,
+			{ "Property VHost Value", "sapms.property.vhost.value", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS Property VHost Value", HFILL }},
+
 		{ &hf_sapms_property_ip_address,
 			{ "Property IP Address v4", "sapms.property.ipaddr4", FT_IPv4, BASE_NONE, NULL, 0x0, "SAP MS Property IP Address IPv4", HFILL }},
 		{ &hf_sapms_property_ip_address6,
 			{ "Property IP Address v6", "sapms.property.ipaddr6", FT_IPv6, BASE_NONE, NULL, 0x0, "SAP MS Property IP Address IPv6", HFILL }},
-		{ &hf_sapms_property_service,
-			{ "Property Service Number", "sapms.property.servno", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP MS Property Service Number", HFILL }},
+
+		{ &hf_sapms_property_param_name_length,
+			{ "Property Parameter Name Length", "sapms.property.param.name_length", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP MS Property Parameter Name Length", HFILL }},
+		{ &hf_sapms_property_param_name_value,
+			{ "Property Parameter Name", "sapms.property.param.name", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS Property Parameter Name", HFILL }},
+		{ &hf_sapms_property_param_value_length,
+			{ "Property Parameter Value Length", "sapms.property.param.value_length", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP MS Property Parameter Value Length", HFILL }},
+		{ &hf_sapms_property_param_value_value,
+			{ "Property Parameter Value", "sapms.property.param.value", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS Property Parameter Value", HFILL }},
+
+		{ &hf_sapms_property_service_number,
+			{ "Property Service Number", "sapms.property.service.number", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP MS Property Service Number", HFILL }},
+		{ &hf_sapms_property_service_value,
+			{ "Property Service Value", "sapms.property.service.value", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP MS Property Service Value", HFILL }},
 		{ &hf_sapms_property_release,
 			{ "Property Release", "sapms.property.release", FT_STRINGZ, BASE_NONE, NULL, 0x0, "SAP MS Property Release", HFILL }},
 		{ &hf_sapms_property_release_patchno,
@@ -1463,9 +1569,11 @@ proto_register_sapms(void)
 		{ &hf_sapms_logon_misc,
 			{ "Logon Misc", "sapms.logon.misc", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS Logon Misc", HFILL }},
 		{ &hf_sapms_logon_address6_length,
-			{ "Logon Address IPv6 Length", "sapms.logon.addr6_length", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP MS Logon Address IPv6 Length", HFILL }},
+			{ "Logon Address IPv6 Length", "sapms.logon.addr6_length", FT_INT16, BASE_DEC, NULL, 0x0, "SAP MS Logon Address IPv6 Length", HFILL }},
 		{ &hf_sapms_logon_address6,
 			{ "Logon Address IPv6", "sapms.logon.address6", FT_IPv6, BASE_NONE, NULL, 0x0, "SAP MS Logon Address IPv6", HFILL }},
+		{ &hf_sapms_logon_end,
+			{ "Logon Address End", "sapms.logon.end", FT_INT32, BASE_DEC, NULL, 0x0, "SAP MS Logon End", HFILL }},
 
 		{ &hf_sapms_shutdown_reason_length,
 			{ "Shutdown Reason Length", "sapms.shutdown.reason_length", FT_UINT16, BASE_DEC, NULL, 0x0, "SAP MS Shutdown Reason Length", HFILL }},
