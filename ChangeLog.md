@@ -5,6 +5,10 @@ v0.8.2 - 2020-XX-XX
 -------------------
 
 - Replaced AppVeyor and Travis builds with GitHub Actions.
+- `src/packet-sapdiag.c`: Fixed compiler warnings.
+- `src/packet-sapigs.c`: Fixed compiler warnings.
+- `src/packet-sapms.c`: Added a couple of Message Server fields based on Mathieu ([@gelim](https://github.com/gelim)) and Dmitry ([@_chipik](https://twitter.com/_chipik)) work on pysap. Thanks!
+- `src/packet-saprouter.c`: Fixed compiler warnings.
 
 
 v0.8.1 - 2020-03-20
