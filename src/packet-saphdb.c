@@ -526,6 +526,8 @@ static expert_field ei_saphdb_option_part_unknown = EI_INIT;
 static expert_field ei_saphdb_part_buffer_length_invalid = EI_INIT;
 static expert_field ei_saphdb_segments_incorrect_order = EI_INIT;
 static expert_field ei_saphdb_segments_number_incorrect = EI_INIT;
+static expert_field ei_saphdb_segment_length = EI_INIT;
+static expert_field ei_saphdb_buffer_length = EI_INIT;
 static expert_field ei_saphdb_parts_number_incorrect = EI_INIT;
 static expert_field ei_saphdb_varpartlenght_incorrect = EI_INIT;
 
@@ -809,13 +811,18 @@ dissect_saphdb_part(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *d
 	part_buffer_length_item = proto_tree_add_item_ret_int(part_tree, hf_saphdb_part_bufferlength, tvb, offset, 4, ENC_LITTLE_ENDIAN, &bufferlength); offset += 4; length += 4;
 	proto_tree_add_item(part_tree, hf_saphdb_part_buffersize, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length += 4;
 
+	/* Check the length */
+	if (bufferlength < 0) {
+		expert_add_info_format(pinfo, part_buffer_length_item, &ei_saphdb_buffer_length, "Part Buffer length %d is invalid", bufferlength);
+	}
+
 	/* Align the buffer length to 8 */
 	if (bufferlength % 8 != 0) {
 		bufferlength += 8 - bufferlength % 8;
 	}
 
 	/* Adjust the length */
-	if (tvb_reported_length_remaining(tvb, offset) < bufferlength) {
+	if (bufferlength < 0 || tvb_reported_length_remaining(tvb, offset) < bufferlength) {
 		bufferlength = tvb_reported_length_remaining(tvb, offset);
 	}
 
@@ -843,7 +850,7 @@ dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 	gint16 segment_number = 0;
 	guint32 length = 0, part_length = 0;
 	gint32 segmentlength = 0;
-	proto_item *segment_item = NULL, *segment_number_item = NULL, *number_of_parts_item = NULL, *segment_buffer_item = NULL;
+	proto_item *segment_item = NULL, *segmentlength_item = NULL, *number_of_parts_item = NULL, *segment_number_item = NULL, *segment_buffer_item = NULL;
 	proto_tree *segment_tree = NULL, *segment_buffer_tree = NULL;
 
 	/* Add the Segment subtree */
@@ -852,7 +859,8 @@ dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 	proto_item_append_text(segment_item, " (%d/%d)", nosegment, number_of_segments);
 
 	/* Add the Segment fields */
-	proto_tree_add_item_ret_int(segment_tree, hf_saphdb_segment_segmentlength, tvb, offset, 4, ENC_LITTLE_ENDIAN, &segmentlength); offset += 4; length += 4;
+	segmentlength = tvb_get_gint32(tvb, offset, ENC_LITTLE_ENDIAN);
+	segmentlength_item = proto_tree_add_item(segment_tree, hf_saphdb_segment_segmentlength, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length += 4;
 	proto_tree_add_item(segment_tree, hf_saphdb_segment_segmentofs, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length += 4;
 	number_of_parts = tvb_get_gint16(tvb, offset, ENC_LITTLE_ENDIAN);
 	number_of_parts_item = proto_tree_add_item(segment_tree, hf_saphdb_segment_noofparts, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; length += 2;
@@ -861,8 +869,15 @@ dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 	segmentkind = tvb_get_gint8(tvb, offset);
 	proto_tree_add_item(segment_tree, hf_saphdb_segment_segmentkind, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
 
+	/* Check a couple of fields */
+	if (segmentlength < 13) {
+		expert_add_info_format(pinfo, segmentlength_item, &ei_saphdb_segment_length, "Segment length %d is invalid", segmentlength);
+	}
+	if (number_of_parts < 0) {
+		expert_add_info_format(pinfo, number_of_parts_item, &ei_saphdb_parts_number_incorrect, "Number of parts %d is invalid", number_of_parts);
+	}
 	if (segment_number < 0 || nosegment != segment_number) {
-		expert_add_info_format(pinfo, segment_number_item, &ei_saphdb_segments_incorrect_order, "Segment number %d is invalid", segment_number);
+		expert_add_info_format(pinfo, segment_number_item, &ei_saphdb_segments_incorrect_order, "Segment number %d is invalid (expected %d)", segment_number, nosegment);
 	}
 
 	/* Add additional fields according to the segment kind*/
@@ -884,7 +899,7 @@ dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 	}
 
 	/* Add the Segment Buffer subtree */
-	if (number_of_parts > 0) {
+	if (segmentlength > length && number_of_parts > 0) {
 		segment_buffer_item = proto_tree_add_item(segment_tree, hf_saphdb_segment_buffer, tvb, offset, segmentlength - length, ENC_NA);
 		segment_buffer_tree = proto_item_add_subtree(segment_buffer_item, ett_saphdb);
 
@@ -894,8 +909,6 @@ dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 			offset += part_length; length += part_length;
 		}
 
-	} else {
-		expert_add_info_format(pinfo, number_of_parts_item, &ei_saphdb_parts_number_incorrect, "Number of parts %d is invalid", number_of_parts);
 	}
 
 	/* Adjust the item tree length */
@@ -908,6 +921,8 @@ dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 static int
 dissect_saphdb(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_)
 {
+	guint32 offset = 0;
+
 	/* Add the protocol to the column */
 	col_add_str(pinfo->cinfo, COL_PROTOCOL, "SAPHDB");
 	/* Clear out stuff in the info column */
@@ -916,7 +931,6 @@ dissect_saphdb(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 	/* we are being asked for details */
 	if (tree && (tvb_reported_length(tvb) == 8 || tvb_reported_length(tvb) == 14 || tvb_reported_length(tvb) >= 32)) {
 
-		guint32 offset = 0;
 		proto_item *ti = NULL;
 		proto_tree *saphdb_tree = NULL;
 
@@ -991,7 +1005,7 @@ dissect_saphdb(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 
 	}
 
-	return tvb_reported_length(tvb);
+	return offset;
 }
 
 void
@@ -1152,6 +1166,8 @@ proto_register_saphdb(void)
 		{ &ei_saphdb_part_buffer_length_invalid, { "saphdb.segment.part.bufferlength", PI_MALFORMED, PI_ERROR, "The Part Buffer length is incorrect", EXPFILL }},
 		{ &ei_saphdb_segments_incorrect_order, { "saphdb.segment.segmentno", PI_MALFORMED, PI_ERROR, "The segments are in incorrect order or are invalid", EXPFILL }},
 		{ &ei_saphdb_segments_number_incorrect, { "saphdb.noofsegm", PI_MALFORMED, PI_ERROR, "The number of segments is incorrect", EXPFILL }},
+		{ &ei_saphdb_segment_length, { "saphdb.segment.segmentlength", PI_MALFORMED, PI_ERROR, "The segment length is incorrect", EXPFILL }},
+		{ &ei_saphdb_buffer_length, { "saphdb.segment.part.bufferlength", PI_MALFORMED, PI_ERROR, "The part buffer length is incorrect", EXPFILL }},
 		{ &ei_saphdb_parts_number_incorrect, { "saphdb.segment.noofparts", PI_MALFORMED, PI_ERROR, "The number of parts is incorrect", EXPFILL }},
 		{ &ei_saphdb_varpartlenght_incorrect, { "saphdb.varpartlength", PI_MALFORMED, PI_ERROR, "The length is incorrect", EXPFILL }},
 	};
