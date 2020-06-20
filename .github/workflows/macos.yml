@@ -121,8 +121,37 @@ jobs:
            run: |
               mkdir exe
               cp build/run/Wireshark.app/Contents/PlugIns/wireshark/3-2/epan/sap.so exe/sap-source.so
-         - name: Upload Ubuntu packages
-           uses: actions/upload-artifact@v1
+         - name: Upload MacOS artifacts
+           uses: actions/upload-artifact@v2
            with:
               name: packages
               path: exe
+
+   release:
+      name: Release
+      runs-on: macos-latest
+      needs: intree
+      env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      if: ${{ github.event_name == 'push' && startsWith(github.ref, 'v') }}
+      steps:
+         - name: Download MacOS artifacts
+           uses: actions/download-artifact@v2
+           with:
+              name: packages
+              path: exe
+         - name: Create a release
+           id: create_release
+           uses: actions/create-release@v1
+           with:
+              tag_name: ${{ github.ref }}
+              release_name: SAP Plug-in for Wireshark ${{ github.ref }}
+              draft: true
+              prerelease: false
+         - name: Upload release asset
+           uses: actions/upload-release-asset@v1
+           with:
+              upload_url: ${{ steps.create_release.outputs.upload_url }} 
+              asset_path: exe/sap-source.so
+              asset_name: sap-${{ github.ref }}-macos-x86-64.so
+              asset_content_type: application/octet-stream
