@@ -785,7 +785,7 @@ dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, 
 
 
 static int
-dissect_saphdb_part(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_, guint32 offset, guint16 noofparts, guint16 nopart)
+dissect_saphdb_part(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_, guint32 offset, gint16 number_of_parts, guint16 part_number)
 {
 	gint8 partkind = 0;
 	gint16 argcount = 0;
@@ -797,7 +797,7 @@ dissect_saphdb_part(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *d
 	/* Add the Part subtree */
 	part_item = proto_tree_add_item(tree, hf_saphdb_part, tvb, offset, 16, ENC_NA);
 	part_tree = proto_item_add_subtree(part_item, ett_saphdb);
-	proto_item_append_text(part_item, " (%d/%d)", nopart, noofparts);
+	proto_item_append_text(part_item, " (%d/%d)", part_number, number_of_parts);
 
 	/* Add the Part fields */
 	partkind = tvb_get_gint8(tvb, offset);
@@ -820,11 +820,13 @@ dissect_saphdb_part(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *d
 	}
 
     /* Add the part buffer tree and dissect it */
-	part_buffer_item = proto_tree_add_item(part_tree, hf_saphdb_part_buffer, tvb, offset, bufferlength, ENC_NA);
-	part_buffer_tree = proto_item_add_subtree(part_buffer_item, ett_saphdb);
+	if (argcount > 0) {
+		part_buffer_item = proto_tree_add_item(part_tree, hf_saphdb_part_buffer, tvb, offset, bufferlength, ENC_NA);
+		part_buffer_tree = proto_item_add_subtree(part_buffer_item, ett_saphdb);
 
-	dissect_saphdb_part_buffer(tvb, pinfo, part_buffer_tree, offset, bufferlength, argcount, partkind, partkind_item);
-	offset += bufferlength; length += bufferlength;
+		dissect_saphdb_part_buffer(tvb, pinfo, part_buffer_tree, offset, bufferlength, argcount, partkind, partkind_item);
+		offset += bufferlength; length += bufferlength;
+	}
 
 	/* Adjust the item tree length */
 	proto_item_set_len(part_tree, length);
@@ -834,32 +836,33 @@ dissect_saphdb_part(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *d
 
 
 static int
-dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_, guint32 offset, guint16 noofsegm, guint16 nosegment)
+dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_, guint32 offset, gint16 number_of_segments, guint16 nosegment)
 {
-	guint8 segmentkind = 0;  // XXX: This should be a gint8
-	guint16 noofparts = 0, segmentno = 0, nopart = 0;  // XXX: This should be a gint16
+	gint8 segmentkind = 0;
+	gint16 number_of_parts = 0;
+	gint16 segment_number = 0;
 	guint32 length = 0, part_length = 0;
 	gint32 segmentlength = 0;
-	proto_item *segment_item = NULL, *segmentno_item = NULL, *noofparts_item = NULL, *segment_buffer_item = NULL;
+	proto_item *segment_item = NULL, *segment_number_item = NULL, *number_of_parts_item = NULL, *segment_buffer_item = NULL;
 	proto_tree *segment_tree = NULL, *segment_buffer_tree = NULL;
 
 	/* Add the Segment subtree */
 	segment_item = proto_tree_add_item(tree, hf_saphdb_segment, tvb, offset, 13, ENC_NA);
 	segment_tree = proto_item_add_subtree(segment_item, ett_saphdb);
-	proto_item_append_text(segment_item, " (%d/%d)", nosegment, noofsegm);
+	proto_item_append_text(segment_item, " (%d/%d)", nosegment, number_of_segments);
 
 	/* Add the Segment fields */
 	proto_tree_add_item_ret_int(segment_tree, hf_saphdb_segment_segmentlength, tvb, offset, 4, ENC_LITTLE_ENDIAN, &segmentlength); offset += 4; length += 4;
 	proto_tree_add_item(segment_tree, hf_saphdb_segment_segmentofs, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4; length += 4;
-	noofparts = tvb_get_letohs(tvb, offset);
-	noofparts_item = proto_tree_add_item(segment_tree, hf_saphdb_segment_noofparts, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; length += 2;
-	segmentno = tvb_get_letohs(tvb, offset);
-	segmentno_item = proto_tree_add_item(segment_tree, hf_saphdb_segment_segmentno, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; length += 2;
-	segmentkind = tvb_get_guint8(tvb, offset);
+	number_of_parts = tvb_get_gint16(tvb, offset, ENC_LITTLE_ENDIAN);
+	number_of_parts_item = proto_tree_add_item(segment_tree, hf_saphdb_segment_noofparts, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; length += 2;
+	segment_number = tvb_get_gint16(tvb, offset, ENC_LITTLE_ENDIAN);
+	segment_number_item = proto_tree_add_item(segment_tree, hf_saphdb_segment_segmentno, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; length += 2;
+	segmentkind = tvb_get_gint8(tvb, offset);
 	proto_tree_add_item(segment_tree, hf_saphdb_segment_segmentkind, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
 
-	if (nosegment != segmentno) {
-		expert_add_info_format(pinfo, segmentno_item, &ei_saphdb_segments_incorrect_order, "Segments number %d is invalid", segmentno);
+	if (segment_number < 0 || nosegment != segment_number) {
+		expert_add_info_format(pinfo, segment_number_item, &ei_saphdb_segments_incorrect_order, "Segment number %d is invalid", segment_number);
 	}
 
 	/* Add additional fields according to the segment kind*/
@@ -880,18 +883,19 @@ dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 			break;
 	}
 
-	if (noofparts < 0) {
-		expert_add_info_format(pinfo, noofparts_item, &ei_saphdb_parts_number_incorrect, "Number of parts %d is invalid", noofparts);
-	}
-
 	/* Add the Segment Buffer subtree */
-	segment_buffer_item = proto_tree_add_item(segment_tree, hf_saphdb_segment_buffer, tvb, offset, segmentlength - length, ENC_NA);
-	segment_buffer_tree = proto_item_add_subtree(segment_buffer_item, ett_saphdb);
+	if (number_of_parts > 0) {
+		segment_buffer_item = proto_tree_add_item(segment_tree, hf_saphdb_segment_buffer, tvb, offset, segmentlength - length, ENC_NA);
+		segment_buffer_tree = proto_item_add_subtree(segment_buffer_item, ett_saphdb);
 
-	/* Iterate over the parts and dissect them */
-	for (nopart = 1; nopart > 0 && nopart <= noofparts && tvb_reported_length_remaining(tvb, offset) >= 16; nopart++) {
-		part_length = dissect_saphdb_part(tvb, pinfo, segment_buffer_tree, NULL, offset, noofparts, nopart);
-		offset += part_length; length += part_length;
+		/* Iterate over the parts and dissect them */
+		for (guint16 part_number = 1; part_number <= number_of_parts && tvb_reported_length_remaining(tvb, offset) >= 16; part_number++) {
+			part_length = dissect_saphdb_part(tvb, pinfo, segment_buffer_tree, NULL, offset, number_of_parts, part_number);
+			offset += part_length; length += part_length;
+		}
+
+	} else {
+		expert_add_info_format(pinfo, number_of_parts_item, &ei_saphdb_parts_number_incorrect, "Number of parts %d is invalid", number_of_parts);
 	}
 
 	/* Adjust the item tree length */
@@ -942,9 +946,9 @@ dissect_saphdb(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 		/* All other message types */
 		} else if (tvb_reported_length(tvb) >= 32) {
 
-			guint16 noofsegm = 0, nosegment = 0;  // XXX: This should be gint16
-			guint32 varpartlength = 0, varpartsize = 0;  // XXX: This should be gint32
-			proto_item *message_header_item = NULL, *varpartlength_item = NULL, *noofsegm_item = NULL, *message_buffer_item = NULL;
+			gint16 number_of_segments = 0;
+			guint32 varpartlength = 0, varpartsize = 0;
+			proto_item *message_header_item = NULL, *varpartlength_item = NULL, *number_of_segments_item = NULL, *message_buffer_item = NULL;
 			proto_tree *message_header_tree = NULL, *message_buffer_tree = NULL;
 
 			/* Add the Message Header subtree */
@@ -956,28 +960,31 @@ dissect_saphdb(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 			proto_tree_add_item(message_header_tree, hf_saphdb_message_header_packetcount, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
 			varpartlength_item = proto_tree_add_item_ret_uint(message_header_tree, hf_saphdb_message_header_varpartlength, tvb, offset, 4, ENC_LITTLE_ENDIAN, &varpartlength); offset += 4;
 			proto_tree_add_item(message_header_tree, hf_saphdb_message_header_varpartsize, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
-			noofsegm = tvb_get_letohs(tvb, offset);
-			noofsegm_item = proto_tree_add_item(message_header_tree, hf_saphdb_message_header_noofsegm, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2;
+			number_of_segments = tvb_get_gint16(tvb, offset, ENC_LITTLE_ENDIAN);
+			number_of_segments_item = proto_tree_add_item(message_header_tree, hf_saphdb_message_header_noofsegm, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2;
 			proto_tree_add_item(message_header_tree, hf_saphdb_message_header_packetoptions, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1;
 			offset += 1;  /* Reserved1 field */
 			proto_tree_add_item(message_header_tree, hf_saphdb_message_header_compressionvarpartlength, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
 			offset += 4;  /* Reserved2 field */
 
+			/* Check the length of the variable part against the remaining packet */
 			if (tvb_reported_length_remaining(tvb, offset) != varpartlength) {
 				expert_add_info_format(pinfo, varpartlength_item, &ei_saphdb_varpartlenght_incorrect, "Length of variable part %d is invalid", varpartlength);
 				varpartlength = tvb_reported_length_remaining(tvb, offset);
 			}
-			if (noofsegm < 0) {
-				expert_add_info_format(pinfo, noofsegm_item, &ei_saphdb_segments_number_incorrect, "Number of segments %d is invalid", noofsegm);
-			}
 
 			/* Add the Message Buffer subtree */
-			message_buffer_item = proto_tree_add_item(saphdb_tree, hf_saphdb_message_buffer, tvb, offset, varpartlength, ENC_NA);
-			message_buffer_tree = proto_item_add_subtree(message_buffer_item, ett_saphdb);
+			if (varpartlength > 0 && number_of_segments > 0) {
+				message_buffer_item = proto_tree_add_item(saphdb_tree, hf_saphdb_message_buffer, tvb, offset, varpartlength, ENC_NA);
+				message_buffer_tree = proto_item_add_subtree(message_buffer_item, ett_saphdb);
 
-			/* Iterate over the segments and dissect them */
-			for (nosegment = 1; noofsegm > 0 && nosegment <= noofsegm && tvb_reported_length_remaining(tvb, offset) >= 13; nosegment++) {
-				offset += dissect_saphdb_segment(tvb, pinfo, message_buffer_tree, NULL, offset, noofsegm, nosegment);
+				/* Iterate over the segments and dissect them */
+				for (guint16 segment_number = 1; segment_number <= number_of_segments && tvb_reported_length_remaining(tvb, offset) >= 13; segment_number++) {
+					offset += dissect_saphdb_segment(tvb, pinfo, message_buffer_tree, NULL, offset, number_of_segments, segment_number);
+				}
+
+			} else {
+				expert_add_info_format(pinfo, number_of_segments_item, &ei_saphdb_segments_number_incorrect, "Number of segments %d is invalid", number_of_segments);
 			}
 
 		}
