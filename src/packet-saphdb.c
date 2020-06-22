@@ -26,6 +26,9 @@
 #include <epan/expert.h>
 #include <epan/wmem/wmem.h>
 
+#include <epan/dissectors/packet-tcp.h>
+#include <epan/dissectors/packet-tls.h>
+
 
 /* Define default ports */
 #define SAPHDB_PORT_RANGE "30013-39913,30015-39915"
@@ -919,7 +922,7 @@ dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 
 
 static int
-dissect_saphdb(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_)
+dissect_saphdb_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_)
 {
 	guint32 offset = 0;
 
@@ -1006,6 +1009,33 @@ dissect_saphdb(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 	}
 
 	return offset;
+}
+
+static guint
+get_saphdb_pdu_len(packet_info *pinfo _U_, tvbuff_t *tvb, int offset, void *data _U_)
+{
+	/* Entire HDB packets are of 32-bytes header plus the value in varpartlength field */
+	guint32 varpartlength = tvb_get_guint32(tvb, offset + 12, ENC_LITTLE_ENDIAN);
+	return varpartlength + 32;
+}
+
+static int
+dissect_saphdb_tcp(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_)
+{
+	return dissect_saphdb_message(tvb, pinfo, tree, FALSE);
+}
+
+static int
+dissect_saphdb(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_)
+{
+	if (tvb_reported_length(tvb) == 14 || tvb_reported_length(tvb) == 8) {
+		return dissect_saphdb_tcp(tvb, pinfo, tree, data);
+	}
+	else
+	{
+		tcp_dissect_pdus(tvb, pinfo, tree, TRUE, 32, get_saphdb_pdu_len, dissect_saphdb_tcp, data);
+	}
+	return tvb_reported_length(tvb);
 }
 
 void
@@ -1172,7 +1202,6 @@ proto_register_saphdb(void)
 		{ &ei_saphdb_varpartlenght_incorrect, { "saphdb.varpartlength", PI_MALFORMED, PI_ERROR, "The length is incorrect", EXPFILL }},
 	};
 
-
 	module_t *saphdb_module;
 	expert_module_t* saphdb_expert;
 
@@ -1182,7 +1211,7 @@ proto_register_saphdb(void)
 	saphdb_expert = expert_register_protocol(proto_saphdb);
 	expert_register_field_array(saphdb_expert, ei, array_length(ei));
 
-	register_dissector("saphdb", dissect_saphdb, proto_saphdb);
+	saphdb_handle = register_dissector("saphdb", dissect_saphdb, proto_saphdb);
 
 	proto_register_field_array(proto_saphdb, hf, array_length(hf));
 	proto_register_subtree_array(ett, array_length(ett));
@@ -1200,11 +1229,6 @@ proto_register_saphdb(void)
 /**
  * Helpers for dealing with the port range
  */
-static void range_delete_callback (guint32 port, gpointer ptr _U_)
-{
-	dissector_delete_uint("tcp.port", port, saphdb_handle);
-}
-
 static void range_add_callback (guint32 port, gpointer ptr _U_)
 {
 	dissector_add_uint("tcp.port", port, saphdb_handle);
@@ -1217,18 +1241,10 @@ void
 proto_reg_handoff_saphdb(void)
 {
 	static range_t *saphdb_port_range;
-	static gboolean initialized = FALSE;
-
-	if (!initialized) {
-		saphdb_handle = create_dissector_handle(dissect_saphdb, proto_saphdb);
-		initialized = TRUE;
-	} else {
-		range_foreach(saphdb_port_range, range_delete_callback, NULL);
-		wmem_free(wmem_epan_scope(), saphdb_port_range);
-	}
 
 	saphdb_port_range = range_copy(wmem_epan_scope(), global_saphdb_port_range);
 	range_foreach(saphdb_port_range, range_add_callback, NULL);
+	ssl_dissector_add(0, saphdb_handle);
 }
 
 /*
