@@ -34,6 +34,14 @@
 #define SAPHDB_PORT_RANGE "30013-39913,30015-39915"
 
 
+/* SAP HDB Packet Options values */
+static const value_string saphdb_message_header_packetoptions_vals[] = {
+	{ 0, "Uncompressed" },
+	{ 2, "Compressed" },
+	/* NULL */
+	{ 0x00, NULL }
+};
+
 /* SAP HDB Segment Kind values */
 static const value_string saphdb_segment_segmentkind_vals[] = {
 	{ 0, "Invalid" },
@@ -456,6 +464,7 @@ static int hf_saphdb_message_header_packetoptions = -1;
 static int hf_saphdb_message_header_compressionvarpartlength = -1;
 /* SAP HDB Message Buffer items */
 static int hf_saphdb_message_buffer = -1;
+static int hf_saphdb_compressed_buffer = -1;
 
 /* SAP HDB Segment items */
 static int hf_saphdb_segment = -1;
@@ -525,6 +534,7 @@ static range_t *global_saphdb_port_range;
 
 
 /* Expert info */
+static expert_field ei_saphdb_compressed_unknown = EI_INIT;
 static expert_field ei_saphdb_option_part_unknown = EI_INIT;
 static expert_field ei_saphdb_part_buffer_length_invalid = EI_INIT;
 static expert_field ei_saphdb_segments_incorrect_order = EI_INIT;
@@ -847,7 +857,7 @@ dissect_saphdb_part(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *d
 
 
 static int
-dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_, guint32 offset, gint16 number_of_segments, guint16 nosegment)
+dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_, guint32 offset, gint16 number_of_segments, guint16 nosegment, gboolean compressed)
 {
 	gint8 segmentkind = 0, message_type = 0;
 	gint16 number_of_parts = 0, segment_number = 0, function_code = 0;
@@ -916,6 +926,11 @@ dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 			break;
 	}
 
+	/* If the packet is compressed, compression will apply from here on. As we don't support compression yet, we stop dissecting here. */
+	if (compressed) {
+		return length;
+	}
+
 	/* Add the Segment Buffer subtree */
 	if (segmentlength > length && number_of_parts > 0) {
 		segment_buffer_item = proto_tree_add_item(segment_tree, hf_saphdb_segment_buffer, tvb, offset, segmentlength - length, ENC_NA);
@@ -981,9 +996,10 @@ dissect_saphdb_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 		/* All other message types */
 		} else if (tvb_reported_length(tvb) >= 32) {
 
+			gboolean compressed = FALSE;
 			gint16 number_of_segments = 0;
-			guint32 varpartlength = 0, varpartsize = 0;
-			proto_item *message_header_item = NULL, *varpartlength_item = NULL, *number_of_segments_item = NULL, *message_buffer_item = NULL;
+			guint32 varpartlength = 0, varpartsize = 0, compressionvarpartlength = 0;
+			proto_item *message_header_item = NULL, *varpartlength_item = NULL, *number_of_segments_item = NULL, *message_buffer_item = NULL, *compressed_buffer_item = NULL;
 			proto_tree *message_header_tree = NULL, *message_buffer_tree = NULL;
 
 			/* Add the Message Header subtree */
@@ -997,8 +1013,10 @@ dissect_saphdb_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 			proto_tree_add_item(message_header_tree, hf_saphdb_message_header_varpartsize, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
 			number_of_segments = tvb_get_gint16(tvb, offset, ENC_LITTLE_ENDIAN);
 			number_of_segments_item = proto_tree_add_item(message_header_tree, hf_saphdb_message_header_noofsegm, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2;
+			compressed = tvb_get_gint8(tvb, offset) == 2;
 			proto_tree_add_item(message_header_tree, hf_saphdb_message_header_packetoptions, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1;
 			offset += 1;  /* Reserved1 field */
+			compressionvarpartlength = tvb_get_guint32(tvb, offset, ENC_LITTLE_ENDIAN);
 			proto_tree_add_item(message_header_tree, hf_saphdb_message_header_compressionvarpartlength, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
 			offset += 4;  /* Reserved2 field */
 
@@ -1013,9 +1031,20 @@ dissect_saphdb_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 				message_buffer_item = proto_tree_add_item(saphdb_tree, hf_saphdb_message_buffer, tvb, offset, varpartlength, ENC_NA);
 				message_buffer_tree = proto_item_add_subtree(message_buffer_item, ett_saphdb);
 
-				/* Iterate over the segments and dissect them */
-				for (guint16 segment_number = 1; segment_number <= number_of_segments && tvb_reported_length_remaining(tvb, offset) >= 13; segment_number++) {
-					offset += dissect_saphdb_segment(tvb, pinfo, message_buffer_tree, NULL, offset, number_of_segments, segment_number);
+				/* If the packet is compressed, the message header and the first segment header is sent uncompressed. We dissect the
+				 * first segment only and add a new item with the compressed buffer. Adding an expert warning as well. */
+				if (compressed) {
+					offset += dissect_saphdb_segment(tvb, pinfo, message_buffer_tree, NULL, offset, number_of_segments, 1, compressed);
+					compressed_buffer_item = proto_tree_add_item(message_buffer_tree, hf_saphdb_compressed_buffer, tvb, offset, varpartlength, ENC_NA);
+					if (global_saphdb_highlight_items){
+						expert_add_info_format(pinfo, compressed_buffer_item, &ei_saphdb_compressed_unknown, "Packet is compressed and decompression is not supported");
+					}
+
+				} else {
+					/* Iterate over the segments and dissect them */
+					for (guint16 segment_number = 1; segment_number <= number_of_segments && tvb_reported_length_remaining(tvb, offset) >= 13; segment_number++) {
+						offset += dissect_saphdb_segment(tvb, pinfo, message_buffer_tree, NULL, offset, number_of_segments, segment_number, compressed);
+					}
 				}
 
 			} else {
@@ -1089,13 +1118,15 @@ proto_register_saphdb(void)
 		{ &hf_saphdb_message_header_noofsegm,
 			{ "Number of Segments", "saphdb.noofsegm", FT_INT16, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Number of Segments", HFILL }},
 		{ &hf_saphdb_message_header_packetoptions,
-			{ "Packet Options", "saphdb.packetoptions", FT_INT8, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Packet Options", HFILL }},
+			{ "Packet Options", "saphdb.packetoptions", FT_INT8, BASE_DEC, VALS(saphdb_message_header_packetoptions_vals), 0x0, "SAP HDB Message Header Packet Options", HFILL }},
 		{ &hf_saphdb_message_header_compressionvarpartlength,
 			{ "Compression Var Part Length", "saphdb.compressionvarpartlength", FT_UINT32, BASE_DEC, NULL, 0x0, "SAP HDB Message Header Compression Var Part Length", HFILL }},
 
 		/* Message Buffer items */
 		{ &hf_saphdb_message_buffer,
 			{ "Message Buffer", "saphdb.buffer", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Message Buffer", HFILL }},
+		{ &hf_saphdb_compressed_buffer,
+			{ "Compressed Buffer", "saphdb.buffer", FT_NONE, BASE_NONE, NULL, 0x0, "SAP HDB Compressed Buffer", HFILL }},
 
 		/* Segment items */
 		{ &hf_saphdb_segment,
@@ -1210,6 +1241,7 @@ proto_register_saphdb(void)
 
 	/* Register the expert info */
 	static ei_register_info ei[] = {
+		{ &ei_saphdb_compressed_unknown, { "saphdb.compressed", PI_UNDECODED, PI_WARN, "The packet is compressed, and decompression is not supported", EXPFILL }},
 		{ &ei_saphdb_option_part_unknown, { "saphdb.segment.part.option.unknown", PI_UNDECODED, PI_WARN, "The Option Part has a unknown type that is not dissected", EXPFILL }},
 		{ &ei_saphdb_part_buffer_length_invalid, { "saphdb.segment.part.bufferlength", PI_MALFORMED, PI_ERROR, "The Part Buffer length is incorrect", EXPFILL }},
 		{ &ei_saphdb_segments_incorrect_order, { "saphdb.segment.segmentno", PI_MALFORMED, PI_ERROR, "The segments are in incorrect order or are invalid", EXPFILL }},
