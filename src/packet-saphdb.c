@@ -579,7 +579,7 @@ opv_to_opt(const gint8 value, const option_part_definition *opd)
 
 
 static int
-dissect_saphdb_part_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset, gint16 argcount, const option_part_definition *definition)
+dissect_saphdb_part_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset, gint16 argcount, guint8 partkind, const option_part_definition *definition)
 {
 	guint32 parsed_length = 0;
 
@@ -599,7 +599,7 @@ dissect_saphdb_part_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 		option_type_item = proto_tree_add_item(tree, hf_saphdb_part_option_type, tvb, offset + parsed_length, 1, ENC_NA); parsed_length += 1;
 		if (option_type != opv_to_opt(option_key, definition)) {
 			if (global_saphdb_highlight_items){
-				expert_add_info_format(pinfo, option_type_item, &ei_saphdb_option_part_unknown, "Option Type for key %d doesn't match! (expected %d, obtained %d)", option_key, opv_to_opt(option_key, definition), option_type);
+				expert_add_info_format(pinfo, option_type_item, &ei_saphdb_option_part_unknown, "Option Type for key %d in part kind %d doesn't match! (expected %d, obtained %d)", option_key, partkind, opv_to_opt(option_key, definition), option_type);
 			}
 		}
 
@@ -654,7 +654,7 @@ dissect_saphdb_part_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 }
 
 static int
-dissect_saphdb_part_multi_line_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset, gint16 rowcount, const option_part_definition *definition)
+dissect_saphdb_part_multi_line_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset, gint16 rowcount, guint8 partkind, const option_part_definition *definition)
 {
 	guint32 parsed_length = 0;
 
@@ -668,7 +668,7 @@ dissect_saphdb_part_multi_line_options_data(tvbuff_t *tvb, packet_info *pinfo, p
 
 		/* Now parse the options in the row if there are*/
 		if (argcount > 0) {
-			parsed_length += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset + parsed_length, argcount, definition);
+			parsed_length += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset + parsed_length, argcount, partkind, definition);
 		}
 
 		rowcount--;
@@ -742,39 +742,39 @@ dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, 
 
 		// Multi-line Option Parts
 		case 15:  // TOPOLOGYINFORMATION
-			offset += dissect_saphdb_part_multi_line_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_topology_info_vals);
+			offset += dissect_saphdb_part_multi_line_options_data(tvb, pinfo, tree, offset, argcount, partkind, saphdb_part_topology_info_vals);
 			break;
 
 		// Option Parts
 		case 27:  // COMMANDINFO
-			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_command_info_vals);
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, partkind, saphdb_part_command_info_vals);
 			break;
 		case 29:  // CLIENTCONTEXT
-			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_client_context_vals);
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, partkind, saphdb_part_client_context_vals);
 			break;
 		case 34:  // SESSIONCONTEXT
-			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_session_context_vals);
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, partkind, saphdb_part_session_context_vals);
 			break;
 		case 39:  // STATEMENTCONTEXT
-			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_statement_context_vals);
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, partkind, saphdb_part_statement_context_vals);
 			break;
 		case 42:  // CONNECTOPTIONS
-			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_connect_options_vals);
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, partkind, saphdb_part_connect_options_vals);
 			break;
 		case 43:  // COMMITOPTIONS
-			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_commit_options_vals);
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, partkind, saphdb_part_commit_options_vals);
 			break;
 		case 44:  // FETCHOPTIONS
-			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_fetch_options_vals);
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, partkind, saphdb_part_fetch_options_vals);
 			break;
 		case 64:  // TRANSACTIONFLAGS
-			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_transaction_flags_vals);
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, partkind, saphdb_part_transaction_flags_vals);
 			break;
 		case 67:  // DBCONNECTINFO
-			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_dbconnect_info_flags_vals);
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, partkind, saphdb_part_dbconnect_info_flags_vals);
 			break;
 		case 68:  // LOBFLAGS
-			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, saphdb_part_lob_flags_vals);
+			offset += dissect_saphdb_part_options_data(tvb, pinfo, tree, offset, argcount, partkind, saphdb_part_lob_flags_vals);
 			break;
 
 		default:
@@ -806,6 +806,7 @@ dissect_saphdb_part(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *d
 
 	/* Add the Part fields */
 	partkind = tvb_get_gint8(tvb, offset);
+	proto_item_append_text(part_item, ", %s", val_to_str(partkind, saphdb_part_partkind_vals, "Unknown"));
 	partkind_item = proto_tree_add_item(part_tree, hf_saphdb_part_partkind, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
 	proto_tree_add_item(part_tree, hf_saphdb_part_partattributes, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
 	argcount = tvb_get_gint16(tvb, offset, ENC_LITTLE_ENDIAN);
@@ -848,9 +849,8 @@ dissect_saphdb_part(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *d
 static int
 dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _U_, guint32 offset, gint16 number_of_segments, guint16 nosegment)
 {
-	gint8 segmentkind = 0;
-	gint16 number_of_parts = 0;
-	gint16 segment_number = 0;
+	gint8 segmentkind = 0, message_type = 0;
+	gint16 number_of_parts = 0, segment_number = 0, function_code = 0;
 	guint32 length = 0, part_length = 0;
 	gint32 segmentlength = 0;
 	proto_item *segment_item = NULL, *segmentlength_item = NULL, *number_of_parts_item = NULL, *segment_number_item = NULL, *segment_buffer_item = NULL;
@@ -872,6 +872,9 @@ dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 	segmentkind = tvb_get_gint8(tvb, offset);
 	proto_tree_add_item(segment_tree, hf_saphdb_segment_segmentkind, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
 
+	col_append_fstr(pinfo->cinfo, COL_INFO, "Segment %s (", val_to_str(segmentkind, saphdb_segment_segmentkind_vals, "Unknown"));
+	proto_item_append_text(segment_item, ", %s", val_to_str(segmentkind, saphdb_segment_segmentkind_vals, "Unknown"));
+
 	/* Check a couple of fields */
 	if (segmentlength < 13) {
 		expert_add_info_format(pinfo, segmentlength_item, &ei_saphdb_segment_length, "Segment length %d is invalid", segmentlength);
@@ -886,18 +889,30 @@ dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 	/* Add additional fields according to the segment kind*/
 	switch (segmentkind) {
 		case 1: /* Request */
+			message_type = tvb_get_gint8(tvb, offset);
+			col_append_fstr(pinfo->cinfo, COL_INFO, "%s)", val_to_str(message_type, saphdb_segment_messagetype_vals, "Unknown"));
+			proto_item_append_text(segment_item, ", %s", val_to_str(message_type, saphdb_segment_messagetype_vals, "Unknown"));
 			proto_tree_add_item(segment_tree, hf_saphdb_segment_messagetype, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
+
 			proto_tree_add_item(segment_tree, hf_saphdb_segment_commit, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
 			proto_tree_add_item(segment_tree, hf_saphdb_segment_commandoptions, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length += 1;
+
 			offset += 8; length += 8; // Reserved1 field
 			break;
 		case 2: /* Reply */
 			offset += 1; length += 1; // Reserved2 field
+
+			function_code = tvb_get_gint16(tvb, offset, ENC_LITTLE_ENDIAN);
+			col_append_fstr(pinfo->cinfo, COL_INFO, "%s)", val_to_str(function_code, saphdb_segment_functioncode_vals, "Unknown"));
+			proto_item_append_text(segment_item, ", %s", val_to_str(function_code, saphdb_segment_functioncode_vals, "Unknown"));
 			proto_tree_add_item(segment_tree, hf_saphdb_segment_functioncode, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; length += 2;
+
 			offset += 8; length += 8; // Reserved3 field
 			break;
 		default: /* Error and other types */
 			offset += 11; length += 11; // Reserved or unused fields
+			col_append_fstr(pinfo->cinfo, COL_INFO, ")");
+
 			break;
 	}
 
@@ -945,6 +960,7 @@ dissect_saphdb_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 		/* Initialization Request message */
 		if (tvb_reported_length(tvb) == 14) {
 			proto_tree_add_item(saphdb_tree, hf_saphdb_initialization_request, tvb, offset, 14, ENC_NA); offset += 14;
+			col_add_str(pinfo->cinfo, COL_INFO, "Initialization Request");
 
 		/* Initialization Reply message */
 		} else if (tvb_reported_length(tvb) == 8) {
@@ -959,6 +975,8 @@ dissect_saphdb_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 			proto_tree_add_item(initialization_reply_tree, hf_saphdb_initialization_reply_product_version_minor, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2;
 			proto_tree_add_item(initialization_reply_tree, hf_saphdb_initialization_reply_protocol_version_major, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1;
 			proto_tree_add_item(initialization_reply_tree, hf_saphdb_initialization_reply_protocol_version_minor, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2;
+
+			col_add_str(pinfo->cinfo, COL_INFO, "Initialization Reply");
 
 		/* All other message types */
 		} else if (tvb_reported_length(tvb) >= 32) {
