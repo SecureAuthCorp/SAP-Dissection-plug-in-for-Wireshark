@@ -868,7 +868,7 @@ dissect_sapms_property(tvbuff_t *tvb, proto_tree *tree, guint32 offset){
 
 			proto_tree_add_item(value_tree, hf_sapms_property_vhost_logon, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2;
 
-			offset =+ 12;  /* Padding */
+			offset += 12;  /* Padding */
 
 			vhost_length = tvb_get_ntohs(tvb, offset);
 			proto_tree_add_item(value_tree, hf_sapms_property_vhost_length, tvb, offset, 2, ENC_BIG_ENDIAN); offset+=2;
@@ -877,7 +877,7 @@ dissect_sapms_property(tvbuff_t *tvb, proto_tree *tree, guint32 offset){
 				proto_tree_add_item(value_tree, hf_sapms_property_vhost_value, tvb, offset, vhost_length, ENC_ASCII|ENC_NA); offset += vhost_length;
 			}
 
-			offset =+ 2;  /* Padding */
+			offset += 2;  /* Padding */
 			break;
 		}
 		case 0x03:{			/* MS_PROPERTY_IPADR */
@@ -922,7 +922,7 @@ dissect_sapms_property(tvbuff_t *tvb, proto_tree *tree, guint32 offset){
 static void
 dissect_sapms_opcode(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset, guint8 flag, guint8 opcode, guint8 opcode_version, guint32 length){
 	gint client_length = 0;
-	guint8 dp_version = 0;
+	guint8 dp_version _U_ = 0 ;
 
 	switch (opcode){
 		case 0x00:{     /* MS_DP_ADM */
