@@ -37,7 +37,7 @@ jobs:
            run: |
               sudo apt-get install -yqq libxml2-dev libxslt-dev python-dev python-pip
          - name: Set up Python
-           uses: actions/setup-python@v1
+           uses: actions/setup-python@v2
            with:
               python-version: 2.7
          - name: Install Python packages for testing
@@ -53,7 +53,7 @@ jobs:
               mkdir exe
               cp build/sap.so exe/sap-standalone.so
          - name: Upload Ubuntu packages
-           uses: actions/upload-artifact@v1
+           uses: actions/upload-artifact@v2
            with:
               name: packages
               path: exe
@@ -90,7 +90,7 @@ jobs:
            run: |
               sudo apt-get install -yqq libxml2-dev libxslt-dev python-dev python-pip
          - name: Set up Python
-           uses: actions/setup-python@v1
+           uses: actions/setup-python@v2
            with:
               python-version: 2.7
          - name: Install Python packages for testing

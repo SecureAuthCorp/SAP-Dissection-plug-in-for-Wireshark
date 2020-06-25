@@ -33,7 +33,7 @@ jobs:
               make install
 
          - name: Set up Python
-           uses: actions/setup-python@v1
+           uses: actions/setup-python@v2
            with:
               python-version: 2.7
          - name: Install dependencies for testing
@@ -52,7 +52,7 @@ jobs:
               mkdir exe
               cp build/sap.so exe/sap-standalone.so
          - name: Upload Ubuntu packages
-           uses: actions/upload-artifact@v1
+           uses: actions/upload-artifact@v2
            with:
               name: packages
               path: exe
@@ -75,7 +75,7 @@ jobs:
               git apply plugins/epan/sap/wireshark-${{ env.WIRESHARK_BRANCH }}.patch
 
          - name: Set up Python 3.8
-           uses: actions/setup-python@v1
+           uses: actions/setup-python@v2
            with:
               python-version: 3.8
          - name: Set up Ruby 2.6
@@ -102,7 +102,7 @@ jobs:
               make sap tshark
 
          - name: Set up Python
-           uses: actions/setup-python@v1
+           uses: actions/setup-python@v2
            with:
               python-version: 2.7
          - name: Install dependencies for testing
