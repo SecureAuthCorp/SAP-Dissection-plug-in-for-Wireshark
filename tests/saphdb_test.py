@@ -33,18 +33,18 @@ class WiresharkSAPHDBTestCase(WiresharkTestCase):
     def test_saphdb_dissection(self):
         """Test dissection of a basic SAP HDB packet. """
         pkt = Ether()/IP()/TCP(dport=30013)
-        pkt /= SAPHDB(segments=[SAPHDBSegment(segmentkind=1),
-                                SAPHDBSegment(segmentkind=2, parts=[SAPHDBPart(),
-                                                                    SAPHDBPart()])])
-        pkt.show2()
+        pkt /= SAPHDB(segments=[SAPHDBSegment(segmentkind=1, segmentno=1),
+                                SAPHDBSegment(segmentkind=2, segmentno=2,
+                                              parts=[SAPHDBPart(),
+                                                     SAPHDBPart()])])
 
         packet = self.get_capture(pkt)[0]
-        packet.show()
-
         self.assertIn('saphdb', packet)
         self.assertIn('message_header', dir(packet['saphdb']))
         print(packet["saphdb"].field_names)
-        self.assertEqual(packet["saphdb"].varpartlength, "80")
+        self.assertEqual(int(packet["saphdb"].sessionid), pkt[SAPHDB].sessionid)
+        self.assertEqual(int(packet["saphdb"].noofsegm), len(pkt[SAPHDB].segments))
+        self.assertEqual(int(packet["saphdb"].varpartlength), 80)
 
 
 def suite():
