@@ -3,7 +3,7 @@ SAP Dissector Plugin for Wireshark
 
 [![Build and test Ubuntu plug-in](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/workflows/Build%20and%20test%20Ubuntu%20plug-in/badge.svg)](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/actions?query=workflow%3A%22Build+and+test+Ubuntu+plug-in%22)
 [![Build and test MacOS plug-in](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/workflows/Build%20and%20test%20MacOS%20plug-in/badge.svg)](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/actions?query=workflow%3A%22Build+and+test+MacOS+plug-in%22)
-[![Build Windows plug-in](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/workflows/Build%20Windows%20plug-in/badge.svg)](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/actions?query=workflow%3A%22Build+Windows+plug-in%22)
+[![Build and test Windows plug-in](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/workflows/Build%20and%20test%20Windows%20plug-in/badge.svg)](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/actions?query=workflow%3A%22Build+and+test+Windows+plug-in%22)
 
 SECUREAUTH LABS. Copyright (C) 2020 SecureAuth Corporation. All rights reserved.
 
@@ -20,8 +20,8 @@ uses different network protocols. While some of them are standard and well-known
 protocols, others are proprietaries and public information is not available.
 
 This [Wireshark](https://www.wireshark.org/) plugin provides dissection
-of SAP's NI, Message Server, Router, Diag, Enqueue, IGS and SNC protocols. The
-dissectors are based on information acquired at researching the different
+of SAP's NI, Message Server, Router, Diag, Enqueue, IGS, SNC and HDB protocols.
+The dissectors are based on information acquired at researching the different
 protocols and services. Additional experimental support is included for SAP's
 RFC protocol. Detailed information about the research can be found in
 [pysap's documentation](https://pysap.readthedocs.io/en/latest/user/index.html#references).
@@ -77,6 +77,14 @@ This plugin counts on several different dissectors:
 - SAP IGS (Internet Graphic Server) Protocol dissector
 
 	This dissector parses packets used by SAP's IGS services.
+
+- SAP HDB (HANA SQL Command Network) Protocol dissector
+
+    This dissector parses HANA SQL Command Network Protocol packets. It supports
+    HDB over TLS with the form of a "Decode as" dissector. The main Part Kind
+    formats used during the authentication and initialization of the connections
+    are supported, but others are still missing. Decompression of compressed
+    packets is not yet supported.
 
 - SAP RFC (Remote Function Call) Protocol dissector (experimental)
 
