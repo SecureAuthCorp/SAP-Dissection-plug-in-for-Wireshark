@@ -20,15 +20,15 @@
 
 # Standard imports
 import unittest
-from os import remove, path
 from binascii import unhexlify
+from os import remove, path, getenv
 from os.path import join as join, dirname
 # External imports
 import pyshark
 from scapy.all import *
 
 
-TSHARK_PATH = "./tshark"
+TSHARK_PATH = getenv("TSHARK_PATH", "./tshark")
 
 
 def read_data_file(filename, unhex=True):

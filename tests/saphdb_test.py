@@ -41,7 +41,6 @@ class WiresharkSAPHDBTestCase(WiresharkTestCase):
         packet = self.get_capture(pkt)[0]
         self.assertIn('saphdb', packet)
         self.assertIn('message_header', dir(packet['saphdb']))
-        print(packet["saphdb"].field_names)
         self.assertEqual(int(packet["saphdb"].sessionid), pkt[SAPHDB].sessionid)
         self.assertEqual(int(packet["saphdb"].noofsegm), len(pkt[SAPHDB].segments))
         self.assertEqual(int(packet["saphdb"].varpartlength), 80)
