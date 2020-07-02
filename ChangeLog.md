@@ -5,10 +5,13 @@ v0.8.2 - 2020-XX-XX
 -------------------
 
 - Replaced AppVeyor and Travis builds with GitHub Actions.
+- Added support for dissecting HANA SQL Command Network Protocol packets.
 - `src/packet-sapdiag.c`: Fixed compiler warnings.
+- `src/packet-saphdb.c`: New dissector for HDB protocol.
 - `src/packet-sapigs.c`: Fixed compiler warnings.
 - `src/packet-sapms.c`: Added a couple of Message Server fields based on Mathieu ([@gelim](https://github.com/gelim)) and Dmitry ([@_chipik](https://twitter.com/_chipik)) work on pysap. Thanks!
 - `src/packet-saprouter.c`: Fixed compiler warnings.
+- `tests/saphdb_test.py`: Basic unit test for validating dissection of HDB packet's header. 
 
 
 v0.8.1 - 2020-03-20
