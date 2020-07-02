@@ -116,6 +116,8 @@ jobs:
            run: |
               cd plugins/epan/sap
               python tests/__init__.py
+           env:
+              TSHARK_PATH: ${{ github.workspace }}/build/run/Wireshark.app/Contents/MacOS/tshark
 
          - name: Copy plugin so
            run: |

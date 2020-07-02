@@ -101,6 +101,8 @@ jobs:
            run: |
               cd plugins/epan/sap/
               python tests/__init__.py
+           env:
+              TSHARK_PATH: ${{ github.workspace }}/build/run/tshark
 
          - name: Copy plugin so
            run: |

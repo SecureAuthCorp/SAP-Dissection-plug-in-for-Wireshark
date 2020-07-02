@@ -2,7 +2,7 @@
 #
 # Adapted from Wireshark's repository https://github.com/wireshark/wireshark/tree/master/.github/workflows
 
-name: Build Windows plug-in
+name: Build and test Windows plug-in
 
 on: [push, pull_request]
 
@@ -77,6 +77,8 @@ jobs:
            run: |
               cd plugins/epan/sap/
               python tests/__init__.py
+           env:
+              TSHARK_PATH: ${{ github.workspace }}\build\run\RelWithDebInfo\tshark.exe
 
          - name: Move Windows artifacts
            run: |
