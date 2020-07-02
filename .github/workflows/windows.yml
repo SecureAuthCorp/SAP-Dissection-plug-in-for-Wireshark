@@ -62,21 +62,18 @@ jobs:
               msbuild /m /p:Configuration=RelWithDebInfo nsis_package.vcxproj
            working-directory: build
 
-         - name: Install dependencies for testing
-           run: |
-              choco install vcpython27 -f -y
          - name: Set up Python
            uses: actions/setup-python@v2
            with:
               python-version: 2.7
          - name: Install Python packages for testing
            run: |
-              python -m pip install --upgrade pip setuptools
+              python -m pip install --upgrade pip setuptools wheel
               pip install pysap pyshark-legacy
          - name: Run tests
            run: |
               cd build/run/RelWithDebInfo/
-              python ../../plugins/epan/sap/tests/__init__.py
+              python ../../../plugins/epan/sap/tests/__init__.py
 
          - name: Move Windows artifacts
            run: |
