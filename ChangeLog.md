@@ -9,8 +9,10 @@ v0.8.2 - 2020-XX-XX
 - `src/packet-sapdiag.c`: Fixed compiler warnings.
 - `src/packet-saphdb.c`: New dissector for HDB protocol.
 - `src/packet-sapigs.c`: Fixed compiler warnings.
+- `src/packet-sapms.c`: Fixed compiler warnings.
 - `src/packet-sapms.c`: Added a couple of Message Server fields based on Mathieu ([@gelim](https://github.com/gelim)) and Dmitry ([@_chipik](https://twitter.com/_chipik)) work on pysap. Thanks!
 - `src/packet-saprouter.c`: Fixed compiler warnings.
+- `src/packet-sapsnc.c`: Fixed compiler warnings.
 - `tests/saphdb_test.py`: Basic unit test for validating dissection of HDB packet's header. 
 
 
