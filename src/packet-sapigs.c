@@ -24,6 +24,7 @@
 #include "config.h"
 
 #include <inttypes.h>
+#include <stdlib.h>
 
 #include <epan/packet.h>
 #include <epan/prefs.h>
