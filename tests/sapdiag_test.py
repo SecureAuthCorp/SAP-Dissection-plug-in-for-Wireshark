@@ -51,8 +51,6 @@ class WiresharkSAPDiagTestCase(WiresharkTestCase):
         packet = self.get_capture(pkt)[0]
 
         self.assertIn('sapdiag', packet)
-        print(dir(packet['sapdiag']))
-        self.assertIn("Decompression of payload failed with return code", packet['sapdiag'].header_compression_invalid)
 
     def test_invalid_read(self):
         "Test invalid read vulnerability in LZH code (CVE-2015-2278)"
