@@ -57,7 +57,7 @@ else(Wireshark_FOUND)
   include(WiresharkPlugin)
 
   # Plugin name and version info (major minor micro extra)
-  set_module_info(sap 0 8 2 0)
+  set_module_info(sap 0 8 3 0)
 
 endif(Wireshark_FOUND)
 
