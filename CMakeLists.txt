@@ -47,7 +47,7 @@ if(Wireshark_FOUND)
   set(LINK_MODE_MODULE MODULE)
 
   # Plugin name and version info (major minor micro)
-  set(PLUGIN_VERSION "0.8.2.dev")
+  set(PLUGIN_VERSION "0.8.2")
   add_definitions(-DPLUGIN_VERSION=\"${PLUGIN_VERSION}\")
 
 else(Wireshark_FOUND)
@@ -64,7 +64,7 @@ endif(Wireshark_FOUND)
 set(DISSECTOR_SRC
 	src/packet-sapdiag.c
 	src/packet-sapenqueue.c
-  src/packet-saphdb.c
+	src/packet-saphdb.c
 	src/packet-sapigs.c
 	src/packet-saprouter.c
 	src/packet-sapprotocol.c
@@ -102,7 +102,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 register_plugin_files(plugin.c
 	plugin
 	${DISSECTOR_SRC}
-  ${DISSECTOR_SUPPORT_SRC}
+	${DISSECTOR_SUPPORT_SRC}
 )
 
 if(Wireshark_FOUND)
