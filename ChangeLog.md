@@ -4,6 +4,8 @@ Changelog
 v0.8.3 - 2020-XX-XX
 -------------------
 
+- `src/packet-saphdb.c`: Fixed type of options 51 and 52 in `CONNECTOPTIONS` part. Thanks [@jvis](https://twitter.com/jvis)! 
+
 
 v0.8.2 - 2020-07-15
 -------------------
