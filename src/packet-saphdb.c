@@ -552,6 +552,9 @@ static gboolean global_saphdb_highlight_items = TRUE;
 /* Protocol handle */
 static dissector_handle_t saphdb_handle;
 
+static dissector_handle_t gssapi_handle;
+
+
 void proto_reg_handoff_saphdb(void);
 
 
@@ -688,12 +691,114 @@ dissect_saphdb_part_multi_line_options_data(tvbuff_t *tvb, packet_info *pinfo, p
 
 }
 
+void
+dissect_saphdb_gss_authentication_fields(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset, guint32 length)
+{
+	guint8 field_short_length = 0, commtype = 0;
+	guint16 field_count = 0, field_length = 0;
+
+	/* Parse the field count */
+	field_count = tvb_get_guint16(tvb, offset, ENC_LITTLE_ENDIAN);
+	proto_tree_add_item(tree, hf_saphdb_part_authentication_field_count, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2;
+
+	for (guint16 field = 0; field < field_count; field++) {
+
+		/* Parse the field length. If the first byte is 0xFF, the length is contained in the next 2 bytes */
+		field_short_length = tvb_get_guint8(tvb, offset);
+		if (field_short_length == 0xff) {
+			offset += 1;
+			field_length = tvb_get_guint16(tvb, offset, ENC_BIG_ENDIAN);
+			proto_tree_add_item(tree, hf_saphdb_part_authentication_field_length, tvb, offset, 2, ENC_BIG_ENDIAN); offset += 2;
+		} else {
+			proto_tree_add_item(tree, hf_saphdb_part_authentication_field_length, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1;
+			field_length = field_short_length;
+		}
+
+		/* We try then to see if we're dealing with the commtype field (second field and with length 1)
+		 * and extract it
+		 */
+		if ((field == 1) && (field_length == 1))
+		{
+			commtype = tvb_get_guint8(tvb, offset);
+		}
+
+		/* If this is the last value of a three field packet, and is one of the commtypes that carries an
+		 * SPNEGO structure, we call the GSSAPI dissector. The Kerberos data is extracted in a new TVB.
+		 */
+		if (((commtype == 3) || (commtype == 6)) && (field_count == 3) && (field == 2)) {
+			tvbuff_t *kerberos_tvb;
+			kerberos_tvb = tvb_new_subset_length(tvb, offset, field_length);
+			add_new_data_source(pinfo, kerberos_tvb, "Kerberos Data");
+			call_dissector(gssapi_handle, kerberos_tvb, pinfo, tree);
+		}
+		else
+		/* If not we add the field value in plain */
+		{
+			proto_tree_add_item(tree, hf_saphdb_part_authentication_field_value, tvb, offset, field_length, ENC_NA);
+		}
+
+		offset += field_length;
+	}
+
+}
+
+
+static int
+dissect_saphdb_part_authentication_fields(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset)
+{
+	guint8 field_short_length = 0;
+	guint16 field_count = 0, field_length = 0;
+	guint32 parsed_length = 0;
+
+	proto_item *gss_item = NULL;
+	proto_tree *gss_tree = NULL;
+
+	gboolean is_gss = FALSE;
+
+	/* Parse the field count */ /* TODO: Should this match with argcount? */
+	field_count = tvb_get_guint16(tvb, offset, ENC_LITTLE_ENDIAN);
+	proto_tree_add_item(tree, hf_saphdb_part_authentication_field_count, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; parsed_length += 2;
+
+	for (guint16 field = 0; field < field_count; field++) {
+
+		/* Parse the field length. If the first byte is 0xFF, the length is contained in the next 2 bytes */
+		field_short_length = tvb_get_guint8(tvb, offset);
+		if (field_short_length == 0xff) {
+			offset += 1; parsed_length += 1;
+			field_length = tvb_get_guint16(tvb, offset, ENC_BIG_ENDIAN);
+			proto_tree_add_item(tree, hf_saphdb_part_authentication_field_length, tvb, offset, 2, ENC_BIG_ENDIAN); offset += 2; parsed_length += 2;
+		} else {
+			proto_tree_add_item(tree, hf_saphdb_part_authentication_field_length, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; parsed_length += 1;
+			field_length = field_short_length;
+		}
+
+		/* Add the field value */
+		gss_item = proto_tree_add_item(tree, hf_saphdb_part_authentication_field_value, tvb, offset, field_length, ENC_NA);
+
+		/* Check if this is a GSS field so we can parse the remaining fields */
+		if ((((field_count == 2) && (field == 0)) || ((field_count == 3) && (field == 1))) &&
+			(field_length == 3) && (tvb_strneql(tvb, offset, "GSS", 3) != -1)) {
+			is_gss = TRUE;
+		}
+
+		/* If the method is GSS, and this is the last value, we add a new tree and parse the value */
+		if (is_gss && field == field_count - 1) {
+			proto_item_append_text(gss_item, ": GSS Token");
+			gss_tree = proto_item_add_subtree(gss_item, ett_saphdb);
+			dissect_saphdb_gss_authentication_fields(tvb, pinfo, gss_tree, offset, field_length);
+		}
+
+		offset += field_length; parsed_length += field_length;
+
+	}
+
+	return parsed_length;
+}
+
 
 static int
 dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset, guint32 length, gint16 argcount, guint8 partkind, proto_item *partkind_item)
 {
-	guint8 field_short_length = 0;
-	guint16 field_count = 0, field_length = 0;
 	gint32 error_text_length = 0;
 
 	switch (partkind) {
@@ -718,32 +823,11 @@ dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, 
 				}
 			}
 			break;
+
 		case 33:  // AUTHENTICATION
-
-			/* Parse the field count */ /* TODO: Should this match with argcount? */
-			field_count = tvb_get_guint16(tvb, offset, ENC_LITTLE_ENDIAN);
-			proto_tree_add_item(tree, hf_saphdb_part_authentication_field_count, tvb, offset, 2, ENC_LITTLE_ENDIAN); offset += 2; length -= 2;
-
-			for (guint16 field = 0; field < field_count; field++) {
-
-				/* Parse the field length. If the first byte is 0xFF, the length is contained in the next 2 bytes */
-				field_short_length = tvb_get_guint8(tvb, offset);
-				if (field_short_length == 0xff) {
-					offset += 1; length -= 1;
-					field_length = tvb_get_guint16(tvb, offset, ENC_BIG_ENDIAN);
-					proto_tree_add_item(tree, hf_saphdb_part_authentication_field_length, tvb, offset, 2, ENC_BIG_ENDIAN); offset += 2; length -= 2;
-				} else {
-					proto_tree_add_item(tree, hf_saphdb_part_authentication_field_length, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1; length -= 1;
-					field_length = field_short_length;
-				}
-
-				/* Add the field value */
-				proto_tree_add_item(tree, hf_saphdb_part_authentication_field_value, tvb, offset, field_length, ENC_NA); offset += field_length; length -= field_length;
-
-			}
-
-			offset += length;
+			offset += dissect_saphdb_part_authentication_fields(tvb, pinfo, tree, offset);
 			break;
+
 		case 35:   // CLIENTID
 			if (length > 0 && tvb_reported_length_remaining(tvb, offset) >= length) {
 				proto_tree_add_item(tree, hf_saphdb_part_clientid, tvb, offset, length, ENC_NA); offset += length; length = 0;
@@ -1295,6 +1379,9 @@ proto_reg_handoff_saphdb(void)
 	saphdb_port_range = range_copy(wmem_epan_scope(), global_saphdb_port_range);
 	range_foreach(saphdb_port_range, range_add_callback, NULL);
 	ssl_dissector_add(0, saphdb_handle);
+
+	gssapi_handle = find_dissector_add_dependency("gssapi", proto_saphdb);
+
 }
 
 /*
