@@ -346,19 +346,19 @@ static const option_part_definition saphdb_part_connect_options_vals[] = {
 	{ 55, "IP Address", 29 },
 	{ 56, "LRR Ping Time", 3 },
 	/* NULL */
-	{ 0x00, NULL }
+	{ 0x00, NULL, 0x00 }
 };
 
 static const option_part_definition saphdb_part_commit_options_vals[] = {
 	{ 1, "Hold Cursors Over Commit", 28 },
 	/* NULL */
-	{ 0x00, NULL }
+	{ 0x00, NULL, 0x00 }
 };
 
 static const option_part_definition saphdb_part_fetch_options_vals[] = {
 	{ 1, "Result Set Pos", 3 },
 	/* NULL */
-	{ 0x00, NULL }
+	{ 0x00, NULL, 0x00 }
 };
 
 static const option_part_definition saphdb_part_transaction_flags_vals[] = {
@@ -370,7 +370,7 @@ static const option_part_definition saphdb_part_transaction_flags_vals[] = {
 	{ 5, "No Write Transaction Started", 28 },
 	{ 6, "Session Closing Transaction Error", 28 },
 	/* NULL */
-	{ 0x00, NULL }
+	{ 0x00, NULL, 0x00}
 };
 
 static const option_part_definition saphdb_part_topology_info_vals[] = {
@@ -388,14 +388,14 @@ static const option_part_definition saphdb_part_topology_info_vals[] = {
 	{ 12, "All Host Names", 29 },
 	{ 13, "Site Type", 3 },
 	/* NULL */
-	{ 0x00, NULL }
+	{ 0x00, NULL, 0x00 }
 };
 
 static const option_part_definition saphdb_part_command_info_vals[] = {
 	{ 1, "Line Number", 3 },
 	{ 2, "Source Module", 29 },
 	/* NULL */
-	{ 0x00, NULL }
+	{ 0x00, NULL, 0x00 }
 };
 
 static const option_part_definition saphdb_part_client_context_vals[] = {
@@ -403,7 +403,7 @@ static const option_part_definition saphdb_part_client_context_vals[] = {
 	{ 2, "Client Type", 29 },
 	{ 3, "Application Name", 29 },
 	/* NULL */
-	{ 0x00, NULL }
+	{ 0x00, NULL, 0x00 }
 };
 
 static const option_part_definition saphdb_part_session_context_vals[] = {
@@ -414,7 +414,7 @@ static const option_part_definition saphdb_part_session_context_vals[] = {
 	{ 5, "Master Host Name", 29 },
 	{ 6, "Master Host Port Number", 3 },
 	/* NULL */
-	{ 0x00, NULL }
+	{ 0x00, NULL, 0x00 }
 };
 
 static const option_part_definition saphdb_part_statement_context_vals[] = {
@@ -424,7 +424,7 @@ static const option_part_definition saphdb_part_statement_context_vals[] = {
 	{ 4, "Flag Set", 8 },
 	{ 5, "Query Time Out", 4 },
 	/* NULL */
-	{ 0x00, NULL }
+	{ 0x00, NULL, 0x00 }
 };
 
 static const option_part_definition saphdb_part_dbconnect_info_flags_vals[] = {
@@ -433,13 +433,13 @@ static const option_part_definition saphdb_part_dbconnect_info_flags_vals[] = {
 	{ 3, "Port", 3 },
 	{ 4, "Is Connected", 28 },
 	/* NULL */
-	{ 0x00, NULL }
+	{ 0x00, NULL, 0x00 }
 };
 
 static const option_part_definition saphdb_part_lob_flags_vals[] = {
 	{ 0, "Implicit Streaming", 28 },
 	/* NULL */
-	{ 0x00, NULL }
+	{ 0x00, NULL, 0x00 }
 };
 
 
@@ -575,7 +575,7 @@ opv_to_opi(const gint8 value, const option_part_definition *opd, const char *unk
 }
 
 /* Option Part Value to Option Part Type */
-const gint8
+gint8
 opv_to_opt(const gint8 value, const option_part_definition *opd)
 {
 	gint i = 0;
@@ -600,8 +600,6 @@ dissect_saphdb_part_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 		gint8 option_key = 0, option_type = 0;
 		gint16 option_length = 0;
 		gint8 option_value_byte = 0;
-		gint32 option_value_int = 0;
-		gint64 option_value_int64 = 0;
 		proto_item *option_type_item = NULL;
 
 		option_key = tvb_get_gint8(tvb, offset + parsed_length);
@@ -692,7 +690,7 @@ dissect_saphdb_part_multi_line_options_data(tvbuff_t *tvb, packet_info *pinfo, p
 }
 
 void
-dissect_saphdb_gss_authentication_fields(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset, guint32 length)
+dissect_saphdb_gss_authentication_fields(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset)
 {
 	guint8 field_short_length = 0, commtype = 0;
 	guint16 field_count = 0, field_length = 0;
@@ -785,7 +783,7 @@ dissect_saphdb_part_authentication_fields(tvbuff_t *tvb, packet_info *pinfo, pro
 		if (is_gss && field == field_count - 1) {
 			proto_item_append_text(gss_item, ": GSS Token");
 			gss_tree = proto_item_add_subtree(gss_item, ett_saphdb);
-			dissect_saphdb_gss_authentication_fields(tvb, pinfo, gss_tree, offset, field_length);
+			dissect_saphdb_gss_authentication_fields(tvb, pinfo, gss_tree, offset);
 		}
 
 		offset += field_length; parsed_length += field_length;
@@ -803,7 +801,7 @@ dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, 
 
 	switch (partkind) {
 		case 3:   // COMMAND
-			if (length > 0 && tvb_reported_length_remaining(tvb, offset) >= length) {
+			if ((length > 0) && ((guint32)tvb_reported_length_remaining(tvb, offset) >= length)) {
 				proto_tree_add_item(tree, hf_saphdb_part_command, tvb, offset, length, ENC_NA); offset += length; length = 0;
 			}
 			break;
@@ -814,12 +812,12 @@ dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, 
 			proto_tree_add_item(tree, hf_saphdb_part_error_level, tvb, offset, 1, ENC_NA); offset += 1; length -= 1;
 			proto_tree_add_item(tree, hf_saphdb_part_error_sqlstate, tvb, offset, 5, ENC_NA); offset += 5; length -= 5;
 
-			if (error_text_length > 0 && tvb_reported_length_remaining(tvb, offset) >= error_text_length) {
+			if ((error_text_length > 0) && (tvb_reported_length_remaining(tvb, offset) >= error_text_length)) {
 				proto_tree_add_item(tree, hf_saphdb_part_error_text, tvb, offset, error_text_length, ENC_NA); offset += error_text_length; length -= error_text_length;
 
 				/* Align the error text length to 8 */
-				if (error_text_length % 8 != 0) {
-					length += 8 - error_text_length % 8;
+				if ((error_text_length % 8) != 0) {
+					length += 8 - (error_text_length % 8);
 				}
 			}
 			break;
@@ -829,7 +827,7 @@ dissect_saphdb_part_buffer(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, 
 			break;
 
 		case 35:   // CLIENTID
-			if (length > 0 && tvb_reported_length_remaining(tvb, offset) >= length) {
+			if ((length > 0) && ((guint32)tvb_reported_length_remaining(tvb, offset) >= length)) {
 				proto_tree_add_item(tree, hf_saphdb_part_clientid, tvb, offset, length, ENC_NA); offset += length; length = 0;
 			}
 			break;
@@ -1016,7 +1014,7 @@ dissect_saphdb_segment(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 	}
 
 	/* Add the Segment Buffer subtree */
-	if (segmentlength > length && number_of_parts > 0) {
+	if (((guint32)segmentlength > length) && (number_of_parts > 0)) {
 		segment_buffer_item = proto_tree_add_item(segment_tree, hf_saphdb_segment_buffer, tvb, offset, segmentlength - length, ENC_NA);
 		segment_buffer_tree = proto_item_add_subtree(segment_buffer_item, ett_saphdb);
 
@@ -1082,7 +1080,7 @@ dissect_saphdb_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 
 			gboolean compressed = FALSE;
 			gint16 number_of_segments = 0;
-			guint32 varpartlength = 0, varpartsize = 0, compressionvarpartlength = 0;
+			guint32 varpartlength = 0;
 			proto_item *message_header_item = NULL, *varpartlength_item = NULL, *number_of_segments_item = NULL, *message_buffer_item = NULL, *compressed_buffer_item = NULL;
 			proto_tree *message_header_tree = NULL, *message_buffer_tree = NULL;
 
@@ -1100,12 +1098,11 @@ dissect_saphdb_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 			compressed = tvb_get_gint8(tvb, offset) == 2;
 			proto_tree_add_item(message_header_tree, hf_saphdb_message_header_packetoptions, tvb, offset, 1, ENC_LITTLE_ENDIAN); offset += 1;
 			offset += 1;  /* Reserved1 field */
-			compressionvarpartlength = tvb_get_guint32(tvb, offset, ENC_LITTLE_ENDIAN);
 			proto_tree_add_item(message_header_tree, hf_saphdb_message_header_compressionvarpartlength, tvb, offset, 4, ENC_LITTLE_ENDIAN); offset += 4;
 			offset += 4;  /* Reserved2 field */
 
 			/* Check the length of the variable part against the remaining packet */
-			if (tvb_reported_length_remaining(tvb, offset) != varpartlength) {
+			if ((guint32)tvb_reported_length_remaining(tvb, offset) != varpartlength) {
 				expert_add_info_format(pinfo, varpartlength_item, &ei_saphdb_varpartlenght_incorrect, "Length of variable part %d is invalid", varpartlength);
 				varpartlength = tvb_reported_length_remaining(tvb, offset);
 			}
