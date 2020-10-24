@@ -7,7 +7,7 @@ SAP Dissector Plugin for Wireshark
 
 SECUREAUTH LABS. Copyright (C) 2020 SecureAuth Corporation. All rights reserved.
 
-Version 0.8.3.dev0 (XXX 2020)
+Version 0.9.1.dev0 (XXX 2020)
 
 
 Overview
@@ -98,7 +98,7 @@ Installation & Build
 
 This Wireshark plugin is not distributed as part of the Wireshark source. It
 can be build as a standalone plugin, or as part of Wireshark, and is compatible
-with version 3.2.
+with version 3.4.
 
 ### Installing on Linux ###
 
@@ -121,13 +121,13 @@ To build and install the plugin on Debian/Ubuntu linux distributions:
 
 The following steps are required to build and install the plugin as part of Wireshark:
 
-1) Download and decompress the [Wireshark version 3.2 source](https://www.wireshark.org/download.html)
+1) Download and decompress the [Wireshark version 3.4 source](https://www.wireshark.org/download.html)
    or checkout the code from the [source repository](https://code.wireshark.org/review/wireshark).
 
     ```
     git clone https://code.wireshark.org/review/wireshark
     cd wireshark
-    git checkout master-3.2
+    git checkout master-3.4
     ```
 
 2) Copy the SAP Wireshark Plugin to a new `plugins/epan/sap` directory.
@@ -140,7 +140,7 @@ The following steps are required to build and install the plugin as part of Wire
    performed using the patch file provided. At the root directory run:
 
     ```
-    git apply plugins/epan/sap/wireshark-master-3.2.patch
+    git apply plugins/epan/sap/wireshark-master-3.4.patch
     ```
 
 4) Perform a new build including the plugin. At the root directory run:
@@ -205,7 +205,7 @@ for building Wireshark on Windows.
    performed using the patch file provided. At the root directory run:
 
     ```
-    git apply plugins/epan/sap/wireshark-master-3.2.patch
+    git apply plugins/epan/sap/wireshark-master-3.4.patch
     ```
 
 4) Perform a new build including the plugin.
@@ -249,7 +249,7 @@ the `ptf` command-line, run:
 
 It's worth mentioning that compression libraries for SAP Diag/RFC protocol are
 originally written in C++, thus the entire plugin needs to be compiled for C++.
-See [Wireshark's portability notes](https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-3.2)
+See [Wireshark's portability notes](https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=doc/README.developer;hb=refs/heads/master-3.4)
 for more information.
 
 

@@ -7,7 +7,7 @@ name: Build and test Windows plug-in
 on: [push, pull_request]
 
 env:
-   WIRESHARK_BRANCH: master-3.2
+   WIRESHARK_BRANCH: master
    WIRESHARK_BASE_DIR: C:/wireshark-libs
    WIRESHARK_QT_VERSION: 5.12.3
 
@@ -29,7 +29,9 @@ jobs:
            run: |
               git apply plugins/epan/sap/wireshark-${{ env.WIRESHARK_BRANCH }}.patch
          - name: Choco install
-           run: cinst -y --force --no-progress asciidoctorj xsltproc docbook-bundle winflexbison3 cmake nsis
+           run: cinst -y --force --no-progress asciidoctorj xsltproc docbook-bundle cmake nsis
+         - name: Install winflexbison3
+           run: cinst -y --force --no-progress winflexbison3 --version 2.5.18.20190508
          - name: Install strawberryperl
            run: |
               choco install strawberryperl
@@ -87,7 +89,7 @@ jobs:
               mv build/packaging/nsis/*exe exe/
          - name: Move plugin dll
            run: |
-              mv build/run/RelWithDebInfo/plugins/3.2/epan/sap.dll exe/sap.dll
+              mv build/run/RelWithDebInfo/plugins/3.4/epan/sap.dll exe/sap.dll
          - name: Upload Windows artifacts
            uses: actions/upload-artifact@v2
            with:

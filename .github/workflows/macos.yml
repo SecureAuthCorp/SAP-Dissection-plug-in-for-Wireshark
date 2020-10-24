@@ -7,7 +7,7 @@ name: Build and test MacOS plug-in
 on: [push, pull_request]
 
 env:
-   WIRESHARK_BRANCH: master-3.2
+   WIRESHARK_BRANCH: master
    WIRESHARK_QT_VERSION: 5.12.3
 
 jobs:
@@ -122,7 +122,7 @@ jobs:
          - name: Copy plugin so
            run: |
               mkdir exe
-              cp build/run/Wireshark.app/Contents/PlugIns/wireshark/3-2/epan/sap.so exe/sap-source.so
+              cp build/run/Wireshark.app/Contents/PlugIns/wireshark/3-4/epan/sap.so exe/sap-source.so
          - name: Upload MacOS artifacts
            uses: actions/upload-artifact@v2
            with:
