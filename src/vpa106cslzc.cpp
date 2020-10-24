@@ -595,7 +595,7 @@ int CsObjectInt::CsDecomprLZC (SAP_BYTE * inbuf,
 /*--------------------------------------------------------------------*/
 {
   register BYTE_TYP *stackp;
-  register CODE_INT code, oldcode, incode, finchar;
+  register CODE_INT code = 0, oldcode = 0, incode = 0, finchar = 0;
   register SAP_INT rest_lenr;
 /*
   static BYTE_TYP *sstackp = (BYTE_TYP *) 0;
