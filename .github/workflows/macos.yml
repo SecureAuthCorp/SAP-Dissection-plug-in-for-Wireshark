@@ -7,7 +7,7 @@ name: Build and test MacOS plug-in
 on: [push, pull_request]
 
 env:
-   WIRESHARK_BRANCH: master
+   WIRESHARK_BRANCH: release-3.4
    WIRESHARK_QT_VERSION: 5.12.3
 
 jobs:
