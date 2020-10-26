@@ -13,6 +13,7 @@ jobs:
    standalone:
       name: Build and test standalone plugin
       runs-on: ubuntu-latest
+      continue-on-error: true
       steps:
          - name: Checkout plug-in
            uses: actions/checkout@v2
