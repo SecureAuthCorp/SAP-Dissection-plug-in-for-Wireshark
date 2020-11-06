@@ -43,11 +43,15 @@ if(Wireshark_FOUND)
 
   include_directories (${Wireshark_INCLUDE_DIR})
 
+  IF(APPLE)
+    LINK_DIRECTORIES(/usr/local/lib)
+  ENDIF()
+
   set(LINK_MODE_LIB SHARED)
   set(LINK_MODE_MODULE MODULE)
 
   # Plugin name and version info (major minor micro)
-  set(PLUGIN_VERSION "0.8.2")
+  set(PLUGIN_VERSION "0.8.3")
   add_definitions(-DPLUGIN_VERSION=\"${PLUGIN_VERSION}\")
 
 else(Wireshark_FOUND)
