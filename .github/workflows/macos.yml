@@ -41,11 +41,11 @@ jobs:
               brew install libdnet libpcap
          - name: Install Python packages for testing
            run: |
-              python -m pip install --upgrade pip setuptools wheel
+              python2 -m pip install --upgrade pip setuptools wheel
               pip install pyshark-legacy https://github.com/SecureAuthCorp/pysap/archive/master.zip
          - name: Run tests
            run: |
-              python tests/__init__.py        
+              python2 tests/__init__.py
 
          - name: Copy plugin so
            run: |
@@ -110,12 +110,12 @@ jobs:
               brew install libdnet libpcap
          - name: Install Python packages for testing
            run: |
-              python -m pip install --upgrade pip setuptools wheel
+              python2 -m pip install --upgrade pip setuptools wheel
               pip install pyshark-legacy https://github.com/SecureAuthCorp/pysap/archive/master.zip
          - name: Run tests
            run: |
               cd plugins/epan/sap
-              python tests/__init__.py
+              python2 tests/__init__.py
            env:
               TSHARK_PATH: ${{ github.workspace }}/build/run/Wireshark.app/Contents/MacOS/tshark
 
