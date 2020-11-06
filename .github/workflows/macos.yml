@@ -23,7 +23,7 @@ jobs:
          - name: Install dependencies for a standalone build
            run: |
               # This is the pinned formula for Wireshark 3.2.7, as homebrew has moved now to 3.4
-              brew install wireshark@3.2.7 -v
+              brew extract --version=3.2.7 wireshark homebrew/core
 
          - name: Build standalone
            run: |
