@@ -305,8 +305,9 @@ proper SDLC process.
 Authors
 -------
 
-The library was designed and developed by Martin Gallo from
-SecureAuth Labs team.
+The library was designed and developed by Martin Gallo from [SecureAuth's Innovation
+Labs](https://www.secureauth.com/labs/) team, with the help of a large number of
+contributors.
 
 ### Contributors ###
 

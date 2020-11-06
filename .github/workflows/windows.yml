@@ -73,13 +73,13 @@ jobs:
               python-version: 2.7
          - name: Install Python packages for testing
            run: |
-              python -m pip install --upgrade pip setuptools wheel
+              python2 -m pip install --upgrade pip setuptools wheel
               pip install pyshark-legacy https://github.com/SecureAuthCorp/pysap/archive/master.zip
               pip install --upgrade trollius==2.2.post1
          - name: Run tests
            run: |
               cd plugins/epan/sap/
-              python tests/__init__.py
+              python2 tests/__init__.py
            env:
               TSHARK_PATH: ${{ github.workspace }}\build\run\RelWithDebInfo\tshark.exe
 
