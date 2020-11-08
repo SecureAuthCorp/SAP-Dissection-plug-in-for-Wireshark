@@ -24,8 +24,8 @@ set -e
 CMAKE_OPTIONS=-DENABLE_APPLICATION_BUNDLE=OFF
 
 # Build tshark and plugins
-cd ${HOME}/wireshark-${WIRESHARK_BRANCH}
-mkdir -p build && cd build && cmake .. ${CMAKE_OPTIONS} && make -j3 tshark sap
+cd "${HOME}"/wireshark-"${WIRESHARK_BRANCH}"
+mkdir -p build && cd build && cmake .. "${CMAKE_OPTIONS}" && make -j3 tshark sap
 
 # Build entire wireshark if required
 if [ "${BUILD_WIRESHARK}" == "yes" ]; then

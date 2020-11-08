@@ -28,26 +28,26 @@ sudo gem install asciidoctor
 sudo apt-get install -yqq cmake libglib2.0-dev qttools5-dev qttools5-dev-tools libqt5svg5-dev qtmultimedia5-dev qt5-default libpcap-dev bison flex make python3 python3-pip perl libgcrypt-dev
 
 # Check out source
-mkdir -p ${HOME}/wireshark-$WIRESHARK_BRANCH
-cd ${HOME}/wireshark-$WIRESHARK_BRANCH
+mkdir -p "${HOME}"/wireshark-"${WIRESHARK_BRANCH}"
+cd "${HOME}"/wireshark-"${WIRESHARK_BRANCH}"
 git init
-if ! git config remote.origin.url > /dev/null; then
-  git remote add -t $WIRESHARK_BRANCH -f origin https://github.com/wireshark/wireshark;
+if ! git config remote.origin.url >/dev/null; then
+  git remote add -t "${WIRESHARK_BRANCH}" -f origin https://github.com/wireshark/wireshark
 fi
-git checkout $WIRESHARK_BRANCH
+git checkout "${WIRESHARK_BRANCH}"
 
 # Link the plugin to the plugins directory if required
 if [ ! -e plugins/epan/sap ]; then
-  ln -s $PLUGIN_DIR plugins/epan/sap
+  ln -s "${PLUGIN_DIR}" plugins/epan/sap
 fi
 
 # Apply the patch if required
-if git apply --check $PLUGIN_DIR/wireshark-$WIRESHARK_BRANCH.patch &> /dev/null; then
-  git apply $PLUGIN_DIR/wireshark-$WIRESHARK_BRANCH.patch
+if git apply --check "${PLUGIN_DIR}"/wireshark-"${WIRESHARK_BRANCH}".patch &>/dev/null; then
+  git apply "${PLUGIN_DIR}"/wireshark-"${WIRESHARK_BRANCH}".patch
 fi
 
 # Install test requirements
-sudo apt-get install -yqq libxml2-dev libxslt-dev python-dev python-pip
+sudo apt-get install -yqq libxml2-dev libxslt-dev python2.7-dev python-pip
 sudo -H sh -c "pip install pip -U"
 sudo -H sh -c "pip install setuptools -U"
 sudo -H sh -c "CXX=g++ CC=gcc pip install pysap pyshark-legacy"
