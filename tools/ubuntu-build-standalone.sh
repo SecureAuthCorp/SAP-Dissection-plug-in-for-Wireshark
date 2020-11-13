@@ -21,4 +21,4 @@
 set -e
 
 # Build sap plugin
-mkdir -p build && cd build && cmake ${PLUGIN_DIR} && make && make install
+mkdir -p build && cd build && cmake "${PLUGIN_DIR}" && make && make install

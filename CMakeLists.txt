@@ -43,6 +43,10 @@ if(Wireshark_FOUND)
 
   include_directories (${Wireshark_INCLUDE_DIR})
 
+  IF(APPLE)
+    LINK_DIRECTORIES(/usr/local/lib)
+  ENDIF()
+
   set(LINK_MODE_LIB SHARED)
   set(LINK_MODE_MODULE MODULE)
 
