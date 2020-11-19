@@ -41,7 +41,7 @@ jobs:
            with:
               version: ${{ env.WIRESHARK_QT_VERSION }}
          - name: Add msbuild to PATH
-           uses: microsoft/setup-msbuild@v1.0.0
+           uses: microsoft/setup-msbuild@v1.0.2
            with:
               vs-version: 16.4
          - name: Set MSVC command prompt
