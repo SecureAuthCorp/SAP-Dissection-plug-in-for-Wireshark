@@ -14,7 +14,7 @@ Overview
 --------
 
 [SAP Netweaver](https://www.sap.com/platform/netweaver/index.epx) and
-[SAP HANA](https://www.sap.com/products/hana.html)are technology platforms for
+[SAP HANA](https://www.sap.com/products/hana.html) are technology platforms for
 building and integrating SAP business applications. Communication between components
 uses different network protocols. While some of them are standard and well-known
 protocols, others are proprietaries and public information is not available.
@@ -306,8 +306,7 @@ Authors
 -------
 
 The library was designed and developed by Martin Gallo from [SecureAuth's Innovation
-Labs](https://www.secureauth.com/labs/) team, with the help of a large number of
-contributors.
+Labs](https://www.secureauth.com/labs/) team, with the help of many contributors.
 
 ### Contributors ###
 
@@ -324,7 +323,7 @@ Contributions made by:
 * Luca Di Stefano
 * Alexis La Goutte ([@alagoutte](https://github.com/alagoutte))
 * Yvan Genuer ([@iggy38](https://github.com/iggy38))
-* Mathieu Geli ([@gelim](https://github.com/gelim)))
+* Mathieu Geli ([@gelim](https://github.com/gelim))
 
 
 Contact
