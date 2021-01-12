@@ -77,7 +77,7 @@ jobs:
            with:
               python-version: 3.8
          - name: Set up Ruby 2.6
-           uses: actions/setup-ruby@v1
+           uses: actions/setup-ruby@v1.1.2
            with:
               ruby-version: '2.6'
          - name: Update brew packages
