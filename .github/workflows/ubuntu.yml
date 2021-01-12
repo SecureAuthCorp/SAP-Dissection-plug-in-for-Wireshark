@@ -64,10 +64,8 @@ jobs:
       runs-on: ubuntu-latest
       steps:
          - name: Checkout Wireshark
-           uses: actions/checkout@v2
-           with:
-              repository: wireshark/wireshark
-              ref: ${{ env.WIRESHARK_BRANCH }}
+           run: |
+             git clone --single-branch --branch ${{ env.WIRESHARK_BRANCH }} https://gitlab.com/wireshark/wireshark/
          - name: Checkout plug-in
            uses: actions/checkout@v2
            with:
