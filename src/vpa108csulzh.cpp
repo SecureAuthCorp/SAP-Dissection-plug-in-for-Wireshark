@@ -736,7 +736,7 @@ int CsObjectInt::DecompDynamic (int *state)
                                     /* number of literal/length codes */
       cshu.dd_nl = 257 + ((unsigned)cshu.bb & 0x1f);
       DUMPBITS(5)
-      __attribute__((fallthrough));
+      /* __attribute__((fallthrough)); */
 
     case 6:
       NEEDBITS(5)
@@ -748,7 +748,7 @@ int CsObjectInt::DecompDynamic (int *state)
 
       cshu.dd_nd = 1 + ((unsigned)cshu.bb & 0x1f);  /* number of distance codes ....*/
       DUMPBITS(5)
-      __attribute__((fallthrough));
+      /* __attribute__((fallthrough)); */
 
     case 7:
       NEEDBITS(4)
@@ -936,7 +936,7 @@ int CsObjectInt::DecompBlock (int *state, int *e) /* state, last block flag */
 
       *e = (int)cshu.bb & 1;
       DUMPBITS(1)
-      __attribute__((fallthrough));
+      /* __attribute__((fallthrough)); */
 
     case 4:     /* read in block type ................................*/
       NEEDBITS(2)
