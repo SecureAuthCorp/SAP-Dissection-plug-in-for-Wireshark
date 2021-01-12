@@ -67,9 +67,10 @@ jobs:
          - name: Checkout plug-in
            uses: actions/checkout@v2
            with:
-              path: plugins/epan/sap
+              path: wireshark/plugins/epan/sap
          - name: Apply patch
            run: |
+              cd wireshark
               git apply plugins/epan/sap/wireshark-${{ env.WIRESHARK_BRANCH }}.patch
 
          - name: Set up Python 3.8
@@ -94,6 +95,7 @@ jobs:
 
          - name: Build in-tree
            run: |
+              cd wireshark
               mkdir build
               cd build
               cmake ..
