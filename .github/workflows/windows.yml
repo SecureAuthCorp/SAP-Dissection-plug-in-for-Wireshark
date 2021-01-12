@@ -18,13 +18,14 @@ jobs:
       steps:
          - name: Checkout Wireshark
            run: |
-             git clone --single-branch --branch ${{ env.WIRESHARK_BRANCH }} https://gitlab.com/wireshark/wireshark/
+              git clone --single-branch --branch ${{ env.WIRESHARK_BRANCH }} git@gitlab.com:wireshark/wireshark.git
          - name: Checkout plug-in
            uses: actions/checkout@v2
            with:
-              path: plugins/epan/sap
+              path: wireshark/plugins/epan/sap
          - name: Apply patch
            run: |
+              cd wireshark
               git apply plugins/epan/sap/wireshark-${{ env.WIRESHARK_BRANCH }}.patch
          - name: Choco install
            run: cinst -y --force --no-progress asciidoctorj xsltproc docbook-bundle cmake nsis
