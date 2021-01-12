@@ -1,7 +1,7 @@
 Changelog
 =========
 
-v0.9.1 - 2020-XX-XX
+v0.9.1 - 2021-XX-XX
 -------------------
 
 - Switched to Wireshark 3.4 branch.
