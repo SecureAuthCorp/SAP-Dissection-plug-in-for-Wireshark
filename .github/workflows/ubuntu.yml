@@ -1,6 +1,6 @@
 # GitHub Action workflows to build and test the plug-in on Ubuntu
 #
-# Adapted from Wireshark's repository https://github.com/wireshark/wireshark/tree/master/.github/workflows
+# Adapted from Wireshark's repository https://gitlab.com/wireshark/wireshark/-/tree/master/.github/workflows
 
 name: Build and test Ubuntu plug-in
 
@@ -44,7 +44,7 @@ jobs:
          - name: Install Python packages for testing
            run: |
               python2 -m pip install --upgrade pip setuptools wheel
-              pip install pyshark-legacy https://github.com/SecureAuthCorp/pysap/archive/master.zip
+              pip install pyshark-legacy pysap
          - name: Run tests
            run: |
               python2 tests/__init__.py
