@@ -18,18 +18,15 @@ jobs:
       steps:
          - name: Checkout Wireshark
            run: |
-              mkdir -p wireshark
-              cd wireshark
               git init
               git remote add -t "${{ env.WIRESHARK_BRANCH }}" -f origin https://gitlab.com/wireshark/wireshark.git
               git checkout ${{ env.WIRESHARK_BRANCH }}
          - name: Checkout plug-in
            uses: actions/checkout@v2
            with:
-              path: wireshark/plugins/epan/sap
+              path: plugins/epan/sap
          - name: Apply patch
            run: |
-              cd wireshark
               git apply plugins/epan/sap/wireshark-${{ env.WIRESHARK_BRANCH }}.patch
          - name: Choco install
            run: cinst -y --force --no-progress asciidoctorj xsltproc docbook-bundle cmake nsis

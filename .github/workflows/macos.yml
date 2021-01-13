@@ -63,18 +63,15 @@ jobs:
       steps:
          - name: Checkout Wireshark
            run: |
-              mkdir -p wireshark
-              cd wireshark
               git init
               git remote add -t "${{ env.WIRESHARK_BRANCH }}" -f origin https://gitlab.com/wireshark/wireshark.git
               git checkout ${{ env.WIRESHARK_BRANCH }}
          - name: Checkout plug-in
            uses: actions/checkout@v2
            with:
-              path: wireshark/plugins/epan/sap
+              path: plugins/epan/sap
          - name: Apply patch
            run: |
-              cd wireshark
               git apply plugins/epan/sap/wireshark-${{ env.WIRESHARK_BRANCH }}.patch
 
          - name: Set up Python 3.8
@@ -99,7 +96,6 @@ jobs:
 
          - name: Build in-tree
            run: |
-              cd wireshark
               mkdir build
               cd build
               cmake ..
