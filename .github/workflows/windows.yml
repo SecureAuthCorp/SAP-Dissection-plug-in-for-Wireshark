@@ -18,7 +18,11 @@ jobs:
       steps:
          - name: Checkout Wireshark
            run: |
-              git clone --single-branch --branch ${{ env.WIRESHARK_BRANCH }} git@gitlab.com:wireshark/wireshark.git
+              mkdir -p wireshark
+              cd wireshark
+              git init
+              git remote add -t "${{ env.WIRESHARK_BRANCH }}" -f origin https://gitlab.com/wireshark/wireshark.git
+              git checkout ${{ env.WIRESHARK_BRANCH }}
          - name: Checkout plug-in
            uses: actions/checkout@v2
            with:

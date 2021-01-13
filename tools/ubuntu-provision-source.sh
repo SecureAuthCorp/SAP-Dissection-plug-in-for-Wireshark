@@ -32,7 +32,7 @@ mkdir -p "${HOME}"/wireshark-"${WIRESHARK_BRANCH}"
 cd "${HOME}"/wireshark-"${WIRESHARK_BRANCH}"
 git init
 if ! git config remote.origin.url >/dev/null; then
-  git remote add -t "${WIRESHARK_BRANCH}" -f origin https://github.com/wireshark/wireshark
+  git remote add -t "${WIRESHARK_BRANCH}" -f origin https://gitlab.com/wireshark/wireshark
 fi
 git checkout "${WIRESHARK_BRANCH}"
 
