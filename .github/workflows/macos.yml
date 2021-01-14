@@ -111,7 +111,7 @@ jobs:
          - name: Install Python packages for testing
            run: |
               python2 -m pip install --upgrade pip setuptools wheel
-              pip install pyshark-legacy https://github.com/SecureAuthCorp/pysap/archive/master.zip
+              pip install pyshark-legacy pysap
          - name: Run tests
            run: |
               cd plugins/epan/sap
