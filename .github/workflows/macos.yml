@@ -42,7 +42,11 @@ jobs:
          - name: Install Python packages for testing
            run: |
               python2 -m pip install --upgrade pip setuptools wheel
-              pip install pyshark-legacy pysap
+              python2 -m pip install pysap
+         - name: Install patched pyshark-legacy version
+           run: |
+              git clone https://github.com/martingalloar/pyshark-legacy
+              python2 -m pip install pyshark-legacy/src
          - name: Run tests
            run: |
               python2 tests/__init__.py
