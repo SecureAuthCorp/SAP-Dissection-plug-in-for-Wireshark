@@ -13,7 +13,7 @@ env:
 jobs:
    standalone:
       name: Build and test standalone plugin
-      runs-on: macos-11.0
+      runs-on: macos-latest
       continue-on-error: true
       steps:
          - name: Checkout plug-in
@@ -63,7 +63,7 @@ jobs:
 
    intree:
       name: Build and test in-tree plugin
-      runs-on: macos-11.0
+      runs-on: macos-latest
       steps:
          - name: Checkout Wireshark
            run: |
@@ -140,7 +140,7 @@ jobs:
 
    release:
       name: Release
-      runs-on: macos-11.0
+      runs-on: macos-latest
       needs: intree
       env:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
