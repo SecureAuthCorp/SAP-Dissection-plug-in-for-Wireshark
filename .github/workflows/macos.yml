@@ -91,6 +91,7 @@ jobs:
            uses: jurplel/install-qt-action@v2
            with:
               version: ${{ env.WIRESHARK_QT_VERSION }}
+              setup-python: false
          - name: Install asciidoctor
            run: gem install asciidoctor
 
@@ -111,7 +112,11 @@ jobs:
          - name: Install Python packages for testing
            run: |
               python2 -m pip install --upgrade pip setuptools wheel
-              pip install pyshark-legacy pysap
+              python2 -m pip install pysap
+         - name: Install patched pyshark-legacy version
+           run: |
+              git clone https://github.com/martingalloar/pyshark-legacy
+              python2 -m pip install pyshark-legacy/src
          - name: Run tests
            run: |
               cd plugins/epan/sap
