@@ -2,7 +2,7 @@
 # ===========
 # SAP Dissector Plugin for Wireshark
 #
-# SECUREAUTH LABS. Copyright (C) 2020 SecureAuth Corporation. All rights reserved.
+# SECUREAUTH LABS. Copyright (C) 2021 SecureAuth Corporation. All rights reserved.
 #
 # The plugin was designed and developed by Martin Gallo from
 # SecureAuth's Innovation Labs team.
@@ -35,6 +35,9 @@
 #include "hpa106cslzc.h"
 #include "hpa107cslzh.h"
 #include "hpa105CsObjInt.h"
+
+#include "ws_diag_control.h"
+
 
 /* Enable this macro if you want some debugging information on the (de)compression functions */
 /* #define DEBUG */
@@ -92,6 +95,14 @@ void hexdump(guint8 *address, gint size)
 	}
 	printf("\n");
 }
+
+
+/**
+ * The stack frame size is larger than what Wireshark has specified. In order not to trigger a warning,
+ * and with the aim of altering the original SAP's LZC/LZH code as less as possible, we disable the stack
+ * frame check when declaring this function.
+ */
+DIAG_OFF(frame-larger-than=)
 
 int decompress_packet (const guint8 *in, gint in_length, guint8 *out, guint *out_length)
 {
@@ -226,6 +237,7 @@ int decompress_packet (const guint8 *in, gint in_length, guint8 *out, guint *out
 	return (rt);
 };
 
+DIAG_ON(frame-larger-than=)
 
 /*
  * Editor modelines  -  https://www.wireshark.org/tools/modelines.html

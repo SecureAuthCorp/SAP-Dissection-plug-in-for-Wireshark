@@ -1,13 +1,13 @@
 # GitHub Action workflows to build and test the plug-in on Ubuntu
 #
-# Adapted from Wireshark's repository https://github.com/wireshark/wireshark/tree/master/.github/workflows
+# Adapted from Wireshark's repository https://gitlab.com/wireshark/wireshark/-/tree/master/.github/workflows
 
 name: Build and test Ubuntu plug-in
 
 on: [push, pull_request]
 
 env:
-   WIRESHARK_BRANCH: master-3.2
+   WIRESHARK_BRANCH: release-3.4
 
 jobs:
    standalone:
@@ -43,7 +43,11 @@ jobs:
          - name: Install Python packages for testing
            run: |
               python2 -m pip install --upgrade pip setuptools wheel
-              pip install pyshark-legacy https://github.com/SecureAuthCorp/pysap/archive/master.zip
+              python2 -m pip install pysap
+         - name: Install patched pyshark-legacy version
+           run: |
+              git clone https://github.com/martingalloar/pyshark-legacy
+              python2 -m pip install pyshark-legacy/src
          - name: Run tests
            run: |
               python2 tests/__init__.py
@@ -63,10 +67,10 @@ jobs:
       runs-on: ubuntu-18.04
       steps:
          - name: Checkout Wireshark
-           uses: actions/checkout@v2
-           with:
-              repository: wireshark/wireshark
-              ref: ${{ env.WIRESHARK_BRANCH }}
+           run: |
+              git init
+              git remote add -t "${{ env.WIRESHARK_BRANCH }}" -f origin https://gitlab.com/wireshark/wireshark.git
+              git checkout ${{ env.WIRESHARK_BRANCH }}
          - name: Checkout plug-in
            uses: actions/checkout@v2
            with:
@@ -78,7 +82,7 @@ jobs:
            run: |
               sudo gem install asciidoctor
               sudo apt-get update -qq
-              sudo apt-get install -yqq cmake libglib2.0-dev qttools5-dev qttools5-dev-tools libqt5svg5-dev qtmultimedia5-dev qt5-default libpcap-dev bison flex make python3 python3-pip perl libgcrypt-dev
+              sudo apt-get install -yqq cmake libglib2.0-dev qttools5-dev qttools5-dev-tools libqt5svg5-dev qtmultimedia5-dev qt5-default libc-ares-dev libpcap-dev bison flex make python3 python3-pip perl libgcrypt-dev
 
          - name: Build in-tree
            run: |
@@ -97,7 +101,11 @@ jobs:
          - name: Install Python packages for testing
            run: |
               python2 -m pip install --upgrade pip setuptools wheel
-              pip install pyshark-legacy https://github.com/SecureAuthCorp/pysap/archive/master.zip
+              python2 -m pip install pysap
+         - name: Install patched pyshark-legacy version
+           run: |
+              git clone https://github.com/martingalloar/pyshark-legacy
+              python2 -m pip install pyshark-legacy/src
          - name: Run tests
            run: |
               cd plugins/epan/sap/
@@ -108,7 +116,7 @@ jobs:
          - name: Copy plugin so
            run: |
               mkdir exe
-              cp build/run/plugins/3.2/epan/sap.so exe/sap-source.so
+              cp build/run/plugins/3.4/epan/sap.so exe/sap-source.so
          - name: Upload Ubuntu artifacts
            uses: actions/upload-artifact@v2
            with:

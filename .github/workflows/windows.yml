@@ -1,15 +1,15 @@
 # GitHub Action workflows to build and test the plug-in on Windows
 #
-# Adapted from Wireshark's repository https://github.com/wireshark/wireshark/tree/master/.github/workflows
+# Adapted from Wireshark's repository https://gitlab.com/wireshark/wireshark/-/tree/master/.github/workflows
 
 name: Build and test Windows plug-in
 
 on: [push, pull_request]
 
 env:
-   WIRESHARK_BRANCH: master-3.2
+   WIRESHARK_BRANCH: release-3.4
    WIRESHARK_BASE_DIR: C:/wireshark-libs
-   WIRESHARK_QT_VERSION: 5.12.3
+   WIRESHARK_QT_VERSION: 5.15.1
 
 jobs:
    intree:
@@ -17,10 +17,10 @@ jobs:
       runs-on: windows-latest
       steps:
          - name: Checkout Wireshark
-           uses: actions/checkout@v2
-           with:
-              repository: wireshark/wireshark
-              ref: ${{ env.WIRESHARK_BRANCH }}
+           run: |
+              git init
+              git remote add -t "${{ env.WIRESHARK_BRANCH }}" -f origin https://gitlab.com/wireshark/wireshark.git
+              git checkout ${{ env.WIRESHARK_BRANCH }}
          - name: Checkout plug-in
            uses: actions/checkout@v2
            with:
@@ -29,11 +29,14 @@ jobs:
            run: |
               git apply plugins/epan/sap/wireshark-${{ env.WIRESHARK_BRANCH }}.patch
          - name: Choco install
-           run: cinst -y --force --no-progress asciidoctorj xsltproc docbook-bundle winflexbison3 cmake nsis
+           run: cinst -y --force --no-progress asciidoctorj xsltproc docbook-bundle cmake nsis
+         - name: Install winflexbison3
+           run: cinst -y --force --no-progress winflexbison3 --version 2.5.18.20190508
          - name: Install strawberryperl
-           run: |
-              choco install strawberryperl
-              echo "C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin" >> $GITHUB_PATH
+           uses: shogo82148/actions-setup-perl@v1
+           with:
+              perl-version: '5.30'
+              distribution: strawberry
          - name: Install Qt
            uses: jurplel/install-qt-action@v2
            with:
@@ -50,7 +53,7 @@ jobs:
            run: cmake -A x64 ..
            env:
               PLATFORM: x64
-              QT5_BASE_DIR: C:/Qt/${{ env.WIRESHARK_QT_VERSION }}/msvc2017_64
+              QT5_BASE_DIR: C:/Qt/${{ env.WIRESHARK_QT_VERSION }}/msvc2019_64
            working-directory: build
 
          - name: Build
@@ -72,8 +75,12 @@ jobs:
          - name: Install Python packages for testing
            run: |
               python -m pip install --upgrade pip setuptools wheel
-              pip install pyshark-legacy https://github.com/SecureAuthCorp/pysap/archive/master.zip
-              pip install --upgrade trollius==2.2.post1
+              python -m pip install pysap
+         - name: Install patched pyshark-legacy version
+           run: |
+              git clone https://github.com/martingalloar/pyshark-legacy
+              python -m pip install pyshark-legacy/src
+              python -m pip install --upgrade trollius==2.2.post1
          - name: Run tests
            run: |
               cd plugins/epan/sap/
@@ -87,7 +94,7 @@ jobs:
               mv build/packaging/nsis/*exe exe/
          - name: Move plugin dll
            run: |
-              mv build/run/RelWithDebInfo/plugins/3.2/epan/sap.dll exe/sap.dll
+              mv build/run/RelWithDebInfo/plugins/3.4/epan/sap.dll exe/sap.dll
          - name: Upload Windows artifacts
            uses: actions/upload-artifact@v2
            with:

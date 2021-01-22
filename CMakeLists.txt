@@ -1,7 +1,7 @@
 # ===========
 # SAP Dissector Plugin for Wireshark
 #
-# SECUREAUTH LABS. Copyright (C) 2020 SecureAuth Corporation. All rights reserved.
+# SECUREAUTH LABS. Copyright (C) 2021 SecureAuth Corporation. All rights reserved.
 #
 # The plugin was designed and developed by Martin Gallo from
 # SecureAuth's Innovation Labs team.
@@ -23,11 +23,11 @@ cmake_minimum_required(VERSION 2.6)
 set(CMAKE_BACKWARDS_COMPATIBILITY 2.6)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-find_package(Wireshark 3.2)
+find_package(Wireshark 3.4)
 
 if(Wireshark_FOUND)
 
-  MESSAGE(STATUS "Wireshark 3.2 libraries found in ${Wireshark_LIB_DIR}, performing a stand-alone plug-in build.")
+  MESSAGE(STATUS "Wireshark 3.4 libraries found in ${Wireshark_LIB_DIR}, performing a stand-alone plug-in build.")
 
   if(NOT CMAKE_INSTALL_LIBDIR )
     set(CMAKE_INSTALL_LIBDIR ~/.local/lib/wireshark/plugins/${Wireshark_VERSION_MAJOR}.${Wireshark_VERSION_MINOR}/epan)
@@ -51,17 +51,17 @@ if(Wireshark_FOUND)
   set(LINK_MODE_MODULE MODULE)
 
   # Plugin name and version info (major minor micro)
-  set(PLUGIN_VERSION "0.8.3")
+  set(PLUGIN_VERSION "0.9.1")
   add_definitions(-DPLUGIN_VERSION=\"${PLUGIN_VERSION}\")
 
 else(Wireshark_FOUND)
 
-  MESSAGE(STATUS "Wireshark 3.2 libraries not found, performing an in-tree Wireshark plug-in build.")
+  MESSAGE(STATUS "Wireshark 3.4 libraries not found, performing an in-tree Wireshark plug-in build.")
 
   include(WiresharkPlugin)
 
   # Plugin name and version info (major minor micro extra)
-  set_module_info(sap 0 8 3 0)
+  set_module_info(sap 0 9 1 0)
 
 endif(Wireshark_FOUND)
 
@@ -145,7 +145,7 @@ else(Wireshark_FOUND)
   	NAME
   	  sap
   	SWITCHES
-  	  -g abort -g termoutput -build
+  	  -g abort -g termoutput
   	SOURCES
   	  ${DISSECTOR_SRC}
   	  ${DISSECTOR_HEADERS}

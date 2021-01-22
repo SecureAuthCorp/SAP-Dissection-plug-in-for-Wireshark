@@ -1,7 +1,7 @@
 # ===========
 # SAP Dissector Plugin for Wireshark
 #
-# SECUREAUTH LABS. Copyright (C) 2020 SecureAuth Corporation. All rights reserved.
+# SECUREAUTH LABS. Copyright (C) 2021 SecureAuth Corporation. All rights reserved.
 #
 # The plugin was designed and developed by Martin Gallo from
 # SecureAuth's Innovation Labs team.
@@ -45,14 +45,14 @@ Vagrant.configure(2) do |config|
     source.vm.provision "shell",
       path: "tools/ubuntu-provision-source.sh",
       privileged: false,
-      env: {"WIRESHARK_BRANCH" => "master-3.2",
+      env: {"WIRESHARK_BRANCH" => "release-3.4",
             "PLUGIN_DIR" => "/vagrant/"}
 
     source.vm.provision "shell",
       path: "tools/ubuntu-build-source.sh",
       privileged: false,
       env: {"BUILD_WIRESHARK" => "yes",
-            "WIRESHARK_BRANCH" => "master-3.2",
+            "WIRESHARK_BRANCH" => "release-3.4",
             "PLUGIN_DIR" => "/vagrant/"}
 
     # Add some memory

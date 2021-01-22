@@ -2,7 +2,7 @@
 # ===========
 # SAP Dissector Plugin for Wireshark
 #
-# SECUREAUTH LABS. Copyright (C) 2020 SecureAuth Corporation. All rights reserved.
+# SECUREAUTH LABS. Copyright (C) 2021 SecureAuth Corporation. All rights reserved.
 #
 # The plugin was designed and developed by Martin Gallo from
 # SecureAuth's Innovation Labs team.
@@ -25,14 +25,14 @@ sudo apt-get update -qq
 
 # Install build requirements
 sudo gem install asciidoctor
-sudo apt-get install -yqq cmake libglib2.0-dev qttools5-dev qttools5-dev-tools libqt5svg5-dev qtmultimedia5-dev qt5-default libpcap-dev bison flex make python3 python3-pip perl libgcrypt-dev
+sudo apt-get install -yqq cmake libglib2.0-dev qttools5-dev qttools5-dev-tools libqt5svg5-dev qtmultimedia5-dev qt5-default libc-ares-dev libpcap-dev bison flex make python3 python3-pip perl libgcrypt-dev
 
 # Check out source
 mkdir -p "${HOME}"/wireshark-"${WIRESHARK_BRANCH}"
 cd "${HOME}"/wireshark-"${WIRESHARK_BRANCH}"
 git init
 if ! git config remote.origin.url >/dev/null; then
-  git remote add -t "${WIRESHARK_BRANCH}" -f origin https://github.com/wireshark/wireshark
+  git remote add -t "${WIRESHARK_BRANCH}" -f origin https://gitlab.com/wireshark/wireshark
 fi
 git checkout "${WIRESHARK_BRANCH}"
 
