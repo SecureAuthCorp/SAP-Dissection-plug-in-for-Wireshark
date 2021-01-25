@@ -1,13 +1,17 @@
 Changelog
 =========
 
+v0.9.2 - 2021-XX-XX
+-------------------
+
+
+
 v0.9.1 - 2021-01-25
 -------------------
 
 - Switched to Wireshark 3.4 branch.
 - `src/packet-saphdb.c`: Added dissection of KRB5 tokens in GSS authentication.  
 - `src/packet-saphdb.c`: Fixed type of options 51 and 52 in `CONNECTOPTIONS` part. Thanks [@jvis](https://twitter.com/jvis)!
- 
 
 
 v0.8.2 - 2020-07-15
