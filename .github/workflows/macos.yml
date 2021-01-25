@@ -90,12 +90,8 @@ jobs:
            run: brew update
          - name: Install dependencies for a in-tree build
            run: |
-              brew install c-ares glib libgcrypt gnutls lua@5.1 cmake nghttp2 snappy lz4 libxml2 ninja libmaxminddb doxygen libsmi spandsp brotli minizip zstd || true
-         - name: Install Qt
-           uses: jurplel/install-qt-action@v2
-           with:
-              version: ${{ env.WIRESHARK_QT_VERSION }}
-              setup-python: false
+              brew install c-ares glib libgcrypt gnutls lua@5.1 cmake nghttp2 snappy lz4 libxml2 ninja libmaxminddb libsmi spandsp brotli minizip zstd libssh libilbc speexdsp gettext qt5 || true
+
          - name: Install asciidoctor
            run: gem install asciidoctor
 
