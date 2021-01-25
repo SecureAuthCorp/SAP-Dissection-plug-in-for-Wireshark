@@ -7,7 +7,7 @@ SAP Dissector Plugin for Wireshark
 
 SECUREAUTH LABS. Copyright (C) 2021 SecureAuth Corporation. All rights reserved.
 
-Version 0.9.1.dev0 (XXX 2021)
+Version 0.9.1 (January 2021)
 
 
 Overview
