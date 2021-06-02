@@ -9,7 +9,7 @@ on: [push, pull_request]
 env:
    WIRESHARK_BRANCH: release-3.4
    WIRESHARK_BASE_DIR: C:/wireshark-libs
-   WIRESHARK_QT_VERSION: 5.15.1
+   WIRESHARK_QT_VERSION: 5.15.2
 
 jobs:
    intree:
