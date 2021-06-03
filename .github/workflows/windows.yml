@@ -65,9 +65,6 @@ jobs:
               msbuild /m /p:Configuration=RelWithDebInfo nsis_package.vcxproj
            working-directory: build
 
-         - name: Install dependencies for testing
-           run: |
-              choco install vcpython27 -f -y
          - name: Set up Python
            uses: actions/setup-python@v2
            with:
