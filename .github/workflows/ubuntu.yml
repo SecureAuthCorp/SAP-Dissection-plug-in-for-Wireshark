@@ -35,7 +35,7 @@ jobs:
 
          - name: Install dependencies for testing
            run: |
-              sudo apt-get install -yqq libxml2-dev libxslt-dev python-dev python-pip
+              sudo apt-get install -yqq libxml2-dev libxslt-dev python2.7-dev python-pip
          - name: Set up Python
            uses: actions/setup-python@v2
            with:
@@ -93,7 +93,7 @@ jobs:
 
          - name: Install dependencies for testing
            run: |
-              sudo apt-get install -yqq libxml2-dev libxslt-dev python-dev python-pip
+              sudo apt-get install -yqq libxml2-dev libxslt-dev python2.7-dev python-pip
          - name: Set up Python
            uses: actions/setup-python@v2
            with:

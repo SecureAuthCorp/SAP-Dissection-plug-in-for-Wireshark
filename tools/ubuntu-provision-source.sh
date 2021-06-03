@@ -20,11 +20,9 @@
 
 set -e
 
-# Update repo cache
-sudo apt-get update -qq
-
 # Install build requirements
 sudo gem install asciidoctor
+sudo apt-get update -qq
 sudo apt-get install -yqq cmake libglib2.0-dev qttools5-dev qttools5-dev-tools libqt5svg5-dev qtmultimedia5-dev qt5-default libc-ares-dev libpcap-dev bison flex make python3 python3-pip perl libgcrypt-dev
 
 # Check out source
@@ -48,6 +46,8 @@ fi
 
 # Install test requirements
 sudo apt-get install -yqq libxml2-dev libxslt-dev python2.7-dev python-pip
-sudo -H sh -c "pip install pip -U"
-sudo -H sh -c "pip install setuptools -U"
-sudo -H sh -c "CXX=g++ CC=gcc pip install pysap pyshark-legacy"
+sudo -H sh -c "python2 -m pip install --upgrade pip setuptools wheel"
+sudo -H sh -c "python2 -m pip install pysap"
+
+git clone https://github.com/martingalloar/pyshark-legacy
+sudo -H sh -c "python2 -m pip install pyshark-legacy/src"
