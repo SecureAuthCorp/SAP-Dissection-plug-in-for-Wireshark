@@ -423,9 +423,9 @@ static const option_part_definition saphdb_part_statement_context_vals[] = {
 	{ 3, "Schema Name", 29 },
 	{ 4, "Flag Set", 8 },
 	{ 5, "Query Time Out", 4 },
-    { 6, "Client Reconnection Wait Timeout", 3 },
-    { 7, "Server CPU Time", 4 },
-    { 8, "Server Memory Usage", 4 },
+	{ 6, "Client Reconnection Wait Timeout", 3 },
+	{ 7, "Server CPU Time", 4 },
+	{ 8, "Server Memory Usage", 4 },
 	/* NULL */
 	{ 0x00, NULL, 0x00 }
 };
