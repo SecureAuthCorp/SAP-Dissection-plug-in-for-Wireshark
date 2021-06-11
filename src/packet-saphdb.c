@@ -423,6 +423,9 @@ static const option_part_definition saphdb_part_statement_context_vals[] = {
 	{ 3, "Schema Name", 29 },
 	{ 4, "Flag Set", 8 },
 	{ 5, "Query Time Out", 4 },
+	{ 6, "Client Reconnection Wait Timeout", 3 },
+	{ 7, "Server CPU Time", 4 },
+	{ 8, "Server Memory Usage", 4 },
 	/* NULL */
 	{ 0x00, NULL, 0x00 }
 };
@@ -589,7 +592,6 @@ opv_to_opt(const gint8 value, const option_part_definition *opd)
 	}
 	return 0;
 }
-
 
 static int
 dissect_saphdb_part_options_data(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32 offset, gint16 argcount, guint8 partkind, const option_part_definition *definition)
@@ -1064,7 +1066,7 @@ dissect_saphdb_message(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void
 			proto_item *initialization_reply = NULL;
 			proto_tree *initialization_reply_tree = NULL;
 
-			/* Add the Initialiation Reply subtree */
+			/* Add the Initialization Reply subtree */
 			initialization_reply = proto_tree_add_item(saphdb_tree, hf_saphdb_initialization_reply, tvb, offset, 8, ENC_NA);
 			initialization_reply_tree = proto_item_add_subtree(initialization_reply, ett_saphdb);
 
