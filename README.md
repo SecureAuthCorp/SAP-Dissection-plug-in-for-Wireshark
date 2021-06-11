@@ -30,12 +30,12 @@ RFC protocol. Detailed information about the research can be found in
 Features
 --------
 
-This plugin counts on several different dissectors:
+This plugin counts on several dissectors:
 
 - SAP NI Protocol dissector
 
     This is the dissector for SAP's Network Interface (NI) protocol. The
-    dissector handles the reassemble of fragmented TCP packets and identifies
+    dissector handles reassembling of fragmented TCP packets and identifies
     keep-alive messages (`PING`/`PONG`). It also calls the respective
     sub-dissector according to the port being used.
 
@@ -53,7 +53,7 @@ This plugin counts on several different dissectors:
     payload items, including Support Bits and common `APPL`/`APPL4` items.
     Wireshark's expert information capabilities are used to remark malformed or
     wrong packets. The dissector also calls the RFC sub-dissector when an
-    embedded RFC call is found and the SNC sub-dissector when SNC frames are
+    embedded RFC call is found, and the SNC sub-dissector when SNC frames are
     found.
 
 - SAP Message Server Protocol dissector
@@ -68,7 +68,7 @@ This plugin counts on several different dissectors:
 
 - SAP SNC (Secure Network Connection) Protocol dissector
 
-	This dissector parses SNC frames and their fields. When the frames contains
+	This dissector parses SNC frames and their fields. When the frames contain
 	wrapped data that wasn't encrypted, it allows calling dissectors to get
 	access to the unwrapped data for further dissecting it, as the case of Diag
 	dissector when SNC is used in authentication only or integrity protection
@@ -88,7 +88,7 @@ This plugin counts on several different dissectors:
 
 - SAP RFC (Remote Function Call) Protocol dissector (experimental)
 
-	This dissector perform some basic dissection on the main components of the
+	This dissector performs some basic dissection on the main components of the
 	RFC protocol. It dissects general items and does some basic reassembling
 	and decompression of table contents.
 
@@ -97,7 +97,7 @@ Installation & Build
 --------------------
 
 This Wireshark plugin is not distributed as part of the Wireshark source. It
-can be build as a standalone plugin, or as part of Wireshark, and is compatible
+can be built as a standalone plugin, or as part of Wireshark, and is compatible
 with version 3.4.
 
 ### Installing on Linux ###
@@ -291,17 +291,6 @@ This Wireshark plugin is distributed under the GPLv2 license. Check the `COPYING
 file for more details.
 
 
-Disclaimer
-----------
-
-The spirit of this open source initiative is hopefully to help the community to
-alleviate some of the hindrances associated with the implementation of
-networking protocols and stacks, aiming at speeding up research and educational
-activities. By no means this package is meant to be used in production
-environments / commercial products. If so, we would advise to include it into a
-proper SDLC process.
-
-
 Authors
 -------
 
@@ -326,9 +315,27 @@ Contributions made by:
 * Mathieu Geli ([@gelim](https://github.com/gelim))
 
 
-Contact
--------
+Disclaimer
+----------
 
-Whether you want to report a bug or give some suggestions on this package, drop
-us a few lines at `oss@secureauth.com` or contact the author email
-`mgallo@secureauth.com`.
+The spirit of this Open Source initiative is to help security researchers,
+and the community, speed up research and educational activities related to
+the implementation of networking protocols and stacks.
+
+The information in this repository is for research and educational purposes
+and not meant to be used in production environments and/or as part
+of commercial products.
+
+If you desire to use this code or some part of it for your own uses, we
+recommend applying proper security development life cycle and secure coding
+practices, as well as generate and track the respective indicators of
+compromise according to your needs.
+
+
+Contact Us
+----------
+
+Whether you want to report a bug, send a patch, or give some suggestions
+on this package, drop us a few lines at oss@secureauth.com.
+
+For security-related questions check our [security policy](SECURITY.md).
