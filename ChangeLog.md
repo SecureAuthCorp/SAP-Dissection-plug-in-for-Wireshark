@@ -4,6 +4,7 @@ Changelog
 v0.9.2 - 2021-XX-XX
 -------------------
 
+- `src/packet-saphdb.c`: Added missing `StatementContextOption` values ([\#22](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/issues/22)). Thanks [@nnnoel](https://github.com/nnnnoel)!
 
 
 v0.9.1 - 2021-01-25
