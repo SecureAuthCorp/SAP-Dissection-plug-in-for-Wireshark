@@ -729,14 +729,14 @@ dissect_saprfc_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_t
 static void
 dissect_saprfc_payload(tvbuff_t *tvb, packet_info *info, proto_tree *tree, proto_tree *parent_tree, guint32 offset){
 
-	guint8 item_id1, item_id2, item_id3, item_id4;
+	guint8 item_id1, item_id2;
 	guint16 item_length, item_value_length;
 
 	proto_item *item = NULL, *item_value = NULL;
 	proto_tree *item_tree = NULL, *item_value_tree = NULL;
 
 	while (tvb_offset_exists(tvb, offset)){
-		item_id1 = item_id2 = item_id3 = item_id4 = 0;
+		item_id1 = item_id2 = 0;
 		item_length = item_value_length = 0;
 
 		/* Add the item subtree. We start with a item's length of 1, as we don't have yet the real size of the item */
