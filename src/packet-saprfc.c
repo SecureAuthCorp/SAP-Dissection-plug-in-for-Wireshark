@@ -500,7 +500,7 @@ dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 			tvb_set_child_real_data_tvbuff(tvb, next_tvb);
 			add_new_data_source(pinfo, next_tvb, "Uncompressed Table Data");
 
-			structure = proto_tree_add_item(tree, hf_saprfc_table_structure, structure_tvb, 4, structure_length, ENC_NA);
+			structure = proto_tree_add_item(tree, hf_saprfc_table_structure, structure_tvb, structure_offset, structure_length, ENC_NA);
 			structure_tree = proto_item_add_subtree(structure, ett_saprfc);
 
 			/* Parse row structure */
