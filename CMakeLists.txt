@@ -18,8 +18,8 @@
 
 project(sap-wireshark-plugin C CXX)
 
-cmake_minimum_required(VERSION 2.6)
-set(CMAKE_BACKWARDS_COMPATIBILITY 2.6)
+cmake_minimum_required(VERSION 3.5)
+set(CMAKE_BACKWARDS_COMPATIBILITY 3.5)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 find_package(Wireshark 3.4)
@@ -122,7 +122,7 @@ if(Wireshark_FOUND)
   )
 
   link_directories(${Wireshark_LIB_DIR})
-  
+
   target_link_libraries(sap wireshark)
 
   install(TARGETS sap
