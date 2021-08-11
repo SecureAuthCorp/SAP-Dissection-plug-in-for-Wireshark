@@ -503,9 +503,9 @@ dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 
 			/* Parse row structure */
 			field_count = tvb_get_guint8(structure_tvb, structure_offset); structure_offset+=1;
-			field_types = alloca(field_count);
-			field_lengths = alloca(field_count);
-			field_offsets = alloca(field_count * sizeof(guint32));
+			field_types = (guint8 *)wmem_alloc(wmem_packet_scope(), field_count);
+			field_lengths = (guint8 *)wmem_alloc(wmem_packet_scope(), field_count);
+			field_offsets = (guint32 *)wmem_alloc(wmem_packet_scope(), field_count * sizeof(guint32));
 
 			for (field_index = 0; field_index < field_count; field_index++){
 
