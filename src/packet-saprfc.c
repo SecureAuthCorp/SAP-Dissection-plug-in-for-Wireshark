@@ -395,6 +395,8 @@ static gint ett_saprfc = -1;
 /* Expert info */
 static expert_field ei_saprfc_invalid_decompresssion = EI_INIT;
 static expert_field ei_saprfc_invalid_decompress_length = EI_INIT;
+static expert_field ei_saprfc_invalid_table_structure_length = EI_INIT;
+static expert_field ei_saprfc_mismatching_table_row_width = EI_INIT;
 static expert_field ei_saprfc_unknown_item = EI_INIT;
 
 
@@ -503,6 +505,11 @@ dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 
 			/* Parse row structure */
 			field_count = tvb_get_guint8(structure_tvb, structure_offset); structure_offset+=1;
+			if (structure_length - 1 < 2 * field_count){
+				expert_add_info_format(pinfo, structure, &ei_saprfc_invalid_table_structure_length, "The minimum table structure length %d exceeds the remaining payload length %d. Skipping dissection of table content", 2 * field_count, structure_length - 1);
+				return;
+			}
+
 			field_types = (guint8 *)wmem_alloc(wmem_packet_scope(), field_count);
 			field_lengths = (guint8 *)wmem_alloc(wmem_packet_scope(), field_count);
 			field_offsets = (guint32 *)wmem_alloc(wmem_packet_scope(), field_count * sizeof(guint32));
@@ -526,6 +533,11 @@ dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 					/* Can probably be even longer */
 					structure_offset+=1;
 				}
+			}
+
+			if (field_offset != row_width){
+				expert_add_info_format(pinfo, structure, &ei_saprfc_mismatching_table_row_width, "The table row width %d reported in table metadata does not match row width %d from table structure. Skipping dissection of table content", row_width, field_offset);
+				return;
 			}
 
 			/* Add the payload subtree using the new tvb*/
@@ -1299,6 +1311,8 @@ proto_register_saprfc(void)
 	static ei_register_info ei[] = {
 		{ &ei_saprfc_invalid_decompresssion, { "saprfc.table.compression.failed", PI_MALFORMED, PI_WARN, "Decompression of payload failed", EXPFILL }},
 		{ &ei_saprfc_invalid_decompress_length, { "saprfc.table.compression.uncomplength.invalid", PI_MALFORMED, PI_WARN, "The uncompressed payload length differs with the reported length", EXPFILL }},
+		{ &ei_saprfc_invalid_table_structure_length, { "saprfc.table.structure.length.invalid", PI_MALFORMED, PI_WARN, "The structure item payload is not long enough to parse the reported number of fields", EXPFILL }},
+		{ &ei_saprfc_mismatching_table_row_width, { "saprfc.table.lengths.mismatching", PI_MALFORMED, PI_WARN, "The row width reported in table metadata and field metadata does not match", EXPFILL }},
 		{ &ei_saprfc_unknown_item, { "saprfc.item.unknown", PI_UNDECODED, PI_WARN, "The RFC item has a unknown type that is not dissected", EXPFILL }},
 	};
 
