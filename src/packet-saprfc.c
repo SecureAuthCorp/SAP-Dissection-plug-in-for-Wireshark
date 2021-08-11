@@ -516,9 +516,9 @@ dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 				return;
 			}
 
-			field_types = (guint8 *)wmem_alloc(wmem_packet_scope(), field_count);
-			field_lengths = (guint8 *)wmem_alloc(wmem_packet_scope(), field_count);
-			field_offsets = (guint32 *)wmem_alloc(wmem_packet_scope(), field_count * sizeof(guint32));
+			field_types = (guint8 *)wmem_alloc(pinfo->pool, field_count);
+			field_lengths = (guint8 *)wmem_alloc(pinfo->pool, field_count);
+			field_offsets = (guint32 *)wmem_alloc(pinfo->pool, field_count * sizeof(guint32));
 
 			for (field_index = 0; field_index < field_count; field_index++){
 
