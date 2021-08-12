@@ -546,7 +546,7 @@ dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 
 			/* Parse row structure */
 			field_count = tvb_get_guint8(structure_tvb, structure_offset); structure_offset+=1;
-			if (structure_length - 1 < 2 * field_count){
+			if (structure_length - 1 < (guint32)2 * field_count){
 				expert_add_info_format(pinfo, structure, &ei_saprfc_invalid_table_structure_length, "The minimum table structure length (%d) exceeds the remaining payload length (%d). Skipping dissection of table content", 2 * field_count, structure_length - 1);
 				return;
 			}
@@ -590,7 +590,7 @@ dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 				row_tree = proto_item_add_subtree(row, ett_saprfc);
 				for (field_index = 0; field_index < field_count; field_index++){
 					cell = proto_tree_add_item(row_tree, hf_saprfc_table_row_field, next_tvb, row_offset + field_offsets[field_index], field_lengths[field_index], ENC_NA);
-					gchar *typename = try_val_to_str(field_types[field_index], abap_types_typename_values);
+					const gchar *typename = try_val_to_str(field_types[field_index], abap_types_typename_values);
 					if (typename){
 						proto_item_append_text(cell, " (%s)", typename);
 					}
