@@ -210,6 +210,41 @@ static const value_string saprfc_header_ncpic_parameters_client_info_values[] = 
 	{ 0x00, NULL }
 };
 
+/* ABAP/4 data types, taken from saprfc.h from RFC sdk */
+#define TYPC			0
+#define TYPDATE			1
+#define TYPP			2
+#define TYPTIME			3
+#define TYPX			4
+#define TYPTABH			5
+#define TYPNUM			6
+#define TYPFLOAT		7
+#define TYPINT			8
+#define TYPINT2			9
+#define TYPINT1			10
+/* TYPW = 11 */
+#define TYP1			12
+#define TYP2			13
+#define TYPDECF16		23	/* IEEE 754r decimal floating point 8 bytes  */
+#define TYPDECF34		24	/* IEEE 754r decimal floating point 16 bytes */
+
+static const value_string abap_types_typename_values[] = {
+	{ TYPC, "CHAR" },
+	{ TYPDATE, "DATS" },
+	{ TYPP, "BCD" },
+	{ TYPTIME, "TIMS" },
+	{ TYPX, "RAW" },
+	{ TYPTABH, "ITAB" },
+	{ TYPNUM, "NUMC" },
+	{ TYPFLOAT, "FLTP" },
+	{ TYPINT, "INT" },
+	{ TYPINT2, "INT2" },
+	{ TYPINT1, "INT1" },
+	{ TYP1, "DATE_1" },
+	{ TYP2, "DATE_2" },
+	{ TYPDECF16, "DECF16" },
+	{ TYPDECF34, "DECF34" }
+};
 
 /* SAP RFC Accept Info Flag values */
 #define SAPRFC_ACCEPT_INFO_EINFO						0x01
@@ -526,11 +561,11 @@ dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 				field_tree = proto_item_add_subtree(field, ett_saprfc);
 
 				field_types[field_index] = tvb_get_guint8(structure_tvb, structure_offset);
-				add_item_value_uint8(structure_tvb, field, field_tree, hf_saprfc_table_structure_field_type, structure_offset, "Type");
+				proto_tree_add_item(field_tree, hf_saprfc_table_structure_field_type, structure_tvb, structure_offset, 1, ENC_NA);
 				structure_offset+=1;
 
 				field_lengths[field_index] = tvb_get_guint8(structure_tvb, structure_offset);
-				add_item_value_uint8(structure_tvb, field, field_tree, hf_saprfc_table_structure_field_type, structure_offset, "Length");
+				add_item_value_uint8(structure_tvb, field, field_tree, hf_saprfc_table_structure_field_length, structure_offset, "Length");
 				structure_offset+=1;
 
 				field_offsets[field_index] = field_offset;
@@ -555,9 +590,19 @@ dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 				row_tree = proto_item_add_subtree(row, ett_saprfc);
 				for (field_index = 0; field_index < field_count; field_index++){
 					cell = proto_tree_add_item(row_tree, hf_saprfc_table_row_field, next_tvb, row_offset + field_offsets[field_index], field_lengths[field_index], ENC_NA);
-					if (field_types[field_index]==0){
-						guint8 *string = tvb_get_string_enc(wmem_packet_scope(), next_tvb, row_offset + field_offsets[field_index], field_lengths[field_index], ENC_ASCII);
-						proto_item_append_text(row, ", [%d]=%s", field_index, string);
+					gchar *typename = try_val_to_str(field_types[field_index], abap_types_typename_values);
+					if (typename){
+						proto_item_append_text(cell, " (%s)", typename);
+					}
+
+					switch (field_types[field_index]){
+						case TYPC:
+						case TYPNUM:{
+							guint8 *string = tvb_get_string_enc(wmem_packet_scope(), next_tvb, row_offset + field_offsets[field_index], field_lengths[field_index], ENC_ASCII);
+							proto_item_append_text(row, ", [%d]=%s", field_index, string);
+							proto_item_append_text(cell, " Value=%s", string);
+							break;
+						}
 					}
 				}
 			}
@@ -1282,7 +1327,7 @@ proto_register_saprfc(void)
 		{ &hf_saprfc_table_structure_field,
 			{ "Table Structure Field", "saprfc.table.structure.field", FT_NONE, BASE_NONE, NULL, 0x0, "SAP RFC Table Structure Field", HFILL }},
 		{ &hf_saprfc_table_structure_field_type,
-			{ "Table Structure Field Type", "saprfc.table.structure.field.type", FT_NONE, BASE_NONE, NULL, 0x0, "SAP RFC Table Structure Field Type", HFILL }},
+			{ "Table Structure Field Type", "saprfc.table.structure.field.type", FT_UINT8, BASE_DEC, VALS(abap_types_typename_values), 0x0, "SAP RFC Table Structure Field Type", HFILL }},
 		{ &hf_saprfc_table_structure_field_length,
 			{ "Table Structure Field Length", "saprfc.table.structure.field.length", FT_NONE, BASE_NONE, NULL, 0x0, "SAP RFC Table Structure Field Length", HFILL }},
 		{ &hf_saprfc_table_row,
