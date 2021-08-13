@@ -5,6 +5,7 @@ v0.9.2 - 2021-XX-XX
 -------------------
 
 - `src/packet-saphdb.c`: Added missing `StatementContextOption` values ([\#22](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/issues/22)). Thanks [@nnnoel](https://github.com/nnnnoel)!
+- `src/packet-saprfc.c`: Improve dissection of RFC message items and extended dissection of RFC tables ([\#23](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/issues/23)). Thanks [@biesigrr](https://github.com/biesigrr)!
 
 
 v0.9.1 - 2021-01-25
