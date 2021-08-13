@@ -590,9 +590,9 @@ dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 				row_tree = proto_item_add_subtree(row, ett_saprfc);
 				for (field_index = 0; field_index < field_count; field_index++){
 					cell = proto_tree_add_item(row_tree, hf_saprfc_table_row_field, next_tvb, row_offset + field_offsets[field_index], field_lengths[field_index], ENC_NA);
-					const gchar *typename = try_val_to_str(field_types[field_index], abap_types_typename_values);
-					if (typename){
-						proto_item_append_text(cell, " (%s)", typename);
+					const gchar *field_type_name = try_val_to_str(field_types[field_index], abap_types_typename_values);
+					if (field_type_name){
+						proto_item_append_text(cell, " (%s)", field_type_name);
 					}
 
 					switch (field_types[field_index]){
