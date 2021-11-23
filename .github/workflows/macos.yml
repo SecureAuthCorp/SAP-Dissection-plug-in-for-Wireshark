@@ -8,7 +8,7 @@ on: [push, pull_request]
 
 env:
    WIRESHARK_BRANCH: release-3.6
-   WIRESHARK_QT_VERSION: 5.15.2
+   WIRESHARK_QT_VERSION: 5.15.3
 
 jobs:
    standalone:
