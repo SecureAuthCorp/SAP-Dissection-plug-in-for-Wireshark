@@ -26,7 +26,7 @@
 #include <epan/dissectors/packet-tcp.h>
 #include <epan/next_tvb.h>
 #include <epan/conversation.h>
-#include <epan/wmem/wmem.h>
+#include <wsutil/wmem/wmem.h>
 
 
 #include "packet-sapprotocol.h"

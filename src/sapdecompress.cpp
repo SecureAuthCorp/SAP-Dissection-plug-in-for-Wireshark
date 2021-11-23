@@ -25,7 +25,8 @@
 
 #include <glib.h>
 
-#include <epan/wmem/wmem.h>
+#include <wsutil/wmem/wmem.h>
+#include <epan/wmem_scopes.h>
 
 #include "sapdecompress.h"
 

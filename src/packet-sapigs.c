@@ -27,7 +27,7 @@
 #include <epan/packet.h>
 #include <epan/prefs.h>
 #include <epan/expert.h>
-#include <epan/wmem/wmem.h>
+#include <wsutil/wmem/wmem.h>
 
 /* Define default ports */
 #define SAPIGS_PORT_RANGE "40000-49999"
