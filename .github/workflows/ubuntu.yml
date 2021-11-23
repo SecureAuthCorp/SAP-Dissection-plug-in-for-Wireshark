@@ -7,7 +7,7 @@ name: Build and test Ubuntu plug-in
 on: [push, pull_request]
 
 env:
-   WIRESHARK_BRANCH: release-3.4
+   WIRESHARK_BRANCH: release-3.6
 
 jobs:
    standalone:

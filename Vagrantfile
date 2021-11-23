@@ -44,14 +44,14 @@ Vagrant.configure(2) do |config|
     source.vm.provision "shell",
       path: "tools/ubuntu-provision-source.sh",
       privileged: false,
-      env: {"WIRESHARK_BRANCH" => "release-3.4",
+      env: {"WIRESHARK_BRANCH" => "release-3.6",
             "PLUGIN_DIR" => "/vagrant/"}
 
     source.vm.provision "shell",
       path: "tools/ubuntu-build-source.sh",
       privileged: false,
       env: {"BUILD_WIRESHARK" => "yes",
-            "WIRESHARK_BRANCH" => "release-3.4",
+            "WIRESHARK_BRANCH" => "release-3.6",
             "PLUGIN_DIR" => "/vagrant/"}
 
     # Add some memory
