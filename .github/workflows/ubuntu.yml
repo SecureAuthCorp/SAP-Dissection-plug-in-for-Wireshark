@@ -116,7 +116,7 @@ jobs:
          - name: Copy plugin so
            run: |
               mkdir exe
-              cp build/run/plugins/3.4/epan/sap.so exe/sap-source.so
+              cp build/run/plugins/3.6/epan/sap.so exe/sap-source.so
          - name: Upload Ubuntu artifacts
            uses: actions/upload-artifact@v2
            with:

@@ -91,7 +91,7 @@ jobs:
               mv build/packaging/nsis/*exe exe/
          - name: Move plugin dll
            run: |
-              mv build/run/RelWithDebInfo/plugins/3.4/epan/sap.dll exe/sap.dll
+              mv build/run/RelWithDebInfo/plugins/3.6/epan/sap.dll exe/sap.dll
          - name: Upload Windows artifacts
            uses: actions/upload-artifact@v2
            with:
