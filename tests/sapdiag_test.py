@@ -96,12 +96,5 @@ class WiresharkSAPDiagTestCase(WiresharkTestCase):
         self.assertEqual(len(login_decompressed), int(packet['sapdiag'].header_compression_uncomplength))
 
 
-def suite():
-    loader = unittest.TestLoader()
-    suite = unittest.TestSuite()
-    suite.addTest(loader.loadTestsFromTestCase(WiresharkSAPDiagTestCase))
-    return suite
-
-
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(suite())
+    unittest.main(verbosity=2)

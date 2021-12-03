@@ -177,14 +177,5 @@ class WiresharkSAPRouterTestCase(WiresharkTestCase):
         self.assert_fields(p, packet["saprouter"], self.control_mapping)
 
 
-def suite():
-    loader = unittest.TestLoader()
-    suite = unittest.TestSuite()
-    suite.addTest(loader.loadTestsFromTestCase(WiresharkSAPRouterTestCase))
-    return suite
-
-
 if __name__ == "__main__":
-    test_runner = unittest.TextTestRunner(verbosity=2, resultclass=unittest.TextTestResult)
-    result = test_runner.run(suite())
-    sys.exit(not result.wasSuccessful())
+    unittest.main(verbosity=2)
