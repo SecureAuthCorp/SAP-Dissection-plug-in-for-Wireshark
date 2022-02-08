@@ -109,13 +109,15 @@ reg_code = ""
 reg_code += preamble
 
 reg_code += """
-#include "config.h"
-
 #include <gmodule.h>
+
+#include "ws_version.h"
 
 /* plugins are DLLs on Windows */
 #define WS_BUILD_DLL
 #include "ws_symbol_export.h"
+
+#define HAVE_PLUGINS
 
 """
 
@@ -141,8 +143,8 @@ for symbol in regs['register_tap_listener']:
 
 reg_code += """
 WS_DLL_PUBLIC_DEF const gchar plugin_version[] = PLUGIN_VERSION;
-WS_DLL_PUBLIC_DEF const int plugin_want_major = VERSION_MAJOR;
-WS_DLL_PUBLIC_DEF const int plugin_want_minor = VERSION_MINOR;
+WS_DLL_PUBLIC_DEF const int plugin_want_major = WIRESHARK_VERSION_MAJOR;
+WS_DLL_PUBLIC_DEF const int plugin_want_minor = WIRESHARK_VERSION_MINOR;
 
 WS_DLL_PUBLIC void plugin_register(void);
 

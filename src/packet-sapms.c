@@ -1,7 +1,7 @@
 /*
 # SAP Dissector Plugin for Wireshark
 #
-# SECUREAUTH LABS. Copyright (C) 2021 SecureAuth Corporation. All rights reserved.
+# SECUREAUTH LABS. Copyright (C) 2022 SecureAuth Corporation. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -17,8 +17,6 @@
 #   Martin Gallo (@martingalloar) from SecureAuth's Innovation Labs team.
 #
 */
-
-#include "config.h"
 
 #include <epan/packet.h>
 #include <epan/prefs.h>
@@ -1337,7 +1335,7 @@ proto_register_sapms(void)
 		/* MS_DP_ADM fiels */
 		{ &hf_sapms_dp_adm_dp_version,
 			{ "Dispatcher Version", "sapms.dp_adm.version", FT_UINT8, BASE_DEC, NULL, 0x0, "SAP MS Dispatcher Version", HFILL }},
-		
+
 		/* ADM Message fields */
 		{ &hf_sapms_adm_eyecatcher,
 			{ "Adm Eye Catcher", "sapms.adm.eyecatcher", FT_STRING, BASE_NONE, NULL, 0x0, "SAP MS Adm Eye Catcher", HFILL }},
