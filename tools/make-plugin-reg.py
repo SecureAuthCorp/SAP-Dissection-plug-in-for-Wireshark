@@ -2,6 +2,7 @@
 #
 # Looks for registration routines in the plugins
 # and assembles C code to call all the routines.
+# A new "plugin.c" file will be written in the current directory.
 #
 
 import os
@@ -13,7 +14,8 @@ import re
 #
 srcdir = sys.argv[1]
 #
-# The second argument is either "plugin", "plugin_wtap" or "plugin_codec".
+# The second argument is either "plugin", "plugin_wtap", "plugin_codec",
+# or "plugin_tap".
 #
 registertype = sys.argv[2]
 #
@@ -28,7 +30,7 @@ preamble = """\
  *
  * Generated automatically from %s.
  */
-""" % (sys.argv[0])
+""" % (os.path.basename(sys.argv[0]))
 
 # Create the proper list of filenames
 filenames = []
@@ -51,6 +53,7 @@ regs = {
         'handoff_reg': set(),
         'wtap_register': set(),
         'codec_register': set(),
+        'register_tap_listener': set(),
         }
 
 # For those that don't know Python, r"" indicates a raw string,
@@ -63,12 +66,15 @@ wtap_reg_regex = r"\bwtap_register_(?P<symbol>[_A-Za-z0-9]+)\s*\([^;]+$"
 
 codec_reg_regex = r"\bcodec_register_(?P<symbol>[_A-Za-z0-9]+)\s*\([^;]+$"
 
+tap_reg_regex = r"\bregister_tap_listener_(?P<symbol>[_A-Za-z0-9]+)\s*\([^;]+$"
+
 # This table drives the pattern-matching and symbol-harvesting
 patterns = [
         ( 'proto_reg', re.compile(proto_regex, re.MULTILINE) ),
         ( 'handoff_reg', re.compile(handoff_regex, re.MULTILINE) ),
         ( 'wtap_register', re.compile(wtap_reg_regex, re.MULTILINE) ),
         ( 'codec_register', re.compile(codec_reg_regex, re.MULTILINE) ),
+        ( 'register_tap_listener', re.compile(tap_reg_regex, re.MULTILINE) ),
         ]
 
 # Grep
@@ -87,7 +93,7 @@ for filename in filenames:
     file.close()
 
 # Make sure we actually processed something
-if (len(regs['proto_reg']) < 1 and len(regs['wtap_register']) < 1 and len(regs['codec_register']) < 1):
+if (len(regs['proto_reg']) < 1 and len(regs['wtap_register']) < 1 and len(regs['codec_register']) < 1 and len(regs['register_tap_listener']) < 1):
     print("No plugin registrations found")
     sys.exit(1)
 
@@ -96,19 +102,22 @@ regs['proto_reg'] = sorted(regs['proto_reg'])
 regs['handoff_reg'] = sorted(regs['handoff_reg'])
 regs['wtap_register'] = sorted(regs['wtap_register'])
 regs['codec_register'] = sorted(regs['codec_register'])
+regs['register_tap_listener'] = sorted(regs['register_tap_listener'])
 
 reg_code = ""
 
 reg_code += preamble
 
 reg_code += """
-#include "config.h"
-
 #include <gmodule.h>
 
-/* plugins are DLLs */
+#include "ws_version.h"
+
+/* plugins are DLLs on Windows */
 #define WS_BUILD_DLL
 #include "ws_symbol_export.h"
+
+#define HAVE_PLUGINS
 
 """
 
@@ -118,6 +127,8 @@ if registertype == "plugin_wtap":
     reg_code += "#include \"wiretap/wtap.h\"\n\n"
 if registertype == "plugin_codec":
     reg_code += "#include \"wsutil/codecs.h\"\n\n"
+if registertype == "plugin_tap":
+    reg_code += "#include \"epan/tap.h\"\n\n"
 
 for symbol in regs['proto_reg']:
     reg_code += "void proto_register_%s(void);\n" % (symbol)
@@ -127,11 +138,13 @@ for symbol in regs['wtap_register']:
     reg_code += "void wtap_register_%s(void);\n" % (symbol)
 for symbol in regs['codec_register']:
     reg_code += "void codec_register_%s(void);\n" % (symbol)
+for symbol in regs['register_tap_listener']:
+    reg_code += "void register_tap_listener_%s(void);\n" % (symbol)
 
 reg_code += """
 WS_DLL_PUBLIC_DEF const gchar plugin_version[] = PLUGIN_VERSION;
-WS_DLL_PUBLIC_DEF const int plugin_want_major = VERSION_MAJOR;
-WS_DLL_PUBLIC_DEF const int plugin_want_minor = VERSION_MINOR;
+WS_DLL_PUBLIC_DEF const int plugin_want_major = WIRESHARK_VERSION_MAJOR;
+WS_DLL_PUBLIC_DEF const int plugin_want_minor = WIRESHARK_VERSION_MINOR;
 
 WS_DLL_PUBLIC void plugin_register(void);
 
@@ -158,6 +171,11 @@ if registertype == "plugin_codec":
         reg_code += "    static codecs_plugin plug_%s;\n\n" % (symbol)
         reg_code += "    plug_%s.register_codec_module = codec_register_%s;\n" % (symbol, symbol)
         reg_code += "    codecs_register_plugin(&plug_%s);\n" % (symbol)
+if registertype == "plugin_tap":
+    for symbol in regs['register_tap_listener']:
+        reg_code += "    static tap_plugin plug_%s;\n\n" % (symbol)
+        reg_code += "    plug_%s.register_tap_listener = register_tap_listener_%s;\n" % (symbol, symbol)
+        reg_code += "    tap_register_plugin(&plug_%s);\n" % (symbol)
 
 reg_code += "}\n"
 
@@ -165,7 +183,6 @@ try:
     fh = open(final_filename, 'w')
     fh.write(reg_code)
     fh.close()
-    print('Generated {} for {}.'.format(final_filename, os.path.basename(srcdir)))
 except OSError:
     sys.exit('Unable to write ' + final_filename + '.\n')
 

@@ -1,9 +1,10 @@
 Changelog
 =========
 
-v0.9.2 - 2021-XX-XX
+v0.10.1 - 2022-XX-XX
 -------------------
 
+- Switched to Wireshark 3.6 branch.
 - `src/packet-saphdb.c`: Added missing `StatementContextOption` values ([\#22](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/issues/22)). Thanks [@nnnoel](https://github.com/nnnnoel)!
 - `src/packet-saprfc.c`: Improve dissection of RFC message items and extended dissection of RFC tables ([\#23](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/issues/23)). Thanks [@biesigrr](https://github.com/biesigrr)!
 
@@ -28,7 +29,7 @@ v0.8.2 - 2020-07-15
 - `src/packet-sapms.c`: Added a couple of Message Server fields based on Mathieu ([@gelim](https://github.com/gelim)) and Dmitry ([@_chipik](https://twitter.com/_chipik)) work on pysap. Thanks!
 - `src/packet-saprouter.c`: Fixed compiler warnings.
 - `src/packet-sapsnc.c`: Fixed compiler warnings.
-- `tests/saphdb_test.py`: Basic unit test for validating dissection of HDB packet's header. 
+- `tests/saphdb_test.py`: Basic unit test for validating dissection of HDB packet's header.
 
 
 v0.8.1 - 2020-03-20

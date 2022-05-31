@@ -1,7 +1,7 @@
 /*
 # SAP Dissector Plugin for Wireshark
 #
-# SECUREAUTH LABS. Copyright (C) 2021 SecureAuth Corporation. All rights reserved.
+# SECUREAUTH LABS. Copyright (C) 2022 SecureAuth Corporation. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -18,12 +18,10 @@
 #
 */
 
-#include "config.h"
-
 #include <epan/packet.h>
 #include <epan/prefs.h>
 #include <epan/expert.h>
-#include <epan/wmem/wmem.h>
+#include <wsutil/wmem/wmem.h>
 
 /* Common helpers for adding items */
 #include "saphelpers.h"

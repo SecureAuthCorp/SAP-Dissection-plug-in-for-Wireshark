@@ -18,8 +18,6 @@
 #
 */
 
-#include "config.h"
-
 #include <epan/packet.h>
 #include <epan/expert.h>
 
