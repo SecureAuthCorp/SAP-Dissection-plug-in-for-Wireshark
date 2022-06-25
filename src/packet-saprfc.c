@@ -498,7 +498,7 @@ dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 
 		/* Allocate the buffer only in the scope of current packet, using the
 		 * reported length */
-		decompressed_buffer = (guint8 *)wmem_alloc0(wmem_packet_scope(), reported_length);
+		decompressed_buffer = (guint8 *)wmem_alloc0(pinfo->pool, reported_length);
 		if (!decompressed_buffer){
 			return;
 		}
@@ -596,7 +596,7 @@ dissect_saprfc_tables_compressed(tvbuff_t *tvb, packet_info *pinfo, proto_tree *
 					switch (field_types[field_index]){
 						case TYPC:
 						case TYPNUM:{
-							guint8 *string = tvb_get_string_enc(wmem_packet_scope(), next_tvb, row_offset + field_offsets[field_index], field_lengths[field_index], ENC_ASCII);
+							guint8 *string = tvb_get_string_enc(pinfo->pool, next_tvb, row_offset + field_offsets[field_index], field_lengths[field_index], ENC_ASCII);
 							proto_item_append_text(row, ", [%d]=%s", field_index, string);
 							proto_item_append_text(cell, " Value=%s", string);
 							break;
@@ -637,7 +637,7 @@ dissect_saprfc_tables(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint
 	}
 
 	item_length = tvb_get_ntohs(tvb, offset); offset+=2;
-	table_name = tvb_get_string_enc(wmem_packet_scope(), tvb, offset, item_length, ENC_ASCII); offset+=item_length;
+	table_name = tvb_get_string_enc(pinfo->pool, tvb, offset, item_length, ENC_ASCII); offset+=item_length;
 	offset += 2;
 
 	next_item = tvb_get_ntohs(tvb, offset); offset+=2;
@@ -665,7 +665,7 @@ dissect_saprfc_tables(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint
 	}
 
 	/* Allocate the buffer only in the scope of current packet */
-	reassemble_buffer = (guint8 *)wmem_alloc(wmem_packet_scope(), reassemble_length);
+	reassemble_buffer = (guint8 *)wmem_alloc(pinfo->pool, reassemble_length);
 	if (!reassemble_buffer){
 		return;
 	}
@@ -710,19 +710,19 @@ static void
 dissect_saprfc_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_tree *item_value_tree, guint32 offset, guint8 item_id1, guint8 item_id2, guint16 item_length){
 
 	if (item_id1==0x01 && item_id2==0x02){
-		add_item_value_string(tvb, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Function Name", 1); offset+=item_length;
+		add_item_value_string(tvb, pinfo, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Function Name", 1); offset+=item_length;
 
 	} else if (item_id1==0x02 && item_id2==0x01){
-		add_item_value_string(tvb, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Import Parameter Name", 1); offset+=item_length;
+		add_item_value_string(tvb, pinfo, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Import Parameter Name", 1); offset+=item_length;
 
 	} else if (item_id1==0x02 && item_id2==0x05){
-		add_item_value_string(tvb, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Export Parameter Name", 1); offset+=item_length;
+		add_item_value_string(tvb, pinfo, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Export Parameter Name", 1); offset+=item_length;
 
 	} else if (item_id1==0x02 && item_id2==0x13){
 		proto_tree_add_none_format(item_value_tree, hf_saprfc_item_value, tvb, offset, item_length, "Type Structure A");
 
 	} else if (item_id1==0x03 && item_id2==0x01){
-		add_item_value_string(tvb, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Table Name", 1); offset+=item_length;
+		add_item_value_string(tvb, pinfo, item, item_value_tree, hf_saprfc_item_value, offset, item_length, "Table Name", 1); offset+=item_length;
 
 	} else if (item_id1==0x03 && item_id2==0x02){
 		check_length(pinfo, item_value_tree, 8, item_length, "Table Info");
@@ -755,8 +755,8 @@ dissect_saprfc_item(tvbuff_t *tvb, packet_info *pinfo, proto_item *item, proto_t
 
 	} else if (item_id1==0x01 && item_id2==0x36){
 		add_item_value_uint8(tvb, item, item_value_tree, hf_saprfc_item_value, offset, "#"); offset+=1;
-		add_item_value_hexstring(tvb, item, item_value_tree, hf_saprfc_item_value, offset, 16, "Root-id"); offset+=16;
-		add_item_value_hexstring(tvb, item, item_value_tree, hf_saprfc_item_value, offset, 16, "Conn-id"); offset+=16;
+		add_item_value_hexstring(tvb, pinfo, item, item_value_tree, hf_saprfc_item_value, offset, 16, "Root-id"); offset+=16;
+		add_item_value_hexstring(tvb, pinfo, item, item_value_tree, hf_saprfc_item_value, offset, 16, "Conn-id"); offset+=16;
 		add_item_value_uint32(tvb, item, item_value_tree, hf_saprfc_item_value, offset, "#"); offset+=4;
 
 	} else if (item_id1==0xFF && item_id2==0xFF){

@@ -282,7 +282,7 @@ dissect_routestring(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, guint32
 
 		/* Dissect the port string */
 		len = tvb_strsize(tvb, offset);
-		port = (gchar *)tvb_get_string_enc(wmem_packet_scope(), tvb, offset, len - 1, ENC_ASCII);
+		port = (gchar *)tvb_get_string_enc(pinfo->pool, tvb, offset, len - 1, ENC_ASCII);
 		proto_tree_add_item(route_hop_tree, hf_saprouter_route_string_service, tvb, offset, len, ENC_ASCII|ENC_NA);
 		offset += len;
 

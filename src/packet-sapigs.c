@@ -127,7 +127,7 @@ dissect_sapigs(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 	/* Add the protocol to the column */
 	col_add_str(pinfo->cinfo, COL_PROTOCOL, "SAPIGS");
 	/* Add function name in the info column */
-	col_add_fstr(pinfo->cinfo, COL_INFO, " function: %s", tvb_get_string_enc(wmem_packet_scope(), tvb, 0, 32, ENC_ASCII));
+	col_add_fstr(pinfo->cinfo, COL_INFO, " function: %s", tvb_get_string_enc(pinfo->pool, tvb, 0, 32, ENC_ASCII));
 
 	if (tree) { /* we are being asked for details */
 
@@ -142,7 +142,7 @@ dissect_sapigs(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 		sapigs_tree = proto_item_add_subtree(ti, ett_sapigs);
 
 		/* Retreive function name */
-		sapigs_info_function = (char *)tvb_get_string_enc(wmem_packet_scope(), tvb, offset, 32, ENC_ASCII);
+		sapigs_info_function = (char *)tvb_get_string_enc(pinfo->pool, tvb, offset, 32, ENC_ASCII);
 
 		/* Headers */
 		proto_tree_add_item(sapigs_tree, hf_sapigs_function, tvb, offset, 32, ENC_ASCII|ENC_NA); offset += 32;
@@ -178,14 +178,14 @@ dissect_sapigs(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 				break;
 			}
 			case 6:{	/* ADM:ILLBEBACK */
-				illbeback_type = (gchar *)tvb_get_string_enc(wmem_packet_scope(), tvb, offset, 10, ENC_ASCII|ENC_NA);
+				illbeback_type = (gchar *)tvb_get_string_enc(pinfo->pool, tvb, offset, 10, ENC_ASCII|ENC_NA);
 				if (strncmp("TransMagic", illbeback_type, 10) == 0){
 					/* data is raw after eye_catcher */
 					proto_tree_add_item(sapigs_tree, hf_sapigs_eye_catcher, tvb, offset, 10, ENC_ASCII|ENC_NA); offset += 16;
 					proto_tree_add_item(sapigs_tree, hf_sapigs_data, tvb, offset, -1, ENC_ASCII|ENC_NA);
 				} else {
 					/* we receive sized data */
-					data_length = strtol((gchar *)tvb_get_string_enc(wmem_packet_scope(), tvb, offset, 5, ENC_ASCII), NULL, 10);
+					data_length = strtol((gchar *)tvb_get_string_enc(pinfo->pool, tvb, offset, 5, ENC_ASCII), NULL, 10);
 					proto_tree_add_item(sapigs_tree, hf_sapigs_data_size, tvb, offset, 5, ENC_ASCII|ENC_NA); offset += 5;
 					/* Data */
 					if ((data_length > 0) && (tvb_reported_length_remaining(tvb, offset) >= data_length)) {
@@ -202,14 +202,14 @@ dissect_sapigs(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 				proto_tree_add_item(sapigs_tree, hf_sapigs_padd4, tvb, offset, 2, ENC_NA); offset += 2;
 				proto_tree_add_item(sapigs_tree, hf_sapigs_codepage, tvb, offset, 4, ENC_ASCII|ENC_NA); offset += 4;
 				/* Data offset */
-				data_offset = strtol((gchar *)tvb_get_string_enc(wmem_packet_scope(), tvb, offset, 16, ENC_ASCII), NULL, 10);
+				data_offset = strtol((gchar *)tvb_get_string_enc(pinfo->pool, tvb, offset, 16, ENC_ASCII), NULL, 10);
 				proto_tree_add_item(sapigs_tree, hf_sapigs_offset_data, tvb, offset, 16, ENC_ASCII|ENC_NA); offset += 16;
 				/* Data length */
-				data_length = strtol((gchar *)tvb_get_string_enc(wmem_packet_scope(), tvb, offset, 16, ENC_ASCII), NULL, 10);
+				data_length = strtol((gchar *)tvb_get_string_enc(pinfo->pool, tvb, offset, 16, ENC_ASCII), NULL, 10);
 				proto_tree_add_item(sapigs_tree, hf_sapigs_data_size, tvb, offset, 16, ENC_ASCII|ENC_NA); offset += 16;
 				data_offset += offset;
 		                /* Definition tables */
-				is_table = (gchar *)tvb_get_string_enc(wmem_packet_scope(), tvb, offset, 4, ENC_ASCII);
+				is_table = (gchar *)tvb_get_string_enc(pinfo->pool, tvb, offset, 4, ENC_ASCII);
 				/* if the 4 next char is VERS, we are at the begining of one definition table */
 				while(strncmp("VERS", is_table, 4) == 0){
 					/* Build a tree for Tables */
@@ -222,7 +222,7 @@ dissect_sapigs(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data _
 			                proto_tree_add_item(sapigs_tables_tree, hf_sapigs_table_column_name, tvb, offset+8, 40, ENC_NA); offset += 48;
 			                proto_tree_add_item(sapigs_tables_tree, hf_sapigs_table_column_number, tvb, offset+8, 40, ENC_NA); offset += 48;
 			                proto_tree_add_item(sapigs_tables_tree, hf_sapigs_table_column_width, tvb, offset+8, 40, ENC_NA); offset += 48;
-					is_table = (gchar *)tvb_get_string_enc(wmem_packet_scope(), tvb, offset, 4, ENC_ASCII);
+					is_table = (gchar *)tvb_get_string_enc(pinfo->pool, tvb, offset, 4, ENC_ASCII);
 					}
 				/* Data */
 				if ((data_length > 0) && (tvb_reported_length_remaining(tvb, offset) >= data_length)) {
