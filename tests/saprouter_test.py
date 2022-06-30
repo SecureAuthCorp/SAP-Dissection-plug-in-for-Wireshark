@@ -88,7 +88,7 @@ class WiresharkSAPRouterTestCase(WiresharkTestCase):
                       route_offset=router_string_lens[0],
                       route_string=router_string)
 
-        pkt = Ether()/IP()/TCP(sport=3299, dport=9999)/SAPNI()/p
+        pkt = Ether()/IP()/TCP(dport=3299)/SAPNI()/p
 
         packet = self.get_capture(pkt)[0]
 
@@ -107,7 +107,7 @@ class WiresharkSAPRouterTestCase(WiresharkTestCase):
                       adm_command=2,
                       adm_password="SomePa$$w0rd")
 
-        pkt = Ether()/IP()/TCP(sport=3299, dport=9999)/SAPNI()/p
+        pkt = Ether()/IP()/TCP(dport=3299)/SAPNI()/p
 
         packet = self.get_capture(pkt)[0]
 
@@ -128,7 +128,7 @@ class WiresharkSAPRouterTestCase(WiresharkTestCase):
                           adm_client_count=2,
                           adm_client_ids=[1,2])
 
-            pkt = Ether()/IP()/TCP(sport=3299, dport=9999)/SAPNI()/p
+            pkt = Ether()/IP()/TCP(dport=3299)/SAPNI()/p
 
             packet = self.get_capture(pkt)[0]
 
@@ -147,7 +147,7 @@ class WiresharkSAPRouterTestCase(WiresharkTestCase):
                           adm_command=command,
                           adm_address_mask="0.0.0.0")
 
-            pkt = Ether()/IP()/TCP(sport=3299, dport=9999)/SAPNI()/p
+            pkt = Ether()/IP()/TCP(dport=3299)/SAPNI()/p
 
             packet = self.get_capture(pkt)[0]
 
@@ -167,7 +167,7 @@ class WiresharkSAPRouterTestCase(WiresharkTestCase):
                       control_text_length=8,
                       control_text_value="SOMEDATA")
 
-        pkt = Ether()/IP()/TCP(sport=3299, dport=9999)/SAPNI()/p
+        pkt = Ether()/IP()/TCP(dport=3299)/SAPNI()/p
 
         packet = self.get_capture(pkt)[0]
 
