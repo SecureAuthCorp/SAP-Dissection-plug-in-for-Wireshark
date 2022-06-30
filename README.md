@@ -100,6 +100,11 @@ This Wireshark plugin is not distributed as part of the Wireshark source. It
 can be built as a standalone plugin, or as part of Wireshark, and is compatible
 with version 3.6.
 
+A comprehensive guide of how to compile and install the dissector in Ubuntu and
+macOS has been published as a [blog post in SAP's community](https://blogs.sap.com/2022/06/12/wireshark-with-sap-dissectors-for-ubuntu-and-macos/).
+A more  brief guide is provided below.
+
+
 ### Installing on Linux ###
 
 #### As a standalone plugin ####
