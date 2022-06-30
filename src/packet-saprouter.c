@@ -864,6 +864,9 @@ static void range_add_callback (guint32 port, gpointer ptr _U_)
 }
 
 
+/**
+ * Register Hand off for the SAP Router Protocol
+ */
 void
 proto_reg_handoff_saprouter(void)
 {

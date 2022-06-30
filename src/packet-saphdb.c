@@ -21,6 +21,7 @@
 #include <epan/packet.h>
 #include <epan/prefs.h>
 #include <epan/expert.h>
+#include <wsutil/wmem/wmem.h>
 #include <epan/wmem_scopes.h>
 
 #include <epan/dissectors/packet-tcp.h>
@@ -551,7 +552,7 @@ static gboolean global_saphdb_highlight_items = TRUE;
 
 /* Protocol handle */
 static dissector_handle_t saphdb_handle;
-
+static dissector_handle_t saphdb_handle_tls;
 static dissector_handle_t gssapi_handle;
 
 
@@ -1359,6 +1360,10 @@ proto_register_saphdb(void)
 /**
  * Helpers for dealing with the port range
  */
+static void range_delete_callback (guint32 port, gpointer ptr _U_)
+{
+	dissector_delete_uint("tcp.port", port, saphdb_handle);
+}
 static void range_add_callback (guint32 port, gpointer ptr _U_)
 {
 	dissector_add_uint("tcp.port", port, saphdb_handle);
@@ -1370,11 +1375,21 @@ static void range_add_callback (guint32 port, gpointer ptr _U_)
 void
 proto_reg_handoff_saphdb(void)
 {
+	static gboolean initialized = FALSE;
 	static range_t *saphdb_port_range;
+
+	if (!initialized) {
+		saphdb_handle = create_dissector_handle(dissect_saphdb, proto_saphdb);
+		saphdb_handle_tls = register_dissector("SAPHDB over TLS", dissect_saphdb, proto_saphdb);
+		initialized = TRUE;
+	} else {
+		range_foreach(saphdb_port_range, range_delete_callback, NULL);
+		wmem_free(wmem_epan_scope(), saphdb_port_range);
+	}
 
 	saphdb_port_range = range_copy(wmem_epan_scope(), global_saphdb_port_range);
 	range_foreach(saphdb_port_range, range_add_callback, NULL);
-	ssl_dissector_add(0, saphdb_handle);
+	ssl_dissector_add(0, saphdb_handle_tls);
 
 	gssapi_handle = find_dissector_add_dependency("gssapi", proto_saphdb);
 
