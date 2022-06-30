@@ -155,7 +155,7 @@ The following steps are required to build and install the plugin as part of Wire
     cd build
     cmake ..
     make
-    make install
+    sudo make install
     ```
 
 
