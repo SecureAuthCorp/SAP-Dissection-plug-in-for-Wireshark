@@ -318,6 +318,7 @@ Contributions made by:
 * Alexis La Goutte ([@alagoutte](https://github.com/alagoutte))
 * Yvan Genuer ([@iggy38](https://github.com/iggy38))
 * Mathieu Geli ([@gelim](https://github.com/gelim))
+* Dylan Drummond ([@dmurmelsson](https://github.com/murmelsson))
 
 
 Disclaimer
