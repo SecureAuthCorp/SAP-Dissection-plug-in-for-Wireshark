@@ -1,6 +1,13 @@
 SAP Dissector Plugin for Wireshark
 ==================================
 
+:warning: This project is currently archived
+
+:information_source: The code was contributed by SecureAuth to the [main Wireshark project](https://www.wireshark.org/). Further
+development of the SAP protocols dissectors can be followed in [Wireshark' Gitlab repository](https://gitlab.com/wireshark/wireshark/).
+
+---
+
 [![Build and test Ubuntu plug-in](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/workflows/Build%20and%20test%20Ubuntu%20plug-in/badge.svg)](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/actions?query=workflow%3A%22Build+and+test+Ubuntu+plug-in%22)
 [![Build and test MacOS plug-in](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/workflows/Build%20and%20test%20MacOS%20plug-in/badge.svg)](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/actions?query=workflow%3A%22Build+and+test+MacOS+plug-in%22)
 [![Build and test Windows plug-in](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/workflows/Build%20and%20test%20Windows%20plug-in/badge.svg)](https://github.com/SecureAuthCorp/SAP-Dissection-plug-in-for-Wireshark/actions?query=workflow%3A%22Build+and+test+Windows+plug-in%22)
